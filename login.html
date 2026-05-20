@@ -1,52 +1,337 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Đăng Nhập — WanderViet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary: #2D5A3D;
+            --primary-light: #4A8C5C;
+            --primary-pale: #E8F2EB;
+            --accent: #E8A838;
+            --dark: #1A1A2E;
+            --text: #3D3D52;
+            --text-muted: #7A7A96;
+            --bg: #FAFAF7;
+            --white: #FFFFFF;
+            --border: rgba(45, 90, 61, 0.18);
+            --radius: 16px;
+        }
+        html, body { height: 100%; font-family: 'DM Sans', sans-serif; }
+        body { display: flex; background: var(--bg); color: var(--text); overflow: hidden; }
+
+        /* ── LEFT PANEL ── */
+        .auth-left {
+            width: 50%;
+            min-height: 100vh;
+            background: linear-gradient(160deg, #1A3A28 0%, #2D5A3D 60%, #1E4532 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .auth-left::before {
+            content: '';
+            position: absolute;
+            width: 500px; height: 500px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.08;
+            top: -200px; right: -100px;
+        }
+        .auth-left::after {
+            content: '';
+            position: absolute;
+            width: 300px; height: 300px;
+            background: #4A8C5C;
+            border-radius: 50%;
+            opacity: 0.12;
+            bottom: -100px; left: -50px;
+        }
+
+        .auth-brand { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+        .auth-brand-icon { width: 44px; height: 44px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .auth-brand-icon i { color: var(--white); font-size: 22px; }
+        .auth-brand-name { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 22px; color: var(--white); }
+
+        .auth-hero { position: relative; z-index: 1; }
+        .auth-hero h2 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 3vw, 44px); font-weight: 900; color: var(--white); line-height: 1.2; margin-bottom: 16px; }
+        .auth-hero h2 span { color: var(--accent); }
+        .auth-hero p { color: rgba(255,255,255,0.65); font-size: 16px; line-height: 1.7; max-width: 360px; margin-bottom: 32px; }
+
+        .auth-features { display: flex; flex-direction: column; gap: 16px; }
+        .auth-feature { display: flex; align-items: center; gap: 14px; }
+        .auth-feature-icon { width: 38px; height: 38px; background: rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .auth-feature-icon i { color: var(--accent); font-size: 18px; }
+        .auth-feature span { color: rgba(255,255,255,0.8); font-size: 14px; font-weight: 500; }
+
+        .auth-img-row { display: flex; gap: 12px; position: relative; z-index: 1; }
+        .auth-img { border-radius: 12px; overflow: hidden; flex: 1; height: 80px; }
+        .auth-img img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* ── RIGHT PANEL ── */
+        .auth-right {
+            width: 50%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+            overflow-y: auto;
+        }
+        .auth-form-wrap { width: 100%; max-width: 420px; }
+
+        .auth-tabs { display: flex; background: #F0F0EC; border-radius: 100px; padding: 4px; margin-bottom: 36px; }
+        .auth-tab { flex: 1; text-align: center; padding: 10px; border-radius: 100px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.3s; color: var(--text-muted); border: none; background: transparent; font-family: 'DM Sans', sans-serif; }
+        .auth-tab.active { background: var(--white); color: var(--primary); font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+        .auth-heading { margin-bottom: 28px; }
+        .auth-heading h3 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+        .auth-heading p { font-size: 14px; color: var(--text-muted); }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; letter-spacing: 0.01em; }
+        .input-wrap { position: relative; }
+        .input-wrap i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--text-muted); transition: color 0.3s; pointer-events: none; }
+        .input-wrap input { width: 100%; padding: 13px 14px 13px 44px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--dark); background: var(--white); outline: none; transition: all 0.3s; }
+        .input-wrap input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(45,90,61,0.08); }
+        .input-wrap input:focus ~ i, .input-wrap:focus-within i { color: var(--primary); }
+        .input-wrap .toggle-pw { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); font-size: 18px; pointer-events: all; transition: color 0.3s; }
+        .input-wrap .toggle-pw:hover { color: var(--primary); }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        .form-extra { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+        .remember-me { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--text-muted); }
+        .remember-me input { accent-color: var(--primary); width: 15px; height: 15px; cursor: pointer; }
+        .forgot-link { font-size: 14px; color: var(--primary); font-weight: 500; text-decoration: none; transition: opacity 0.3s; }
+        .forgot-link:hover { opacity: 0.7; }
+
+        .btn-submit { width: 100%; padding: 15px; background: var(--primary); color: var(--white); border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-submit:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,90,61,0.25); }
+        .btn-submit:active { transform: translateY(0); }
+
+        .divider { display: flex; align-items: center; gap: 14px; margin: 24px 0; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .divider span { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
+
+        .social-btns { display: flex; gap: 12px; }
+        .btn-social { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; background: var(--white); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: var(--text); transition: all 0.3s; }
+        .btn-social:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-pale); }
+        .btn-social i { font-size: 20px; }
+        .btn-social.google i { color: #EA4335; }
+        .btn-social.facebook i { color: #1877F2; }
+
+        .auth-footer { text-align: center; margin-top: 24px; font-size: 14px; color: var(--text-muted); }
+        .auth-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
+        .auth-footer a:hover { text-decoration: underline; }
+
+        .form-panel { display: none; }
+        .form-panel.active { display: block; }
+
+        @media (max-width: 900px) {
+            body { overflow-y: auto; }
+            .auth-left { display: none; }
+            .auth-right { width: 100%; padding: 32px 20px; min-height: 100vh; align-items: flex-start; padding-top: 60px; }
+        }
+    </style>
 </head>
 <body>
-    <section class="section">
-        <div class="wrapper">
-            <div class="logreg-box">
-                <div class="form-box login">
-                    <div class="logreg-title">
-                        <h2>Login</h2>
-                        <p>Please login to use the platform</p>
-                    </div>
 
-                    <form action="#">
-                        <div class="input-box">
-                            <span class="icon">
-                            <i class='bx bxs-envelope' ></i>
-                        </span class="icon">
-                            <input type="email" required>
-                            <label>Email</label>
-                        </div>
+<!-- LEFT PANEL -->
+<div class="auth-left">
+    <a href="index.html" class="auth-brand">
+        <div class="auth-brand-icon"><i class='bx bx-trip'></i></div>
+        <span class="auth-brand-name">WanderViet</span>
+    </a>
 
-                        <div class="input-box">
-                            <span class="icon">
-                                <i class='bx bxs-lock-alt' ></i>
-                            </span>
-                            <input type="password" required>
-                            <label>Password</label>
-                        </div>
-
-                        <div class="remember-forgot">
-                            <label for="">
-                                <input type="checkbox">Remember me
-                            </label>
-                            <a href="#">Forgot Password?</a>
-                        </div>
-
-                        <div class="logreg-link">
-                            <p>Don't have an account? <a href="#" class="register-link">Register</a></p>
-                        </div>
-                    </form>
-                </div>
+    <div class="auth-hero">
+        <h2>Hành Trình<br><span>Đáng Nhớ</span><br>Bắt Đầu Tại Đây</h2>
+        <p>Đăng nhập để truy cập hàng trăm tour độc đáo, quản lý đặt chỗ và nhận ưu đãi đặc biệt chỉ dành cho thành viên.</p>
+        <div class="auth-features">
+            <div class="auth-feature">
+                <div class="auth-feature-icon"><i class='bx bx-check-shield'></i></div>
+                <span>Đặt tour an toàn & bảo mật 100%</span>
+            </div>
+            <div class="auth-feature">
+                <div class="auth-feature-icon"><i class='bx bx-gift'></i></div>
+                <span>Nhận voucher độc quyền cho thành viên</span>
+            </div>
+            <div class="auth-feature">
+                <div class="auth-feature-icon"><i class='bx bx-support'></i></div>
+                <span>Hỗ trợ 24/7 trong suốt hành trình</span>
             </div>
         </div>
-    </section>
+    </div>
+
+    <div class="auth-img-row">
+        <div class="auth-img"><img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=200&h=100&fit=crop" alt="Hội An"></div>
+        <div class="auth-img"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=200&h=100&fit=crop" alt="Hạ Long"></div>
+        <div class="auth-img"><img src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=200&h=100&fit=crop" alt="Sapa"></div>
+    </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="auth-right">
+    <div class="auth-form-wrap">
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="switchTab('login')">Đăng Nhập</button>
+            <button class="auth-tab" onclick="switchTab('register')">Đăng Ký</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div class="form-panel active" id="panel-login">
+            <div class="auth-heading">
+                <h3>Chào mừng trở lại 👋</h3>
+                <p>Đăng nhập để tiếp tục hành trình của bạn</p>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <div class="input-wrap">
+                    <i class='bx bxs-envelope'></i>
+                    <input type="email" placeholder="email@example.com">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <div class="input-wrap">
+                    <i class='bx bxs-lock-alt'></i>
+                    <input type="password" id="login-pw" placeholder="Nhập mật khẩu">
+                    <i class='bx bx-hide toggle-pw' onclick="togglePw('login-pw', this)"></i>
+                </div>
+            </div>
+
+            <div class="form-extra">
+                <label class="remember-me">
+                    <input type="checkbox"> Ghi nhớ đăng nhập
+                </label>
+                <a href="#" class="forgot-link">Quên mật khẩu?</a>
+            </div>
+
+            <button class="btn-submit">
+                <i class='bx bx-log-in'></i> Đăng Nhập
+            </button>
+
+            <div class="divider"><span>Hoặc đăng nhập với</span></div>
+
+            <div class="social-btns">
+                <button class="btn-social google">
+                    <i class='bx bxl-google'></i> Google
+                </button>
+                <button class="btn-social facebook">
+                    <i class='bx bxl-facebook'></i> Facebook
+                </button>
+            </div>
+
+            <div class="auth-footer">
+                Chưa có tài khoản? <a href="#" onclick="switchTab('register')">Đăng ký ngay</a>
+            </div>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div class="form-panel" id="panel-register">
+            <div class="auth-heading">
+                <h3>Tạo tài khoản mới ✨</h3>
+                <p>Tham gia cộng đồng 50.000+ du khách WanderViet</p>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Họ</label>
+                    <div class="input-wrap">
+                        <i class='bx bxs-user'></i>
+                        <input type="text" placeholder="Nguyễn">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Tên</label>
+                    <div class="input-wrap">
+                        <i class='bx bxs-user'></i>
+                        <input type="text" placeholder="Lan Anh">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <div class="input-wrap">
+                    <i class='bx bxs-envelope'></i>
+                    <input type="email" placeholder="email@example.com">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Số điện thoại</label>
+                <div class="input-wrap">
+                    <i class='bx bxs-phone'></i>
+                    <input type="tel" placeholder="0912 345 678">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <div class="input-wrap">
+                    <i class='bx bxs-lock-alt'></i>
+                    <input type="password" id="reg-pw" placeholder="Tối thiểu 8 ký tự">
+                    <i class='bx bx-hide toggle-pw' onclick="togglePw('reg-pw', this)"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Xác nhận mật khẩu</label>
+                <div class="input-wrap">
+                    <i class='bx bxs-lock'></i>
+                    <input type="password" id="reg-pw2" placeholder="Nhập lại mật khẩu">
+                    <i class='bx bx-hide toggle-pw' onclick="togglePw('reg-pw2', this)"></i>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label class="remember-me" style="align-items: flex-start; gap: 10px;">
+                    <input type="checkbox" style="margin-top: 2px;">
+                    <span style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">Tôi đồng ý với <a href="#" style="color: var(--primary);">Điều khoản dịch vụ</a> và <a href="#" style="color: var(--primary);">Chính sách bảo mật</a> của WanderViet.</span>
+                </label>
+            </div>
+
+            <button class="btn-submit">
+                <i class='bx bx-user-plus'></i> Tạo Tài Khoản
+            </button>
+
+            <div class="auth-footer">
+                Đã có tài khoản? <a href="#" onclick="switchTab('login')">Đăng nhập</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function switchTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach((t, i) => {
+        t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
+    });
+    document.getElementById('panel-login').classList.toggle('active', tab === 'login');
+    document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+}
+
+function togglePw(inputId, icon) {
+    const input = document.getElementById(inputId);
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    icon.classList.toggle('bx-hide', !isHidden);
+    icon.classList.toggle('bx-show', isHidden);
+}
+</script>
+
 </body>
 </html>
