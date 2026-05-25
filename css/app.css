@@ -4,8 +4,8 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-    --primary: #2D5A3D;
-    --primary-light: #4A8C5C;
+    --primary: #286cc5;
+    --primary-light: #3b7bc4;
     --primary-pale: #E8F2EB;
     --accent: #E8A838;
     --accent-dark: #C4861A;
@@ -94,7 +94,7 @@ p { color: var(--text-muted); }
 /* ── HERO ── */
 .hero {
     min-height: 100vh;
-    background: linear-gradient(135deg, #1A3A28 0%, #2D5A3D 50%, #1E4532 100%);
+    background: linear-gradient(135deg, #175e8d 0%, #0c41b3 50%, #1E4532 100%);
     display: flex; align-items: center;
     position: relative; overflow: hidden;
     padding-top: 100px;

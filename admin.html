@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TripSync Admin – Quản Lý Chuyến Đi</title>
+  <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+<div class="admin-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon"><i class='bx bx-map-alt'></i></div>
+      <div>
+        <div class="sidebar-brand-text">Trip<em>Sync</em></div>
+        <div class="sidebar-brand-badge">ADMIN</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">Tổng quan</div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-nav-item active" onclick="showTab('dashboard')">
+        <i class='bx bx-grid-alt'></i> Dashboard
+      </button>
+      <button class="sidebar-nav-item" onclick="showTab('trips')">
+        <i class='bx bx-trip'></i> Chuyến đi
+        <span class="sidebar-nav-badge" id="trips-badge">0</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-section-label">Quản lý</div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-nav-item" onclick="showTab('places')">
+        <i class='bx bx-map-pin'></i> Địa điểm
+      </button>
+      <button class="sidebar-nav-item" onclick="showTab('members')">
+        <i class='bx bx-group'></i> Thành viên
+      </button>
+      <button class="sidebar-nav-item" onclick="showTab('budget')">
+        <i class='bx bx-wallet'></i> Ngân sách
+      </button>
+    </nav>
+
+    <div class="sidebar-section-label">Khác</div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-nav-item" onclick="window.open('public.html','_blank')">
+        <i class='bx bx-globe'></i> Xem trang Public
+      </button>
+      <button class="sidebar-nav-item" onclick="window.location.href='index.html'">
+        <i class='bx bx-home'></i> WanderViet
+      </button>
+      <button class="sidebar-nav-item">
+        <i class='bx bx-cog'></i> Cài đặt
+      </button>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar">MT</div>
+      <div>
+        <div class="sidebar-user-name">Minh Tuấn</div>
+        <div class="sidebar-user-role">Trưởng nhóm</div>
+      </div>
+      <i class='bx bx-log-out sidebar-user-logout' title="Đăng xuất" onclick="window.location.href='login.html'" style="cursor:pointer"></i>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+    <!-- TOPBAR -->
+    <header class="admin-topbar">
+      <div class="topbar-title" id="page-title">Dashboard</div>
+      <div class="topbar-search">
+        <i class='bx bx-search'></i>
+        <input type="text" placeholder="Tìm kiếm..." />
+      </div>
+      <div class="topbar-actions">
+        <div class="topbar-icon-btn" title="Thông báo">
+          <i class='bx bx-bell'></i>
+          <div class="topbar-notif-dot"></div>
+        </div>
+        <div class="topbar-icon-btn" title="Xem Public" onclick="window.open('public.html','_blank')">
+          <i class='bx bx-globe'></i>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('trip')">
+          <i class='bx bx-plus'></i> Thêm chuyến đi
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="admin-content">
+
+      <!-- ===== DASHBOARD TAB ===== -->
+      <div id="tab-dashboard" class="tab-content">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon blue"><i class='bx bx-trip'></i></div>
+            <div class="stat-info">
+              <div class="stat-label">Chuyến đi</div>
+              <div class="stat-val">3</div>
+              <div class="stat-change"><i class='bx bx-up-arrow-alt'></i>+1 tháng này</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange"><i class='bx bx-group'></i></div>
+            <div class="stat-info">
+              <div class="stat-label">Thành viên</div>
+              <div class="stat-val">8</div>
+              <div class="stat-change"><i class='bx bx-up-arrow-alt'></i>+2 mới</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green"><i class='bx bx-map-pin'></i></div>
+            <div class="stat-info">
+              <div class="stat-label">Địa điểm</div>
+              <div class="stat-val">14</div>
+              <div class="stat-change"><i class='bx bx-up-arrow-alt'></i>+3 mới</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple"><i class='bx bx-wallet'></i></div>
+            <div class="stat-info">
+              <div class="stat-label">Tổng ngân sách</div>
+              <div class="stat-val">32M₫</div>
+              <div class="stat-change down"><i class='bx bx-down-arrow-alt'></i>Còn 1.5M dự phòng</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+          <div>
+            <div class="panel">
+              <div class="panel-header">
+                <h3><i class='bx bx-trip'></i> Chuyến đi gần đây</h3>
+                <div class="panel-header-actions">
+                  <button class="btn btn-ghost btn-sm" onclick="showTab('trips')">Xem tất cả</button>
+                </div>
+              </div>
+              <div class="panel-body" style="padding:0">
+                <table class="trip-table">
+                  <thead>
+                    <tr>
+                      <th>Tên chuyến đi</th>
+                      <th>Ngày</th>
+                      <th>Trạng thái</th>
+                      <th>Nhóm</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <!-- Quick Budget -->
+            <div class="panel">
+              <div class="panel-header">
+                <h3><i class='bx bx-wallet'></i> Ngân sách hiện tại</h3>
+              </div>
+              <div class="panel-body" id="dashboard-budget-body">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TRIPS TAB ===== -->
+      <div id="tab-trips" class="tab-content" style="display:none">
+        <div class="panel">
+          <div class="panel-header">
+            <h3><i class='bx bx-trip'></i> Tất cả chuyến đi</h3>
+            <div class="panel-header-actions">
+              <button class="btn btn-primary btn-sm" onclick="openModal('trip')"><i class='bx bx-plus'></i> Thêm mới</button>
+            </div>
+          </div>
+          <div class="panel-body" style="padding:0">
+            <table class="trip-table">
+              <thead>
+                <tr>
+                  <th>Tên chuyến đi</th>
+                  <th>Ngày đi</th>
+                  <th>Thời lượng</th>
+                  <th>Trạng thái</th>
+                  <th>Nhóm</th>
+                  <th>Ngân sách</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="trips-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PLACES TAB ===== -->
+      <div id="tab-places" class="tab-content" style="display:none">
+        <div class="panel">
+          <div class="panel-header">
+            <h3><i class='bx bx-map-pin'></i> Quản lý địa điểm</h3>
+            <div class="panel-header-actions">
+              <button class="btn btn-primary btn-sm" onclick="openModal('place')"><i class='bx bx-plus'></i> Thêm địa điểm</button>
+            </div>
+          </div>
+          <div class="panel-body" style="padding:0">
+            <table class="trip-table" id="places-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Tên địa điểm</th>
+                  <th>Vị trí</th>
+                  <th>Loại</th>
+                  <th>Ngày thăm</th>
+                  <th>Đánh giá</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="places-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== MEMBERS TAB ===== -->
+      <div id="tab-members" class="tab-content" style="display:none">
+        <div class="panel">
+          <div class="panel-header">
+            <h3><i class='bx bx-group'></i> Thành viên nhóm</h3>
+            <div class="panel-header-actions">
+              <button class="btn btn-primary btn-sm" onclick="addMemberRow()"><i class='bx bx-plus'></i> Thêm thành viên</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="member-manage-list" id="member-manage-list"></div>
+            <button class="btn btn-primary" onclick="showToast('Đã lưu danh sách thành viên','success')">
+              <i class='bx bx-save'></i> Lưu thay đổi
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== BUDGET TAB ===== -->
+      <div id="tab-budget" class="tab-content" style="display:none">
+        <div class="admin-grid">
+          <div>
+            <div class="panel">
+              <div class="panel-header">
+                <h3><i class='bx bx-wallet'></i> Tính ngân sách</h3>
+              </div>
+              <div class="panel-body">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Chuyến đi</label>
+                    <select class="form-control">
+                      <option>Đà Nẵng – Hội An 2025</option>
+                      <option>Phú Quốc 2025</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Số thành viên</label>
+                    <input class="form-control" type="number" value="8" id="member-count" oninput="recalcBudget()" />
+                  </div>
+                </div>
+
+                <div class="form-section-title"><i class='bx bx-list-ul'></i> Danh mục chi phí</div>
+
+                <div class="budget-cats" id="budget-cats"></div>
+
+                <div style="display:flex;gap:10px;margin-top:4px">
+                  <button class="btn btn-ghost btn-sm" onclick="addBudgetCat()"><i class='bx bx-plus'></i> Thêm danh mục</button>
+                  <button class="btn btn-primary" onclick="showToast('Đã lưu ngân sách','success')"><i class='bx bx-save'></i> Lưu</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="panel">
+              <div class="panel-header"><h3><i class='bx bx-pie-chart-alt'></i> Tổng kết</h3></div>
+              <div class="panel-body">
+                <div class="budget-total-display">
+                  <div class="btd-label">Tổng ngân sách</div>
+                  <div class="btd-val" id="total-display">32.000.000₫</div>
+                  <div class="btd-sub">Đà Nẵng – Hội An 2025</div>
+                  <div class="btd-per" id="per-person-display">≈ 4.000.000₫ / người</div>
+                </div>
+                <div class="budget-chart" style="margin-bottom:16px">
+                  <div class="budget-chart-bars" id="chart-bars">
+                    <div class="budget-chart-bar" style="width:31%;background:var(--primary)"></div>
+                    <div class="budget-chart-bar" style="width:22%;background:var(--accent)"></div>
+                    <div class="budget-chart-bar" style="width:25%;background:var(--success)"></div>
+                    <div class="budget-chart-bar" style="width:14%;background:#7c3aed"></div>
+                    <div class="budget-chart-bar" style="width:8%;background:var(--text-muted)"></div>
+                  </div>
+                </div>
+                <div id="budget-summary-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /admin-content -->
+  </main>
+</div>
+
+<!-- ===== MODAL: Add/Edit Trip ===== -->
+<div class="modal-overlay" id="modal-trip">
+  <div class="modal">
+    <div class="modal-header">
+      <h2><i class='bx bx-trip'></i> Thêm / Sửa Chuyến Đi</h2>
+      <button class="modal-close" onclick="closeModal('trip')"><i class='bx bx-x'></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-section-title"><i class='bx bx-info-circle'></i> Thông tin chuyến đi</div>
+      <div class="form-group">
+        <label class="form-label">Tên chuyến đi <span>*</span></label>
+        <input class="form-control" placeholder="VD: Đà Nẵng – Hội An 2025" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ngày bắt đầu <span>*</span></label>
+          <input class="form-control" type="date" value="2025-07-15" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ngày kết thúc <span>*</span></label>
+          <input class="form-control" type="date" value="2025-07-20" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Điểm đến <span>*</span></label>
+          <input class="form-control" placeholder="VD: Đà Nẵng, Quảng Nam" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Trạng thái</label>
+          <select class="form-control">
+            <option>Lên kế hoạch</option>
+            <option>Sắp tới</option>
+            <option>Đang diễn ra</option>
+            <option>Hoàn thành</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Người phụ trách</label>
+        <select class="form-control">
+          <option>Minh Tuấn</option>
+          <option>Lan Anh</option>
+          <option>Quang Huy</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ghi chú</label>
+        <textarea class="form-control" placeholder="Ghi chú, lưu ý về chuyến đi..."></textarea>
+      </div>
+
+      <div class="form-section-title"><i class='bx bx-map-pin'></i> Địa điểm trong chuyến đi</div>
+      <div class="place-rows" id="modal-place-rows">
+        <div class="place-row">
+          <i class='bx bx-grid-vertical place-row-drag'></i>
+          <div class="place-row-inputs">
+            <input class="form-control" placeholder="Tên địa điểm" value="Bãi biển Mỹ Khê" />
+            <input class="form-control" placeholder="Thời gian (VD: 09:00)" value="09:00" style="max-width:100px" />
+            <select class="form-control" style="max-width:130px"><option>Tham quan</option><option>Ăn uống</option><option>Lưu trú</option><option>Di chuyển</option></select>
+          </div>
+          <button class="place-row-del"><i class='bx bx-x'></i></button>
+        </div>
+        <div class="place-row">
+          <i class='bx bx-grid-vertical place-row-drag'></i>
+          <div class="place-row-inputs">
+            <input class="form-control" placeholder="Tên địa điểm" value="Cầu Vàng – Bà Nà Hills" />
+            <input class="form-control" placeholder="Thời gian (VD: 09:00)" value="09:00" style="max-width:100px" />
+            <select class="form-control" style="max-width:130px"><option>Tham quan</option><option>Ăn uống</option><option>Lưu trú</option><option>Di chuyển</option></select>
+          </div>
+          <button class="place-row-del" onclick="this.closest('.place-row').remove()"><i class='bx bx-x'></i></button>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="addPlaceRow()"><i class='bx bx-plus'></i> Thêm địa điểm</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('trip')">Huỷ</button>
+      <button class="btn btn-primary" onclick="saveTrip()"><i class='bx bx-save'></i> Lưu chuyến đi</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Add/Edit Place ===== -->
+<div class="modal-overlay" id="modal-place">
+  <div class="modal">
+    <div class="modal-header">
+      <h2><i class='bx bx-map-pin'></i> Thêm / Sửa Địa Điểm</h2>
+      <button class="modal-close" onclick="closeModal('place')"><i class='bx bx-x'></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Tên địa điểm <span>*</span></label>
+        <input class="form-control" placeholder="VD: Cầu Vàng – Bà Nà Hills" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Vị trí / Địa chỉ</label>
+          <input class="form-control" placeholder="VD: Đà Nẵng" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Loại địa điểm</label>
+          <select class="form-control">
+            <option>Biển</option><option>Núi</option><option>Văn hoá</option>
+            <option>Ăn uống</option><option>Lưu trú</option><option>Check-in</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ngày thăm</label>
+          <input class="form-control" placeholder="VD: Ngày 2" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Giờ đến</label>
+          <input class="form-control" type="time" value="09:00" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Chi phí ước tính (₫)</label>
+          <input class="form-control" type="number" placeholder="0" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Đánh giá</label>
+          <select class="form-control">
+            <option>5.0 ⭐⭐⭐⭐⭐</option><option>4.5 ⭐⭐⭐⭐½</option>
+            <option selected>4.0 ⭐⭐⭐⭐</option><option>3.5 ⭐⭐⭐½</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ghi chú / Lưu ý</label>
+        <textarea class="form-control" placeholder="Lưu ý quan trọng, mẹo hay cho địa điểm này..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('place')">Huỷ</button>
+      <button class="btn btn-primary" onclick="savePlace()"><i class='bx bx-save'></i> Lưu địa điểm</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ── App State ──
+let appData = JSON.parse(localStorage.getItem('tripsync_admin') || 'null') || {
+  trips: [],
+  places: [],
+  members: [],
+  budget: { tripId: null, memberCount: 1, categories: [] },
+};
+function saveData(){ localStorage.setItem('tripsync_admin', JSON.stringify(appData)); }
+
+let editingTripId = null;
+let editingPlaceId = null;
+
+const fmt = n => (n||0).toLocaleString('vi-VN') + '₫';
+const statusMap = { planning:'Lên kế hoạch', upcoming:'Sắp tới', ongoing:'Đang diễn ra', completed:'Hoàn thành' };
+const statusClass = { planning:'planning', upcoming:'upcoming', ongoing:'planning', completed:'completed' };
+
+// ── Tab switching ──
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
+  document.getElementById('tab-'+tab).style.display='block';
+  document.querySelectorAll('.sidebar-nav-item').forEach(b=>b.classList.remove('active'));
+  event?.target?.classList.add('active');
+  const titles={dashboard:'Dashboard',trips:'Chuyến đi',places:'Địa điểm',members:'Thành viên',budget:'Ngân sách'};
+  document.getElementById('page-title').textContent=titles[tab]||tab;
+  if(tab==='trips') renderTripsTab();
+  if(tab==='places') renderPlacesTab();
+  if(tab==='members') renderMembersTab();
+  if(tab==='budget') renderBudgetTab();
+  if(tab==='dashboard') renderDashboard();
+}
+
+// ── Toast ──
+function showToast(msg, type='success') {
+  const icons={success:'bx-check-circle',error:'bx-x-circle',info:'bx-info-circle'};
+  const toast=document.createElement('div');
+  toast.className=`toast ${type}`;
+  toast.innerHTML=`<i class='bx ${icons[type]}'></i> ${msg}`;
+  document.getElementById('toast-container').appendChild(toast);
+  setTimeout(()=>toast.classList.add('show'),50);
+  setTimeout(()=>{toast.classList.remove('show');setTimeout(()=>toast.remove(),400);},3000);
+}
+
+// ── Modals ──
+function openModal(type){
+  if(type==='trip') resetTripForm();
+  if(type==='place') resetPlaceForm();
+  document.getElementById('modal-'+type).classList.add('open');
+}
+function closeModal(type){
+  document.getElementById('modal-'+type).classList.remove('open');
+  if(type==='trip') editingTripId=null;
+  if(type==='place') editingPlaceId=null;
+}
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o) o.classList.remove('open');});
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+});
+
+// ── Search ──
+const searchInput = document.querySelector('.topbar-search input');
+searchInput.addEventListener('input', function(){
+  const q = this.value.toLowerCase().trim();
+  if(!q){ document.querySelectorAll('.trip-table tbody tr').forEach(r=>r.style.display=''); return; }
+  document.querySelectorAll('.trip-table tbody tr').forEach(r=>{
+    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+
+// ── Notification bell ──
+document.querySelector('.topbar-icon-btn[title="Thông báo"]').addEventListener('click',function(){
+  const dot = this.querySelector('.topbar-notif-dot');
+  if(dot) dot.style.display='none';
+  showToast('3 thông báo mới: 2 thành viên xác nhận, 1 địa điểm được thêm','info');
+});
+
+// ── Settings ──
+document.querySelector('.sidebar-nav-item:last-of-type').addEventListener('click', function(){
+  showToast('Trang cài đặt đang được phát triển!','info');
+});
+
+// ── TRIPS ──
+function renderDashboard(){
+  // Update stat cards
+  document.querySelector('.stat-card:nth-child(1) .stat-val').textContent = appData.trips.length;
+  document.querySelector('.stat-card:nth-child(2) .stat-val').textContent = appData.members.length;
+  document.querySelector('.stat-card:nth-child(3) .stat-val').textContent = appData.places.length;
+  const totalBudget = appData.budget.categories.reduce((a,c)=>a+c.amount,0);
+  document.querySelector('.stat-card:nth-child(4) .stat-val').textContent = (totalBudget/1000000).toFixed(0)+'M₫';
+  // Update sidebar badge
+  const tripsBadge = document.getElementById('trips-badge');
+  if(tripsBadge) tripsBadge.textContent = appData.trips.length;
+
+  // Update recent trips table in dashboard
+  const dashTbody = document.querySelector('#tab-dashboard .trip-table tbody');
+  if(dashTbody){
+    if(!appData.trips.length){
+      dashTbody.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:32px 20px;color:var(--text-muted)">
+        <i class='bx bx-trip' style="font-size:2rem;opacity:.3;display:block;margin-bottom:8px"></i>
+        Chưa có chuyến đi nào
+      </td></tr>`;
+    } else {
+      dashTbody.innerHTML=appData.trips.slice(0,3).map(t=>`
+        <tr>
+          <td><div class="trip-table-name">${t.name}</div><div class="trip-table-dest"><i class='bx bx-map-pin'></i> ${t.dest}</div></td>
+          <td style="font-size:13px;color:var(--text-muted)">${formatDate(t.start)} – ${formatDate(t.end)}</td>
+          <td><span class="status-badge ${statusClass[t.status]||'planning'}">${statusMap[t.status]||t.status}</span></td>
+          <td><div class="member-avatars">${(t.members||[]).slice(0,3).map(m=>`<div class="ma">${m}</div>`).join('')}${(t.members||[]).length>3?`<div class="ma ma-more">+${t.members.length-3}</div>`:''}</div></td>
+          <td><div class="action-btns">
+            <div class="action-btn" onclick="editTrip(${t.id})" title="Sửa"><i class='bx bx-edit'></i></div>
+            <div class="action-btn del" onclick="deleteTrip(${t.id})" title="Xóa"><i class='bx bx-trash'></i></div>
+          </div></td>
+        </tr>`).join('');
+    }
+  }
+
+  // Update dashboard budget panel
+  const dashBudgetBody = document.getElementById('dashboard-budget-body');
+  if(dashBudgetBody){
+    const cats = appData.budget.categories;
+    const total = cats.reduce((a,c)=>a+c.amount,0);
+    const members = appData.budget.memberCount||1;
+    const trip = appData.trips[0];
+    if(!cats.length){
+      dashBudgetBody.innerHTML=`<div style="text-align:center;padding:24px;color:var(--text-muted)"><i class='bx bx-wallet' style="font-size:2rem;opacity:.3;display:block;margin-bottom:8px"></i>Chưa có ngân sách</div>`;
+    } else {
+      dashBudgetBody.innerHTML=`
+        <div class="budget-total-display">
+          <div class="btd-label">Tổng ngân sách</div>
+          <div class="btd-val">${fmt(total)}</div>
+          ${trip?`<div class="btd-sub">${trip.name}</div>`:''}
+          <div class="btd-per">≈ ${fmt(Math.round(total/members))} / người</div>
+        </div>
+        <div class="budget-chart">
+          <div class="budget-chart-bars" style="margin-bottom:8px">
+            ${cats.map(c=>`<div class="budget-chart-bar" style="width:${total>0?Math.round(c.amount/total*100):0}%;background:${c.color}"></div>`).join('')}
+          </div>
+        </div>
+        <div>
+          ${cats.map(c=>`<div class="budget-summary-row"><span>${c.name}</span><span>${fmt(c.amount)}</span></div>`).join('')}
+          <div class="budget-summary-row" style="margin-top:8px;padding-top:12px;border-top:2px solid var(--bg-2)">
+            <span>Tổng cộng</span><span style="color:var(--primary)">${fmt(total)}</span>
+          </div>
+        </div>`;
+    }
+  }
+}
+
+function renderTripsTab(){
+  const tbody=document.getElementById('trips-tbody');
+  if(!appData.trips.length){
+    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:40px 20px;color:var(--text-muted)">
+      <i class='bx bx-trip' style="font-size:2.5rem;opacity:.3;display:block;margin-bottom:10px"></i>
+      Chưa có chuyến đi nào. Nhấn <strong>+ Thêm mới</strong> để bắt đầu.
+    </td></tr>`;
+    return;
+  }
+  tbody.innerHTML=appData.trips.map(t=>`
+    <tr>
+      <td><div class="trip-table-name">${t.name}</div><div class="trip-table-dest"><i class='bx bx-map-pin'></i> ${t.dest}</div></td>
+      <td style="font-size:13px">${formatDate(t.start)}</td>
+      <td style="font-size:13px;color:var(--text-muted)">${calcDuration(t.start,t.end)}</td>
+      <td><span class="status-badge ${statusClass[t.status]||'planning'}">${statusMap[t.status]||t.status}</span></td>
+      <td><div class="member-avatars">${t.members.slice(0,3).map(m=>`<div class="ma">${m}</div>`).join('')}${t.members.length>3?`<div class="ma ma-more">+${t.members.length-3}</div>`:''}</div></td>
+      <td style="font-size:13px;font-weight:600;color:var(--primary)">${fmt(t.budget)}</td>
+      <td><div class="action-btns">
+        <div class="action-btn" onclick="editTrip(${t.id})" title="Sửa"><i class='bx bx-edit'></i></div>
+        <div class="action-btn" onclick="window.open('public.html','_blank')" title="Xem Public"><i class='bx bx-globe'></i></div>
+        <div class="action-btn del" onclick="deleteTrip(${t.id})" title="Xóa"><i class='bx bx-trash'></i></div>
+      </div></td>
+    </tr>`).join('');
+}
+
+function formatDate(d){ if(!d) return '—'; const [y,m,dy]=d.split('-'); return `${dy}/${m}/${y}`; }
+function calcDuration(s,e){
+  if(!s||!e) return '—';
+  const days=Math.round((new Date(e)-new Date(s))/86400000)+1;
+  return `${days} ngày ${days-1} đêm`;
+}
+
+// Trip modal fields
+function getTripFields(){
+  const modal=document.getElementById('modal-trip');
+  const inputs=modal.querySelectorAll('input,select,textarea');
+  return {
+    name: inputs[0].value.trim(),
+    start: inputs[1].value,
+    end: inputs[2].value,
+    dest: inputs[3].value.trim(),
+    status: inputs[4].value,
+    leader: inputs[5].value,
+    notes: inputs[6].value,
+  };
+}
+function resetTripForm(){
+  const modal=document.getElementById('modal-trip');
+  modal.querySelectorAll('input:not([type="hidden"]),textarea').forEach(i=>{ if(i.type!=='hidden') i.value=''; });
+  document.getElementById('modal-place-rows').innerHTML='';
+  editingTripId=null;
+  modal.querySelector('.modal-header h2').innerHTML="<i class='bx bx-trip'></i> Thêm Chuyến Đi Mới";
+}
+function editTrip(id){
+  const trip=appData.trips.find(t=>t.id===id);
+  if(!trip) return;
+  editingTripId=id;
+  const modal=document.getElementById('modal-trip');
+  const inputs=modal.querySelectorAll('input,select,textarea');
+  inputs[0].value=trip.name;
+  inputs[1].value=trip.start;
+  inputs[2].value=trip.end;
+  inputs[3].value=trip.dest;
+  inputs[4].value=trip.status;
+  inputs[6].value=trip.notes||'';
+  modal.querySelector('.modal-header h2').innerHTML="<i class='bx bx-edit'></i> Sửa Chuyến Đi";
+  modal.classList.add('open');
+}
+function saveTrip(){
+  const f=getTripFields();
+  if(!f.name){ showToast('Vui lòng nhập tên chuyến đi!','error'); return; }
+  if(!f.start||!f.end){ showToast('Vui lòng chọn ngày đi và ngày về!','error'); return; }
+  if(new Date(f.end)<new Date(f.start)){ showToast('Ngày về phải sau ngày đi!','error'); return; }
+  if(!f.dest){ showToast('Vui lòng nhập điểm đến!','error'); return; }
+
+  if(editingTripId){
+    const idx=appData.trips.findIndex(t=>t.id===editingTripId);
+    if(idx>=0) Object.assign(appData.trips[idx],{...f,budget:appData.trips[idx].budget,members:appData.trips[idx].members});
+    showToast('Đã cập nhật chuyến đi!','success');
+  } else {
+    const newTrip={id:Date.now(),...f,budget:0,members:[]};
+    appData.trips.push(newTrip);
+    showToast('Đã thêm chuyến đi mới!','success');
+  }
+  saveData(); closeModal('trip'); renderTripsTab(); renderDashboard();
+}
+function deleteTrip(id){
+  if(!confirm('Bạn có chắc muốn xóa chuyến đi này?')) return;
+  appData.trips=appData.trips.filter(t=>t.id!==id);
+  saveData(); renderTripsTab(); renderDashboard();
+  showToast('Đã xóa chuyến đi','error');
+}
+
+// ── PLACES ──
+function renderPlacesTab(){
+  const tbody=document.getElementById('places-tbody');
+  if(!appData.places.length){
+    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:40px 20px;color:var(--text-muted)">
+      <i class='bx bx-map-pin' style="font-size:2.5rem;opacity:.3;display:block;margin-bottom:10px"></i>
+      Chưa có địa điểm nào. Nhấn <strong>+ Thêm mới</strong> để thêm địa điểm.
+    </td></tr>`;
+    return;
+  }
+  tbody.innerHTML=appData.places.map((p,i)=>`
+    <tr>
+      <td style="font-weight:700;color:var(--primary)">${i+1}</td>
+      <td><div style="font-weight:600;font-size:14px">${p.name}</div></td>
+      <td style="font-size:13px;color:var(--text-muted)">${p.location}</td>
+      <td><span class="stop-tag">${p.type}</span></td>
+      <td style="font-size:13px">${p.day}</td>
+      <td><span style="display:flex;align-items:center;gap:3px;font-size:13px;font-weight:600"><i class='bx bxs-star' style="color:var(--accent)"></i>${p.rating}</span></td>
+      <td><div class="action-btns">
+        <div class="action-btn" onclick="editPlace(${p.id})" title="Sửa"><i class='bx bx-edit'></i></div>
+        <div class="action-btn del" onclick="deletePlace(${p.id})" title="Xóa"><i class='bx bx-trash'></i></div>
+      </div></td>
+    </tr>`).join('');
+}
+function resetPlaceForm(){
+  const modal=document.getElementById('modal-place');
+  modal.querySelectorAll('input:not([type="hidden"]),textarea').forEach(i=>{if(i.type!=='hidden') i.value='';});
+  editingPlaceId=null;
+  modal.querySelector('.modal-header h2').innerHTML="<i class='bx bx-map-pin'></i> Thêm Địa Điểm Mới";
+}
+function editPlace(id){
+  const p=appData.places.find(x=>x.id===id);
+  if(!p) return;
+  editingPlaceId=id;
+  const modal=document.getElementById('modal-place');
+  const inputs=modal.querySelectorAll('input,select,textarea');
+  inputs[0].value=p.name;
+  inputs[1].value=p.location;
+  inputs[2].value=p.type;
+  inputs[3].value=p.day;
+  inputs[4].value=p.time;
+  inputs[5].value=p.cost||0;
+  // rating select
+  const ratingSelect=modal.querySelectorAll('select')[1];
+  if(ratingSelect) Array.from(ratingSelect.options).forEach(o=>{if(o.value.startsWith(p.rating)) o.selected=true;});
+  if(inputs[7]) inputs[7].value=p.notes||'';
+  modal.querySelector('.modal-header h2').innerHTML="<i class='bx bx-edit'></i> Sửa Địa Điểm";
+  modal.classList.add('open');
+}
+function savePlace(){
+  const modal=document.getElementById('modal-place');
+  const inputs=modal.querySelectorAll('input,select,textarea');
+  const name=inputs[0].value.trim();
+  if(!name){ showToast('Vui lòng nhập tên địa điểm!','error'); return; }
+  const placeData={
+    name,
+    location:inputs[1].value.trim()||'Việt Nam',
+    type:inputs[2].value,
+    day:inputs[3].value.trim()||'Ngày 1',
+    time:inputs[4].value||'09:00',
+    cost:parseFloat(inputs[5].value)||0,
+    rating: (modal.querySelectorAll('select')[1]?.value||'4.0').split(' ')[0],
+    notes: inputs[7]?.value||''
+  };
+  if(editingPlaceId){
+    const idx=appData.places.findIndex(p=>p.id===editingPlaceId);
+    if(idx>=0) appData.places[idx]={...appData.places[idx],...placeData};
+    showToast('Đã cập nhật địa điểm!','success');
+  } else {
+    appData.places.push({id:Date.now(),...placeData});
+    showToast('Đã thêm địa điểm mới!','success');
+  }
+  saveData(); closeModal('place'); renderPlacesTab(); renderDashboard();
+}
+function deletePlace(id){
+  if(!confirm('Bạn có chắc muốn xóa địa điểm này?')) return;
+  appData.places=appData.places.filter(p=>p.id!==id);
+  saveData(); renderPlacesTab(); renderDashboard();
+  showToast('Đã xóa địa điểm','error');
+}
+
+// ── MEMBERS ──
+function renderMembersTab(){
+  const list=document.getElementById('member-manage-list');
+  list.innerHTML=appData.members.map(m=>`
+    <div class="member-manage-row" data-id="${m.id}">
+      <div class="member-manage-avatar" style="background:${m.color}">${m.initials}</div>
+      <input class="form-control" value="${m.name}" placeholder="Tên thành viên" onchange="updateMember(${m.id},'name',this.value)" />
+      <select class="form-control member-role-select" onchange="updateMember(${m.id},'role',this.value)">
+        ${['Trưởng nhóm','Phụ trách tài chính','Phụ trách lịch trình','Thành viên'].map(r=>`<option ${r===m.role?'selected':''}>${r}</option>`).join('')}
+      </select>
+      <input class="form-control" value="${m.phone||''}" placeholder="Số điện thoại" style="max-width:140px" onchange="updateMember(${m.id},'phone',this.value)" />
+      <div class="member-manage-del" onclick="deleteMember(${m.id})" title="Xóa"><i class='bx bx-x'></i></div>
+    </div>`).join('');
+}
+function updateMember(id,field,val){
+  const m=appData.members.find(x=>x.id===id);
+  if(m){ m[field]=val; saveData(); }
+}
+function deleteMember(id){
+  if(!confirm('Xóa thành viên này?')) return;
+  appData.members=appData.members.filter(m=>m.id!==id);
+  saveData(); renderMembersTab(); renderDashboard();
+  showToast('Đã xóa thành viên','error');
+}
+function addMemberRow(){
+  const colors=['linear-gradient(135deg,#0d9488,#2dd4bf)','linear-gradient(135deg,#db2777,#f9a8d4)','linear-gradient(135deg,#ea580c,#fdba74)'];
+  const color=colors[appData.members.length%colors.length];
+  const newMember={id:Date.now(),name:'',role:'Thành viên',phone:'',initials:'?',color};
+  appData.members.push(newMember);
+  saveData(); renderMembersTab();
+  // Focus new row
+  setTimeout(()=>{
+    const rows=document.querySelectorAll('.member-manage-row');
+    const lastInput=rows[rows.length-1]?.querySelector('input');
+    if(lastInput) lastInput.focus();
+  },50);
+}
+// Save members button
+document.querySelector('#tab-members .btn-primary')?.addEventListener('click',()=>{
+  // Collect all current values
+  document.querySelectorAll('.member-manage-row').forEach(row=>{
+    const id=parseInt(row.dataset.id);
+    const m=appData.members.find(x=>x.id===id);
+    if(!m) return;
+    const inputs=row.querySelectorAll('input');
+    const name=inputs[0].value.trim();
+    if(name) m.name=name;
+    m.phone=inputs[1].value.trim();
+    const initials=name.split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase()||'?';
+    m.initials=initials;
+    row.querySelector('.member-manage-avatar').textContent=initials;
+  });
+  saveData(); renderDashboard();
+  showToast('Đã lưu danh sách thành viên','success');
+});
+
+// ── BUDGET ──
+function renderBudgetTab(){
+  const cats=document.getElementById('budget-cats');
+  cats.innerHTML=appData.budget.categories.map((c,i)=>`
+    <div class="budget-cat-row">
+      <div class="budget-cat-color" style="background:${c.color}"></div>
+      <input class="form-control" value="${c.name}" placeholder="Danh mục" style="flex:1" onchange="updateBudgetCat(${i},'name',this.value)" />
+      <input class="form-control amount" type="number" value="${c.amount}" oninput="updateBudgetCat(${i},'amount',this.value);recalcBudget()" placeholder="Số tiền (₫)" />
+      <span class="budget-cat-pct">0%</span>
+      <div class="member-manage-del" onclick="removeBudgetCat(${i})"><i class='bx bx-x'></i></div>
+    </div>`).join('');
+  document.getElementById('member-count').value=appData.budget.memberCount;
+  recalcBudget();
+}
+function updateBudgetCat(i,field,val){
+  if(appData.budget.categories[i]){
+    appData.budget.categories[i][field]=field==='amount'?parseFloat(val)||0:val;
+    saveData();
+  }
+}
+function removeBudgetCat(i){
+  appData.budget.categories.splice(i,1);
+  saveData(); renderBudgetTab();
+}
+function addBudgetCat(){
+  const colors=['#ec4899','#06b6d4','#f97316','#84cc16'];
+  appData.budget.categories.push({name:'Danh mục mới',amount:0,color:colors[appData.budget.categories.length%colors.length]});
+  saveData(); renderBudgetTab();
+}
+function recalcBudget(){
+  const amounts=[...document.querySelectorAll('.budget-cat-row .amount')].map(i=>parseFloat(i.value)||0);
+  const total=amounts.reduce((a,b)=>a+b,0);
+  const members=parseInt(document.getElementById('member-count').value)||1;
+  appData.budget.memberCount=members;
+  document.querySelectorAll('.budget-cat-row .budget-cat-pct').forEach((el,i)=>{
+    el.textContent=total>0?Math.round((amounts[i]/total)*100)+'%':'0%';
+  });
+  if(document.getElementById('total-display')) document.getElementById('total-display').textContent=fmt(total);
+  if(document.getElementById('per-person-display')) document.getElementById('per-person-display').textContent=`≈ ${fmt(Math.round(total/members))} / người`;
+  if(document.getElementById('total-sum')) document.getElementById('total-sum').textContent=fmt(total);
+  // Update chart bars
+  const bars=document.getElementById('chart-bars');
+  if(bars && total>0){
+    const barColors=appData.budget.categories.map(c=>c.color);
+    bars.innerHTML=amounts.map((a,i)=>`<div class="budget-chart-bar" style="width:${total>0?Math.round(a/total*100):0}%;background:${barColors[i]||'#ccc'}"></div>`).join('');
+  }
+  // Update summary list
+  const summaryList=document.getElementById('budget-summary-list');
+  if(summaryList){
+    const cats=[...document.querySelectorAll('.budget-cat-row')].map((row,i)=>({
+      name: row.querySelector('input.form-control')?.value||'',
+      amount: amounts[i]||0
+    }));
+    summaryList.innerHTML=cats.map(c=>`<div class="budget-summary-row"><span>${c.name}</span><span>${fmt(c.amount)}</span></div>`).join('')
+      +`<div class="budget-summary-row" style="font-weight:700;border-top:2px solid var(--bg-2);margin-top:8px;padding-top:12px"><span>Tổng cộng</span><span style="color:var(--primary)" id="total-sum">${fmt(total)}</span></div>`;
+  }
+  saveData();
+}
+// Save budget button  
+document.querySelector('#tab-budget .btn-primary')?.addEventListener('click',()=>{
+  recalcBudget(); saveData();
+  showToast('Đã lưu ngân sách','success');
+});
+
+// ── Place rows in trip modal ──
+function addPlaceRow(){
+  const container=document.getElementById('modal-place-rows');
+  const row=document.createElement('div');
+  row.className='place-row';
+  row.innerHTML=`
+    <i class='bx bx-grid-vertical place-row-drag'></i>
+    <div class="place-row-inputs">
+      <input class="form-control" placeholder="Tên địa điểm" />
+      <input class="form-control" placeholder="Thời gian" style="max-width:100px" />
+      <select class="form-control" style="max-width:130px"><option>Tham quan</option><option>Ăn uống</option><option>Lưu trú</option><option>Di chuyển</option></select>
+    </div>
+    <button class="place-row-del" onclick="this.closest('.place-row').remove()"><i class='bx bx-x'></i></button>`;
+  container.appendChild(row);
+}
+// Remove first place-row-del (had no onclick)
+document.querySelector('.place-row-del:not([onclick])')?.addEventListener('click', function(){
+  this.closest('.place-row').remove();
+});
+
+// ── Confirm delete (legacy) ──
+function confirmDelete(item){
+  if(confirm(`Bạn có chắc muốn xóa ${item}?`)) showToast(`Đã xóa ${item}`,'error');
+}
+
+// ── Dashboard action buttons ──
+document.querySelector('.panel-header-actions .btn-ghost')?.addEventListener('click',()=>showTab('trips'));
+
+// ── Init ──
+renderDashboard();
+renderTripsTab();
+renderPlacesTab();
+renderMembersTab();
+renderBudgetTab();
+</script>
+
+</body>
+</html>

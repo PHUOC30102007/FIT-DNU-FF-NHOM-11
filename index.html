@@ -28,8 +28,9 @@
             <li><a href="#contact">Liên Hệ</a></li>
         </ul>
         <div class="nav-actions">
+            <a href="public.html" class="nav-login" style="display:flex;align-items:center;gap:6px;"><i class='bx bx-trip' style="font-size:16px"></i> TripSync</a>
             <a href="login.html" class="nav-login">Đăng nhập</a>
-            <a href="login.html" class="btn nav-cta">Đặt Tour</a>
+            <a href="login.html" class="btn nav-cta">Đăng ký</a>
         </div>
     </div>
 </nav>
@@ -209,7 +210,7 @@
 
         <div class="tours-grid">
             <!-- Card 1 -->
-            <div class="tour-card">
+            <div class="tour-card" onclick="window.location.href='public.html'" style="cursor:pointer">
                 <div class="tour-img">
                     <img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&h=400&fit=crop" alt="Hội An">
                     <span class="tour-badge">Bán Chạy</span>
@@ -476,33 +477,379 @@
     </div>
 </footer>
 
+<style>
+/* Toast notification */
+.wv-toast-container { position:fixed;top:20px;right:20px;z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none; }
+.wv-toast { background:#fff;border-radius:12px;padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,0.12);display:flex;align-items:center;gap:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:#3D3D52;pointer-events:all;transform:translateX(120%);transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);min-width:260px;border-left:4px solid #2D5A3D; }
+.wv-toast.show { transform:translateX(0); }
+.wv-toast.success { border-color:#2D5A3D; }
+.wv-toast.error { border-color:#E84848; }
+.wv-toast.info { border-color:#E8A838; }
+.wv-toast i { font-size:20px;flex-shrink:0; }
+.wv-toast.success i { color:#2D5A3D; }
+.wv-toast.error i { color:#E84848; }
+.wv-toast.info i { color:#E8A838; }
+/* Modal */
+.modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s; }
+.modal-overlay.open { opacity:1;pointer-events:all; }
+.modal-box { background:#fff;border-radius:20px;padding:32px;max-width:520px;width:90%;max-height:90vh;overflow-y:auto;transform:translateY(24px) scale(0.97);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);font-family:'DM Sans',sans-serif; }
+.modal-overlay.open .modal-box { transform:translateY(0) scale(1); }
+.modal-box h3 { font-family:'Playfair Display',serif;font-size:22px;color:#1A1A2E;margin-bottom:8px; }
+.modal-box p { color:#7A7A96;font-size:14px;margin-bottom:20px; }
+.modal-box .form-group { margin-bottom:16px; }
+.modal-box label { display:block;font-size:13px;font-weight:600;color:#3D3D52;margin-bottom:6px; }
+.modal-box input,.modal-box select,.modal-box textarea { width:100%;padding:12px 14px;border:1.5px solid rgba(45,90,61,0.18);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:#1A1A2E;outline:none;transition:border-color 0.2s; }
+.modal-box input:focus,.modal-box select:focus,.modal-box textarea:focus { border-color:#2D5A3D; }
+.modal-box textarea { resize:vertical;min-height:80px; }
+.modal-box .modal-footer { display:flex;gap:10px;margin-top:20px; }
+.modal-box .btn-cancel { flex:1;padding:12px;border:1.5px solid rgba(45,90,61,0.18);border-radius:10px;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;color:#3D3D52;transition:all 0.2s; }
+.modal-box .btn-cancel:hover { background:#f5f5f5; }
+.modal-box .btn-confirm { flex:2;padding:12px;background:#2D5A3D;border:none;border-radius:10px;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;transition:all 0.2s; }
+.modal-box .btn-confirm:hover { background:#4A8C5C; }
+/* Search results */
+#search-results-section { display:none;padding:32px 0; }
+#search-results-section.visible { display:block; }
+.search-results-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px;margin-top:24px; }
+.no-results { text-align:center;padding:48px;color:#7A7A96; }
+/* Scroll to top */
+.scroll-top-btn { position:fixed;bottom:24px;right:24px;width:44px;height:44px;background:#2D5A3D;border:none;border-radius:50%;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(10px);transition:all 0.3s;z-index:999; }
+.scroll-top-btn.visible { opacity:1;transform:translateY(0); }
+.scroll-top-btn:hover { background:#4A8C5C; }
+</style>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-booking">
+  <div class="modal-box">
+    <h3>Đặt Tour Ngay</h3>
+    <p>Điền thông tin để chúng tôi liên hệ tư vấn miễn phí cho bạn</p>
+    <div class="form-group"><label>Họ và tên</label><input type="text" id="book-name" placeholder="Nguyễn Văn A"></div>
+    <div class="form-group"><label>Số điện thoại</label><input type="tel" id="book-phone" placeholder="0912 345 678"></div>
+    <div class="form-group"><label>Email</label><input type="email" id="book-email" placeholder="email@example.com"></div>
+    <div class="form-group"><label>Tour quan tâm</label><input type="text" id="book-tour" placeholder="Tên tour..."></div>
+    <div class="form-group"><label>Ngày khởi hành dự kiến</label><input type="date" id="book-date"></div>
+    <div class="form-group"><label>Ghi chú</label><textarea id="book-note" placeholder="Yêu cầu đặc biệt, số người..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('booking')">Huỷ</button>
+      <button class="btn-confirm" onclick="submitBooking()"><i class='bx bx-send'></i> Gửi yêu cầu</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-tour-detail">
+  <div class="modal-box">
+    <h3 id="detail-title">Tên Tour</h3>
+    <p id="detail-desc">Mô tả tour...</p>
+    <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+      <span id="detail-duration" style="background:#E8F2EB;color:#2D5A3D;padding:6px 14px;border-radius:100px;font-size:13px;font-weight:600"></span>
+      <span id="detail-price" style="background:#FFF3DC;color:#E8A838;padding:6px 14px;border-radius:100px;font-size:13px;font-weight:600"></span>
+      <span id="detail-rating" style="background:#f0f0f0;color:#3D3D52;padding:6px 14px;border-radius:100px;font-size:13px;font-weight:600"></span>
+    </div>
+    <div id="detail-highlights"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('tour-detail')">Đóng</button>
+      <button class="btn-confirm" onclick="bookFromDetail()"><i class='bx bx-calendar-check'></i> Đặt Tour Này</button>
+    </div>
+  </div>
+</div>
+
+<div class="wv-toast-container" id="toast-container"></div>
+<button class="scroll-top-btn" id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <i class='bx bx-up-arrow-alt'></i>
+</button>
+
 <script>
+// ── Utility: Toast ──
+function showToast(msg, type='success', duration=3500) {
+  const icons = {success:'bx-check-circle', error:'bx-x-circle', info:'bx-star'};
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `wv-toast ${type}`;
+  t.innerHTML = `<i class='bx ${icons[type]||icons.info}'></i><span>${msg}</span>`;
+  c.appendChild(t);
+  requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, duration);
+}
+
+// ── Utility: Modal ──
+function openModal(id) { document.getElementById('modal-'+id).classList.add('open'); }
+function closeModal(id) { document.getElementById('modal-'+id).classList.remove('open'); }
+document.addEventListener('click', e => { if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('open'); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); });
+
+// ── Navbar scroll ──
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  navbar.classList.toggle('scrolled', window.scrollY > 60);
+  document.getElementById('scroll-top-btn').classList.toggle('visible', window.scrollY > 400);
 });
 
+// ── Tour data ──
+const toursData = [
+  { id:1, title:'Phố Cổ Hội An & Thánh Địa Mỹ Sơn', location:'Quảng Nam', duration:'4 ngày 3 đêm', price:'3.500.000đ', priceNum:3500000, rating:'4.9 (128)', badge:'Bán Chạy', category:'Phố Cổ', img:'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&h=400&fit=crop', desc:'Khám phá phố cổ Hội An di sản thế giới với những ngôi nhà cổ rực rỡ ánh đèn lồng và thánh địa Mỹ Sơn bí ẩn.', highlights:['Đèn lồng Hội An về đêm','Thánh địa Mỹ Sơn – Di sản UNESCO','Làng gốm Thanh Hà','Ẩm thực Quảng Nam'] },
+  { id:2, title:'Vịnh Hạ Long – Đêm Trên Du Thuyền 5 Sao', location:'Quảng Ninh', duration:'3 ngày 2 đêm', price:'6.200.000đ', priceNum:6200000, rating:'4.8 (256)', badge:'Hot', badgeClass:'hot', category:'Biển & Đảo', img:'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=400&fit=crop', desc:'Trải nghiệm đêm trên du thuyền 5 sao giữa vịnh Hạ Long huyền ảo – một trong những kỳ quan thiên nhiên thế giới.', highlights:['Du thuyền 5 sao cao cấp','Chèo kayak khám phá hang động','Câu mực đêm','Bữa tiệc hải sản tươi sống'] },
+  { id:3, title:'Sapa Trekking – Ruộng Bậc Thang & Bản Làng', location:'Lào Cai', duration:'3 ngày 2 đêm', price:'2.800.000đ', priceNum:2800000, rating:'4.7 (89)', category:'Núi & Cao Nguyên', img:'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&h=400&fit=crop', desc:'Trekking qua những thửa ruộng bậc thang tuyệt đẹp, ghé thăm bản làng người H\'Mong và Dao Đỏ tại Sapa.', highlights:['Ruộng bậc thang Mù Cang Chải','Bản Cat Cat – làng H\'Mong','Đỉnh Fansipan – nóc nhà Đông Dương','Chợ phiên Bắc Hà cuối tuần'] },
+];
+
+let currentTourId = null;
+let wishlist = JSON.parse(localStorage.getItem('wv_wishlist') || '[]');
+
+// ── Filter buttons ──
 document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-    });
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    const cat = this.textContent.trim();
+    filterTours(cat === 'Tất Cả' ? null : cat);
+  });
 });
 
-document.querySelectorAll('.tour-wishlist').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const icon = this.querySelector('i');
-        icon.classList.toggle('bx-heart');
-        icon.classList.toggle('bxs-heart');
-        if (icon.classList.contains('bxs-heart')) {
-            this.style.background = '#E84848';
-            icon.style.color = 'white';
-        } else {
-            this.style.background = 'rgba(255,255,255,0.9)';
-            icon.style.color = '';
-        }
-    });
+function filterTours(category) {
+  document.querySelectorAll('.tour-card').forEach((card, i) => {
+    const tour = toursData[i];
+    if (!category || (tour && tour.category === category)) {
+      card.style.display = '';
+      card.style.animation = 'fadeInUp 0.4s ease both';
+      card.style.animationDelay = (i * 0.08) + 's';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+// ── Wishlist ──
+document.querySelectorAll('.tour-wishlist').forEach((btn, i) => {
+  const tourId = toursData[i]?.id;
+  if (wishlist.includes(tourId)) {
+    const icon = btn.querySelector('i');
+    icon.classList.replace('bx-heart','bxs-heart');
+    btn.style.background = '#E84848';
+    icon.style.color = 'white';
+  }
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const icon = this.querySelector('i');
+    const isFav = icon.classList.contains('bxs-heart');
+    icon.classList.toggle('bx-heart', isFav);
+    icon.classList.toggle('bxs-heart', !isFav);
+    if (!isFav) {
+      this.style.background = '#E84848';
+      icon.style.color = 'white';
+      if (tourId && !wishlist.includes(tourId)) wishlist.push(tourId);
+      showToast('Đã thêm vào danh sách yêu thích ❤️', 'success');
+    } else {
+      this.style.background = 'rgba(255,255,255,0.9)';
+      icon.style.color = '';
+      wishlist = wishlist.filter(id => id !== tourId);
+      showToast('Đã xóa khỏi danh sách yêu thích', 'info');
+    }
+    localStorage.setItem('wv_wishlist', JSON.stringify(wishlist));
+  });
 });
+
+// ── Tour card click → detail modal ──
+document.querySelectorAll('.tour-card').forEach((card, i) => {
+  const tour = toursData[i];
+  if (!tour) return;
+  card.style.cursor = 'pointer';
+  card.addEventListener('click', function(e) {
+    if (e.target.closest('.tour-wishlist')) return;
+    showTourDetail(tour);
+  });
+});
+
+function showTourDetail(tour) {
+  currentTourId = tour.id;
+  document.getElementById('detail-title').textContent = tour.title;
+  document.getElementById('detail-desc').textContent = tour.desc;
+  document.getElementById('detail-duration').textContent = '⏱ ' + tour.duration;
+  document.getElementById('detail-price').textContent = '💰 Từ ' + tour.price;
+  document.getElementById('detail-rating').textContent = '⭐ ' + tour.rating;
+  document.getElementById('detail-highlights').innerHTML = '<strong style="font-size:13px;color:#3D3D52;display:block;margin-bottom:10px;">Điểm nổi bật:</strong>' +
+    (tour.highlights || []).map(h=>`<div style="padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:14px;color:#3D3D52"><i class='bx bx-check' style="color:#2D5A3D;margin-right:6px"></i>${h}</div>`).join('');
+  openModal('tour-detail');
+}
+
+function bookFromDetail() {
+  const tour = toursData.find(t => t.id === currentTourId);
+  closeModal('tour-detail');
+  if (tour) document.getElementById('book-tour').value = tour.title;
+  openModal('booking');
+}
+
+// ── Book buttons (CTA) ──
+document.querySelectorAll('.btn-accent, .nav-cta').forEach(btn => {
+  if (btn.textContent.trim().includes('Khám Phá') || btn.closest('.hero-actions')) {
+    btn.addEventListener('click', function(e) {
+      if (this.getAttribute('href') === '#tours') return;
+    });
+  }
+});
+
+// ── Destinations click ──
+const destTours = ['Hội An','Hà Nội','Đà Nẵng','TP. Hồ Chí Minh','Phú Quốc'];
+document.querySelectorAll('.dest-card').forEach((card, i) => {
+  card.style.cursor = 'pointer';
+  card.addEventListener('click', () => {
+    const dest = destTours[i] || 'Việt Nam';
+    document.getElementById('book-tour').value = 'Tour ' + dest;
+    openModal('booking');
+  });
+});
+
+// ── Search form ──
+document.querySelector('.search-btn').addEventListener('click', function() {
+  const dest = document.querySelector('.search-field input[type="text"]').value.trim();
+  const date = document.querySelector('.search-field input[type="date"]').value;
+  const type = document.querySelector('.search-field select').value;
+  const people = document.querySelector('.search-field input[type="number"]').value;
+
+  if (!dest && type === 'Tất cả tour') {
+    showToast('Vui lòng nhập điểm đến hoặc chọn loại tour!', 'error');
+    return;
+  }
+
+  const results = toursData.filter(t => {
+    const matchDest = !dest || t.title.toLowerCase().includes(dest.toLowerCase()) || t.location.toLowerCase().includes(dest.toLowerCase());
+    const matchType = type === 'Tất cả tour' || t.category === type;
+    return matchDest && matchType;
+  });
+
+  displaySearchResults(results, dest || type);
+});
+
+function displaySearchResults(results, query) {
+  let section = document.getElementById('search-results-section');
+  if (!section) {
+    section = document.createElement('section');
+    section.id = 'search-results-section';
+    section.className = 'section search-results-section';
+    section.innerHTML = `<div class="container"><h2 id="search-results-title" style="font-family:'Playfair Display',serif;margin-bottom:8px"></h2><div id="search-results-grid" class="search-results-grid"></div></div>`;
+    document.querySelector('.search-section').after(section);
+  }
+  section.classList.add('visible');
+  document.getElementById('search-results-title').textContent = results.length > 0 ? `Tìm thấy ${results.length} tour cho "${query}"` : `Không tìm thấy tour phù hợp với "${query}"`;
+
+  const grid = document.getElementById('search-results-grid');
+  if (results.length === 0) {
+    grid.innerHTML = `<div class="no-results" style="grid-column:1/-1"><i class='bx bx-search-alt' style="font-size:48px;color:#d0d0d0;display:block;margin-bottom:12px"></i><p>Thử tìm kiếm với từ khóa khác hoặc <a href="#tours" style="color:#2D5A3D;font-weight:600">xem tất cả tour</a></p></div>`;
+  } else {
+    grid.innerHTML = results.map(t => `
+      <div class="tour-card" onclick="showTourDetail(toursData.find(x=>x.id===${t.id}))" style="cursor:pointer">
+        <div class="tour-img"><img src="${t.img}" alt="${t.title}">${t.badge?`<span class="tour-badge ${t.badgeClass||''}">${t.badge}</span>`:''}</div>
+        <div class="tour-body">
+          <div class="tour-location"><i class='bx bx-map-pin'></i> ${t.location}</div>
+          <h3 class="tour-title">${t.title}</h3>
+          <div class="tour-footer">
+            <div class="tour-price"><span>Từ</span><br><strong>${t.price}</strong></div>
+            <div class="tour-rating"><i class='bx bxs-star'></i> ${t.rating}</div>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+  section.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ── Newsletter form ──
+document.querySelector('.newsletter-form .btn-accent').addEventListener('click', function() {
+  const input = document.querySelector('.newsletter-input');
+  const email = input.value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('Vui lòng nhập email hợp lệ!', 'error');
+    input.focus();
+    return;
+  }
+  const saved = JSON.parse(localStorage.getItem('wv_newsletter') || '[]');
+  if (saved.includes(email)) {
+    showToast('Email này đã đăng ký rồi!', 'info');
+    return;
+  }
+  saved.push(email);
+  localStorage.setItem('wv_newsletter', JSON.stringify(saved));
+  input.value = '';
+  showToast('🎉 Đăng ký thành công! Voucher 500K đã được gửi đến email của bạn.', 'success', 5000);
+});
+
+// ── Booking form submit ──
+function submitBooking() {
+  const name = document.getElementById('book-name').value.trim();
+  const phone = document.getElementById('book-phone').value.trim();
+  const email = document.getElementById('book-email').value.trim();
+  if (!name) { showToast('Vui lòng nhập họ tên!', 'error'); return; }
+  if (!phone || !/^[0-9]{9,11}$/.test(phone.replace(/\s/g,''))) { showToast('Vui lòng nhập số điện thoại hợp lệ!', 'error'); return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Vui lòng nhập email hợp lệ!', 'error'); return; }
+  closeModal('booking');
+  showToast('✅ Yêu cầu đặt tour đã được gửi! Chúng tôi sẽ liên hệ trong 30 phút.', 'success', 5000);
+  ['book-name','book-phone','book-email','book-tour','book-date','book-note'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+// ── "Đặt Tour" buttons on tour cards ──
+document.querySelectorAll('.tour-card .btn-accent, .tour-card .btn-primary').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    openModal('booking');
+  });
+});
+
+// ── Footer / Blog links (prevent dead links) ──
+document.querySelectorAll('.footer-col a, .footer-bottom-links a').forEach(a => {
+  if (a.getAttribute('href') === '#') {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      showToast('Trang này đang được cập nhật!', 'info');
+    });
+  }
+});
+
+// ── Social buttons ──
+document.querySelectorAll('.footer-social').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    showToast('Đang mở trang mạng xã hội...', 'info');
+  });
+});
+
+// ── "Xem Tất Cả" section buttons ──
+document.querySelectorAll('a[href="#"]').forEach(a => {
+  if (a.textContent.includes('Xem Tất Cả')) {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('.filter-btn')[0].click();
+      document.querySelector('#tours').scrollIntoView({ behavior:'smooth' });
+    });
+  }
+});
+
+// ── "Xem Video" hero button ──
+document.querySelector('.btn-outline')?.addEventListener('click', e => {
+  e.preventDefault();
+  showToast('🎬 Video giới thiệu đang được tải lên. Vui lòng quay lại sau!', 'info');
+});
+
+// ── Smooth scroll for anchor links ──
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior:'smooth' });
+    }
+  });
+});
+
+// ── Booking buttons in nav ──
+document.querySelector('.nav-cta')?.addEventListener('click', e => {
+  // Let it navigate to login.html
+});
+
+// ── Tour detail "Đặt Tour" on footer CTA (if any) ──
+document.querySelectorAll('[onclick*="booking"]').forEach(el => {
+  // already wired
+});
+
+console.log('WanderViet scripts loaded ✅');
 </script>
 
 </body>

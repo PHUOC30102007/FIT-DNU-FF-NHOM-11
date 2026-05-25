@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TripSync – Hành trình Đà Nẵng 2025</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+  <link rel="stylesheet" href="css/public.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="pub-header" id="pub-header">
+  <div class="container">
+    <div class="pub-logo">
+      <div class="pub-logo-icon"><i class='bx bx-map-alt'></i></div>
+      <span class="pub-logo-text">Trip<em>Sync</em></span>
+    </div>
+    <div class="pub-header-actions">
+      <a href="#timeline" class="hide-mobile">Timeline</a>
+      <a href="#places" class="hide-mobile">Địa điểm</a>
+      <a href="#notes" class="hide-mobile">Ghi chú</a>
+      <a href="admin.html" class="btn btn-accent btn-sm"><i class='bx bx-lock-alt'></i> Quản trị</a>
+    </div>
+  </div>
+</header>
+
+<!-- TRIP BANNER -->
+<section class="trip-banner">
+  <div class="trip-banner-blob trip-banner-blob-1"></div>
+  <div class="trip-banner-blob trip-banner-blob-2"></div>
+  <div class="container">
+    <div class="trip-title-row">
+      <div class="trip-title-group">
+        <div class="trip-banner-label"><i class='bx bx-trip'></i> Chuyến đi nhóm</div>
+        <h1 id="banner-title">Chưa có chuyến đi</h1>
+        <div class="trip-banner-sub">
+          <span id="banner-dates"><i class='bx bx-calendar'></i> —</span>
+          <span id="banner-members"><i class='bx bx-group'></i> 0 thành viên</span>
+          <span id="banner-duration"><i class='bx bx-time'></i> —</span>
+        </div>
+      </div>
+      <button class="trip-share-btn" onclick="copyLink()">
+        <i class='bx bx-share-alt'></i> Chia sẻ
+      </button>
+    </div>
+    <div class="trip-stats-row">
+      <div class="trip-stat-pill">
+        <i class='bx bx-wallet'></i>
+        <div>
+          <div class="trip-stat-pill-label">Ngân sách</div>
+          <div class="trip-stat-pill-val" id="banner-budget">—</div>
+        </div>
+      </div>
+      <div class="trip-stat-pill">
+        <i class='bx bx-map-pin'></i>
+        <div>
+          <div class="trip-stat-pill-label">Địa điểm</div>
+          <div class="trip-stat-pill-val" id="banner-places">0 nơi</div>
+        </div>
+      </div>
+      <div class="trip-stat-pill">
+        <i class='bx bx-task'></i>
+        <div>
+          <div class="trip-stat-pill-label">Trạng thái</div>
+          <div class="trip-stat-pill-val" id="banner-status">—</div>
+        </div>
+      </div>
+      <div class="trip-stat-pill">
+        <i class='bx bx-user-check'></i>
+        <div>
+          <div class="trip-stat-pill-label">Phụ trách</div>
+          <div class="trip-stat-pill-val" id="banner-leader">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main class="pub-main">
+  <div class="container">
+    <div class="pub-layout">
+
+      <!-- LEFT: TIMELINE + PLACES + NOTES -->
+      <div class="pub-left">
+
+        <!-- TIMELINE -->
+        <div class="pub-card" id="timeline">
+          <div class="pub-card-header">
+            <h3><i class='bx bx-calendar-event'></i> Timeline Chuyến Đi</h3>
+            <span class="tag" id="timeline-tag">0 Ngày</span>
+          </div>
+          <div class="pub-card-body">
+            <div class="timeline" id="timeline-body"></div>
+          </div>
+        </div>
+
+        <!-- PLACES -->
+        <div class="pub-card" id="places">
+          <div class="pub-card-header">
+            <h3><i class='bx bx-map-pin'></i> Danh Sách Địa Điểm</h3>
+            <span class="tag" id="places-tag">0 địa điểm</span>
+          </div>
+          <div class="pub-card-body">
+            <div class="place-list" id="places-list"></div>
+          </div>
+        </div>
+
+        <!-- NOTES -->
+        <div class="pub-card" id="notes">
+          <div class="pub-card-header">
+            <h3><i class='bx bx-note'></i> Ghi Chú Nhanh</h3>
+            <span class="tag" id="note-count">0 ghi chú</span>
+          </div>
+          <div class="pub-card-body">
+            <div class="notes-list" id="notes-list"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <aside class="pub-sidebar">
+
+        <!-- Budget Summary -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-header"><i class='bx bx-wallet'></i> Tổng Ngân Sách</div>
+          <div class="sidebar-card-body" id="budget-sidebar"></div>
+        </div>
+
+        <!-- Members -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-header"><i class='bx bx-group'></i> Thành Viên (<span id="member-count-label">0</span>)</div>
+          <div class="sidebar-card-body">
+            <div class="member-list" id="member-list"></div>
+          </div>
+        </div>
+
+        <!-- Add Note -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-header"><i class='bx bx-edit'></i> Thêm Ghi Chú</div>
+          <div class="sidebar-card-body">
+            <div class="note-form">
+              <input type="text" id="note-name" placeholder="Tên của bạn..." />
+              <textarea id="note-text" placeholder="Nhập ghi chú, nhắc nhở cho nhóm..."></textarea>
+              <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="addNote()">
+                <i class='bx bx-send'></i> Gửi ghi chú
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="pub-footer">
+  <div class="container">
+    <div class="pub-footer-brand">
+      <i class='bx bx-map-alt' style="color:var(--accent);font-size:22px"></i>
+      <span>Trip<em>Sync</em></span>
+    </div>
+    <p>© 2025 TripSync · Quản lý chuyến đi nhóm</p>
+    <div class="pub-footer-links">
+      <a href="admin.html">Admin</a>
+      <a href="#">Trợ giúp</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── Scroll: navbar scrolled class ──
+  const header = document.getElementById('pub-header');
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // ── Helpers ──
+  const fmt = n => (n || 0).toLocaleString('vi-VN') + '₫';
+  const statusMap = { planning:'Đang lên kế hoạch', upcoming:'Sắp tới', ongoing:'Đang diễn ra', completed:'Hoàn thành' };
+
+  function formatDate(d) {
+    if (!d) return '—';
+    const [y, m, dy] = d.split('-');
+    return `${dy}/${m}/${y}`;
+  }
+  function calcDuration(s, e) {
+    if (!s || !e) return '—';
+    const days = Math.round((new Date(e) - new Date(s)) / 86400000) + 1;
+    return `${days} ngày ${days - 1} đêm`;
+  }
+
+  // ── Trống placeholder ──
+  function emptyState(icon, msg) {
+    return `<div style="text-align:center;padding:40px 20px;color:var(--text-muted,#9ca3af)">
+      <i class='bx ${icon}' style="font-size:2.5rem;opacity:.3;display:block;margin-bottom:10px"></i>
+      <span>${msg}</span>
+    </div>`;
+  }
+
+  // ── Load data từ localStorage ──
+  function loadPublicData() {
+    const raw = localStorage.getItem('tripsync_admin');
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch { return null; }
+  }
+
+  // ── Render Banner ──
+  function renderBanner(data) {
+    const trip = data && data.trips && data.trips[0];
+    if (!trip) {
+      document.getElementById('banner-title').textContent = 'Chưa có chuyến đi';
+      document.getElementById('banner-dates').innerHTML = "<i class='bx bx-calendar'></i> —";
+      document.getElementById('banner-members').innerHTML = "<i class='bx bx-group'></i> 0 thành viên";
+      document.getElementById('banner-duration').innerHTML = "<i class='bx bx-time'></i> —";
+      document.getElementById('banner-budget').textContent = '—';
+      document.getElementById('banner-places').textContent = '0 nơi';
+      document.getElementById('banner-status').textContent = '—';
+      document.getElementById('banner-leader').textContent = '—';
+      return;
+    }
+    const totalBudget = data.budget ? data.budget.categories.reduce((a, c) => a + c.amount, 0) : trip.budget || 0;
+    document.getElementById('banner-title').textContent = trip.name;
+    document.getElementById('banner-dates').innerHTML = `<i class='bx bx-calendar'></i> ${formatDate(trip.start)} – ${formatDate(trip.end)}`;
+    document.getElementById('banner-members').innerHTML = `<i class='bx bx-group'></i> ${(data.members || []).length} thành viên`;
+    document.getElementById('banner-duration').innerHTML = `<i class='bx bx-time'></i> ${calcDuration(trip.start, trip.end)}`;
+    document.getElementById('banner-budget').textContent = totalBudget ? fmt(totalBudget) : '—';
+    document.getElementById('banner-places').textContent = `${(data.places || []).length} nơi`;
+    document.getElementById('banner-status').textContent = statusMap[trip.status] || trip.status || '—';
+    document.getElementById('banner-leader').textContent = trip.leader || (data.members && data.members[0] ? data.members[0].name : '—');
+  }
+
+  // ── Render Timeline ──
+  function renderTimeline(data) {
+    const body = document.getElementById('timeline-body');
+    const tag = document.getElementById('timeline-tag');
+    const trips = data && data.trips;
+
+    if (!trips || !trips.length) {
+      tag.textContent = '0 Ngày';
+      body.innerHTML = emptyState('bx-calendar-event', 'Danh sách trống. Admin chưa thêm chuyến đi nào.');
+      return;
+    }
+
+    const trip = trips[0];
+    const places = (data.places || []);
+    // Nhóm địa điểm theo ngày
+    const byDay = {};
+    places.forEach(p => {
+      const key = p.day || 'Ngày 1';
+      if (!byDay[key]) byDay[key] = [];
+      byDay[key].push(p);
+    });
+
+    const days = Object.keys(byDay);
+    const totalDays = trip.start && trip.end
+      ? Math.round((new Date(trip.end) - new Date(trip.start)) / 86400000) + 1
+      : days.length || 0;
+    tag.textContent = `${totalDays} Ngày`;
+
+    if (!places.length) {
+      body.innerHTML = emptyState('bx-calendar-x', 'Danh sách trống. Admin chưa thêm địa điểm nào.');
+      return;
+    }
+
+    body.innerHTML = days.map((day, idx) => {
+      const stops = byDay[day].map(p => `
+        <div class="timeline-stop">
+          <div class="timeline-dot"></div>
+          <div class="timeline-stop-content">
+            <div class="stop-time">${p.time || ''} – ${p.location || ''}</div>
+            <div class="stop-name">${p.name}</div>
+            ${p.notes ? `<div class="stop-note">${p.notes}</div>` : ''}
+            <div class="stop-tags"><span class="stop-tag">${p.type || ''}</span></div>
+          </div>
+        </div>`).join('');
+      return `
+        <div class="timeline-day">
+          <div class="timeline-day-header">
+            <div class="timeline-day-num">
+              <span class="dn">Ngày</span>
+              <span class="dv">${String(idx + 1).padStart(2, '0')}</span>
+            </div>
+            <div class="timeline-day-info">
+              <h4>${day}</h4>
+              <span>${byDay[day].map(p => p.name).join(' · ')}</span>
+            </div>
+          </div>
+          <div class="timeline-stops">${stops}</div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Render Places ──
+  function renderPlaces(data) {
+    const list = document.getElementById('places-list');
+    const tag = document.getElementById('places-tag');
+    const places = data && data.places;
+
+    if (!places || !places.length) {
+      tag.textContent = '0 địa điểm';
+      list.innerHTML = emptyState('bx-map-pin', 'Danh sách trống. Admin chưa thêm địa điểm nào.');
+      return;
+    }
+
+    tag.textContent = `${places.length} địa điểm`;
+    list.innerHTML = places.map((p, i) => `
+      <div class="place-item">
+        <div class="place-num">${i + 1}</div>
+        <div class="place-info">
+          <div class="place-name">${p.name}</div>
+          <div class="place-meta">
+            <span><i class='bx bx-map'></i> ${p.location || '—'}</span>
+            <span><i class='bx bx-time'></i> ${p.day || '—'} · ${p.time || ''}</span>
+            <span class="place-rating"><i class='bx bxs-star'></i> ${p.rating || '—'}</span>
+          </div>
+        </div>
+        <span class="stop-tag" style="margin-left:auto;flex-shrink:0">${p.type || ''}</span>
+      </div>`).join('');
+  }
+
+  // ── Render Members ──
+  function renderMembers(data) {
+    const list = document.getElementById('member-list');
+    const label = document.getElementById('member-count-label');
+    const members = data && data.members;
+
+    if (!members || !members.length) {
+      label.textContent = '0';
+      list.innerHTML = emptyState('bx-group', 'Danh sách trống. Admin chưa thêm thành viên nào.');
+      return;
+    }
+
+    label.textContent = members.length;
+    list.innerHTML = members.map((m, i) => `
+      <div class="member-item">
+        <div class="member-avatar" style="background:${m.color || 'linear-gradient(135deg,#2D5A3D,#4A8C5C)'}">${m.initials || '?'}</div>
+        <div class="member-info">
+          <div class="member-name">${m.name}</div>
+          <div class="member-role">${m.role}</div>
+        </div>
+        ${i === 0 ? '<span class="member-badge">Leader</span>' : ''}
+      </div>`).join('');
+  }
+
+  // ── Render Budget Sidebar ──
+  function renderBudget(data) {
+    const sidebar = document.getElementById('budget-sidebar');
+    const budget = data && data.budget;
+
+    if (!budget || !budget.categories || !budget.categories.length) {
+      sidebar.innerHTML = emptyState('bx-wallet', 'Danh sách trống. Admin chưa cập nhật ngân sách.');
+      return;
+    }
+
+    const total = budget.categories.reduce((a, c) => a + c.amount, 0);
+    const perPerson = budget.memberCount ? Math.round(total / budget.memberCount) : 0;
+    const bars = budget.categories.map(c => {
+      const pct = total > 0 ? Math.round(c.amount / total * 100) : 0;
+      return `<div class="budget-bar-wrap">
+        <div class="budget-bar-label"><span>${c.name}</span><span>${fmt(c.amount)}</span></div>
+        <div class="budget-bar"><div class="budget-bar-fill" style="width:${pct}%;background:${c.color}"></div></div>
+      </div>`;
+    }).join('');
+
+    sidebar.innerHTML = `
+      <div class="budget-total">
+        <div class="budget-total-label">Tổng chi phí ước tính</div>
+        <div class="budget-total-val">${fmt(total)}</div>
+        <div class="budget-total-note">${fmt(perPerson)} / người · ${budget.memberCount || 0} thành viên</div>
+      </div>
+      <div class="budget-breakdown">${bars}</div>`;
+  }
+
+  // ── Render Notes ──
+  function renderNotes(data) {
+    const list = document.getElementById('notes-list');
+    const countEl = document.getElementById('note-count');
+    const notes = data && data.notes;
+
+    if (!notes || !notes.length) {
+      countEl.textContent = '0 ghi chú';
+      list.innerHTML = emptyState('bx-note', 'Danh sách trống. Hãy thêm ghi chú đầu tiên bên dưới!');
+      return;
+    }
+
+    countEl.textContent = `${notes.length} ghi chú`;
+    list.innerHTML = notes.map(n => `
+      <div class="note-item">
+        <div class="note-author"><i class='bx bx-user'></i> ${n.author}</div>
+        <div class="note-text">${n.text}</div>
+        <div class="note-time">${n.time}</div>
+      </div>`).join('');
+  }
+
+  // ── Add Note ──
+  function addNote() {
+    const name = document.getElementById('note-name').value.trim();
+    const text = document.getElementById('note-text').value.trim();
+    if (!name || !text) { alert('Vui lòng nhập tên và nội dung ghi chú!'); return; }
+
+    const now = new Date();
+    const timeStr = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()} · ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+    // Lưu vào localStorage
+    const data = loadPublicData() || { trips:[], places:[], members:[], budget:{ categories:[] }, notes:[] };
+    if (!data.notes) data.notes = [];
+    data.notes.unshift({ author: name, text, time: timeStr });
+    localStorage.setItem('tripsync_admin', JSON.stringify(data));
+
+    document.getElementById('note-name').value = '';
+    document.getElementById('note-text').value = '';
+    renderNotes(data);
+  }
+
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      alert('Đã sao chép link chia sẻ!');
+    });
+  }
+
+  // ── Init: render tất cả từ localStorage ──
+  (function init() {
+    const data = loadPublicData();
+    renderBanner(data);
+    renderTimeline(data);
+    renderPlaces(data);
+    renderMembers(data);
+    renderBudget(data);
+    renderNotes(data);
+  })();
+</script>
+
+</body>
+</html>
