@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
@@ -136,6 +138,106 @@
         .form-panel { display: none; }
         .form-panel.active { display: block; }
 
+        /* ── GOOGLE BUTTON ── */
+        .btn-social.google {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-social.google:hover {
+            border-color: #EA4335;
+            color: #EA4335;
+            background: #FFF5F5;
+        }
+        .btn-social.google.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* Google User Info Card (sau khi đăng nhập) */
+        .google-user-card {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: linear-gradient(135deg, var(--primary-pale), #F0FAF2);
+            border: 1.5px solid rgba(45,90,61,0.2);
+            border-radius: 14px;
+            margin-bottom: 18px;
+            animation: slideIn 0.4s ease;
+        }
+        .google-user-card.visible { display: flex; }
+        .google-user-avatar {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-light);
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .google-user-avatar-placeholder {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700; font-size: 16px;
+            flex-shrink: 0;
+        }
+        .google-user-info { flex: 1; min-width: 0; }
+        .google-user-name { font-weight: 600; font-size: 14px; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .google-user-email { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .google-user-badge { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--primary); background: rgba(45,90,61,0.1); padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
+        .google-user-badge i { font-size: 13px; }
+
+        /* Google Sign-In success button */
+        .btn-google-continue {
+            width: 100%; padding: 15px;
+            background: linear-gradient(135deg, #4285F4, #34A853);
+            color: white; border: none; border-radius: 12px;
+            font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-bottom: 16px;
+        }
+        .btn-google-continue:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(66,133,244,0.35); }
+        .btn-google-continue i { font-size: 20px; }
+
+        /* Disconnect link */
+        .google-disconnect {
+            display: block; text-align: center; font-size: 12px;
+            color: var(--text-muted); cursor: pointer; margin-bottom: 16px;
+            text-decoration: underline; transition: color 0.2s;
+        }
+        .google-disconnect:hover { color: #EA4335; }
+
+        /* Google loading spinner inside button */
+        .google-spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(234,67,53,0.3);
+            border-top-color: #EA4335;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+        .btn-social.google.loading .google-spinner { display: inline-block; }
+        .btn-social.google.loading .google-btn-text { opacity: 0.6; }
+
+        /* Toast notification */
+        .auth-toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+            padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 500;
+            display: flex; align-items: center; gap: 10px;
+            opacity: 0; pointer-events: none;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 9999; min-width: 280px; max-width: 380px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+        }
+        .auth-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .auth-toast.success { background: #1A3A28; color: white; }
+        .auth-toast.error { background: #B91C1C; color: white; }
+        .auth-toast i { font-size: 20px; flex-shrink: 0; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         @media (max-width: 900px) {
             body { overflow-y: auto; }
             .auth-left { display: none; }
@@ -224,9 +326,28 @@
 
             <div class="divider"><span>Hoặc đăng nhập với</span></div>
 
-            <div class="social-btns">
-                <button class="btn-social google">
-                    <i class='bx bxl-google'></i> Google
+            <!-- Google User Card (hiện sau khi đăng nhập Google) -->
+            <div class="google-user-card" id="google-user-card">
+                <div id="google-avatar-wrap"></div>
+                <div class="google-user-info">
+                    <div class="google-user-name" id="google-user-name"></div>
+                    <div class="google-user-email" id="google-user-email"></div>
+                </div>
+                <div class="google-user-badge"><i class='bx bxl-google'></i> Google</div>
+            </div>
+
+            <!-- Nút tiếp tục với Google (hiện sau khi xác thực) -->
+            <button class="btn-google-continue" id="btn-google-continue" style="display:none" onclick="continueWithGoogle()">
+                <i class='bx bx-check-circle'></i>
+                Tiếp tục với tài khoản này
+            </button>
+            <span class="google-disconnect" id="google-disconnect" style="display:none" onclick="disconnectGoogle()">Dùng tài khoản khác</span>
+
+            <div class="social-btns" id="social-btns-login">
+                <button class="btn-social google" id="btn-google-login" onclick="handleGoogleLogin()">
+                    <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+                    <span class="google-btn-text">Google</span>
+                    <div class="google-spinner"></div>
                 </button>
                 <button class="btn-social facebook">
                     <i class='bx bxl-facebook'></i> Facebook
@@ -316,6 +437,17 @@
 </div>
 
 <script>
+// ============================================================
+// CẤU HÌNH GOOGLE OAUTH
+// Thay YOUR_GOOGLE_CLIENT_ID bằng Client ID thực từ Google Cloud Console
+// Hướng dẫn: https://console.cloud.google.com/apis/credentials
+// ============================================================
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+
+// ── State ──────────────────────────────────────────────────
+let googleUser = null;
+
+// ── Tab switching ──────────────────────────────────────────
 function switchTab(tab) {
     document.querySelectorAll('.auth-tab').forEach((t, i) => {
         t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
@@ -324,6 +456,7 @@ function switchTab(tab) {
     document.getElementById('panel-register').classList.toggle('active', tab === 'register');
 }
 
+// ── Password toggle ────────────────────────────────────────
 function togglePw(inputId, icon) {
     const input = document.getElementById(inputId);
     const isHidden = input.type === 'password';
@@ -331,7 +464,204 @@ function togglePw(inputId, icon) {
     icon.classList.toggle('bx-hide', !isHidden);
     icon.classList.toggle('bx-show', isHidden);
 }
+
+// ── Toast notification ─────────────────────────────────────
+function showAuthToast(message, type = 'success') {
+    let toast = document.getElementById('auth-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'auth-toast';
+        toast.className = 'auth-toast';
+        document.body.appendChild(toast);
+    }
+    const icon = type === 'success' ? 'bx-check-circle' : 'bx-x-circle';
+    toast.innerHTML = `<i class='bx ${icon}'></i><span>${message}</span>`;
+    toast.className = `auth-toast ${type}`;
+    // Trigger reflow
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// ── Google Login ───────────────────────────────────────────
+function handleGoogleLogin() {
+    const btn = document.getElementById('btn-google-login');
+
+    // Kiểm tra Client ID đã cấu hình chưa
+    if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
+        showAuthToast('⚠️ Vui lòng cấu hình GOOGLE_CLIENT_ID trong file login.html', 'error');
+        openGoogleSetupGuide();
+        return;
+    }
+
+    btn.classList.add('loading');
+
+    // Khởi tạo Google Identity Services
+    if (typeof google === 'undefined') {
+        showAuthToast('Không thể tải Google SDK. Kiểm tra kết nối mạng.', 'error');
+        btn.classList.remove('loading');
+        return;
+    }
+
+    google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+        callback: onGoogleTokenReceived,
+        error_callback: (err) => {
+            btn.classList.remove('loading');
+            if (err.type !== 'popup_closed') {
+                showAuthToast('Đăng nhập Google thất bại. Vui lòng thử lại.', 'error');
+            }
+        }
+    }).requestAccessToken();
+}
+
+// ── Nhận token và lấy thông tin user ──────────────────────
+async function onGoogleTokenReceived(tokenResponse) {
+    const btn = document.getElementById('btn-google-login');
+    try {
+        const res = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${tokenResponse.access_token}`);
+        if (!res.ok) throw new Error('Không lấy được thông tin người dùng');
+        const profile = await res.json();
+
+        googleUser = {
+            id: profile.sub,
+            name: profile.name,
+            email: profile.email,
+            picture: profile.picture,
+            token: tokenResponse.access_token
+        };
+
+        // Lưu token vào localStorage
+        localStorage.setItem('authToken', tokenResponse.access_token);
+        localStorage.setItem('googleUser', JSON.stringify(googleUser));
+
+        renderGoogleUserCard(googleUser);
+        btn.classList.remove('loading');
+        showAuthToast(`Xin chào, ${profile.name.split(' ').pop()}! 🎉`);
+
+    } catch (err) {
+        btn.classList.remove('loading');
+        showAuthToast('Không lấy được thông tin Google. Thử lại.', 'error');
+    }
+}
+
+// ── Hiển thị thẻ user Google ──────────────────────────────
+function renderGoogleUserCard(user) {
+    // Avatar
+    const avatarWrap = document.getElementById('google-avatar-wrap');
+    if (user.picture) {
+        avatarWrap.innerHTML = `<img class="google-user-avatar" src="${user.picture}" alt="${user.name}" referrerpolicy="no-referrer">`;
+    } else {
+        const initials = user.name.split(' ').map(n => n[0]).slice(-2).join('').toUpperCase();
+        avatarWrap.innerHTML = `<div class="google-user-avatar-placeholder">${initials}</div>`;
+    }
+
+    document.getElementById('google-user-name').textContent = user.name;
+    document.getElementById('google-user-email').textContent = user.email;
+
+    // Ẩn nút social, hiện card + nút tiếp tục
+    document.getElementById('social-btns-login').style.display = 'none';
+    document.getElementById('google-user-card').classList.add('visible');
+    document.getElementById('btn-google-continue').style.display = 'flex';
+    document.getElementById('google-disconnect').style.display = 'block';
+}
+
+// ── Tiếp tục với tài khoản Google đã xác thực ─────────────
+function continueWithGoogle() {
+    if (!googleUser) return;
+    showAuthToast('Đang chuyển hướng...');
+    // Redirect sau 1.2s — thay 'index.html' bằng trang đích thực của bạn
+    setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+}
+
+// ── Ngắt kết nối Google ───────────────────────────────────
+function disconnectGoogle() {
+    if (googleUser && typeof google !== 'undefined') {
+        google.accounts.oauth2.revoke(googleUser.token, () => {});
+    }
+    googleUser = null;
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('googleUser');
+
+    document.getElementById('google-user-card').classList.remove('visible');
+    document.getElementById('btn-google-continue').style.display = 'none';
+    document.getElementById('google-disconnect').style.display = 'none';
+    document.getElementById('social-btns-login').style.display = 'flex';
+}
+
+// ── Hướng dẫn cấu hình (mở trong tab mới) ─────────────────
+function openGoogleSetupGuide() {
+    // Hiển thị modal hướng dẫn
+    let modal = document.getElementById('setup-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'setup-modal';
+        modal.style.cssText = `
+            position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10000;
+            display:flex;align-items:center;justify-content:center;padding:20px;
+            animation:fadeIn 0.2s ease;
+        `;
+        modal.innerHTML = `
+            <div style="background:white;border-radius:20px;padding:32px;max-width:460px;width:100%;position:relative;box-shadow:0 24px 60px rgba(0,0,0,0.25)">
+                <button onclick="this.closest('#setup-modal').remove()" style="position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;font-size:22px;color:#888">✕</button>
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+                    <div style="width:44px;height:44px;background:#FEE2E2;border-radius:12px;display:flex;align-items:center;justify-content:center">
+                        <svg width="22" height="22" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                    </div>
+                    <div>
+                        <div style="font-weight:700;font-size:17px;color:#1A1A2E">Cấu hình Google OAuth</div>
+                        <div style="font-size:13px;color:#888">3 bước đơn giản</div>
+                    </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px">
+                    ${[
+                        ['1', 'Truy cập Google Cloud Console', 'console.cloud.google.com/apis/credentials'],
+                        ['2', 'Tạo OAuth 2.0 Client ID', 'Chọn Application type: <strong>Web application</strong>'],
+                        ['3', 'Thêm Authorized origins', `Thêm domain của bạn, ví dụ: <code style="background:#f0f0ec;padding:2px 6px;border-radius:4px">http://localhost:5500</code>`],
+                    ].map(([num, title, desc]) => `
+                        <div style="display:flex;gap:12px;align-items:flex-start">
+                            <div style="width:26px;height:26px;background:#2D5A3D;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px">${num}</div>
+                            <div>
+                                <div style="font-weight:600;font-size:14px;color:#1A1A2E;margin-bottom:3px">${title}</div>
+                                <div style="font-size:13px;color:#666">${desc}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="background:#F0F7FF;border-radius:10px;padding:12px 14px;font-size:13px;color:#1D4ED8;margin-bottom:20px">
+                    <strong>Sau khi có Client ID:</strong> Mở file <code>login.html</code> và thay dòng<br>
+                    <code style="background:#DBEAFE;padding:2px 6px;border-radius:4px;display:inline-block;margin-top:4px">GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID...'</code>
+                </div>
+                <a href="https://console.cloud.google.com/apis/credentials" target="_blank"
+                   style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:#2D5A3D;color:white;border-radius:12px;text-decoration:none;font-weight:600;font-size:15px;transition:opacity 0.2s"
+                   onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+                    <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg>
+                    Mở Google Cloud Console
+                </a>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    }
+}
+
+// ── Auto-restore session nếu đã đăng nhập trước đó ────────
+(function restoreSession() {
+    try {
+        const saved = localStorage.getItem('googleUser');
+        if (saved) {
+            const user = JSON.parse(saved);
+            googleUser = user;
+            renderGoogleUserCard(user);
+        }
+    } catch(e) {}
+})();
 </script>
+<style>
+@keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+</style>
 
 </body>
 </html>
