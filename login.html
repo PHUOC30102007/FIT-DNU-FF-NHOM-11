@@ -176,6 +176,23 @@
         .google-spinner { width: 16px; height: 16px; border: 2px solid rgba(234,67,53,0.3); border-top-color: #EA4335; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
         .btn-social.google.loading .google-spinner { display: inline-block; }
 
+        /* ── Register Google Only ── */
+        .reg-benefits { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+        .reg-benefit-item { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--text); background: var(--primary-pale); padding: 10px 12px; border-radius: 10px; }
+        .reg-benefit-item i { color: var(--primary); font-size: 16px; flex-shrink: 0; }
+        .btn-google-reg {
+            width: 100%; padding: 15px 20px; margin-bottom: 14px;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            background: var(--white); border: 2px solid #dadce0;
+            border-radius: 12px; cursor: pointer; transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; color: #3c4043;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .btn-google-reg:hover { border-color: #4285F4; box-shadow: 0 4px 16px rgba(66,133,244,0.2); transform: translateY(-2px); }
+        .btn-google-reg:active { transform: translateY(0); }
+        .reg-divider-note { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: var(--text-muted); margin: 16px 0 20px; }
+        .reg-divider-note i { font-size: 14px; color: var(--primary); }
+
         @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
@@ -290,86 +307,44 @@
             </div>
         </div>
 
-        <!-- ══════════════ REGISTER FORM ══════════════ -->
+        <!-- ══════════════ REGISTER — Google Only ══════════════ -->
         <div class="form-panel" id="panel-register">
             <div class="auth-heading">
                 <h3>Tạo tài khoản mới ✨</h3>
                 <p>Tham gia cộng đồng 50.000+ du khách WanderViet</p>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="reg-lastname">Họ</label>
-                    <div class="input-wrap">
-                        <input type="text" id="reg-lastname" placeholder="Nguyễn">
-                        <i class='bx bxs-user field-icon'></i>
-                    </div>
-                    <div class="field-error" id="err-lastname"><i class='bx bx-error-circle'></i><span></span></div>
-                </div>
-                <div class="form-group">
-                    <label for="reg-firstname">Tên</label>
-                    <div class="input-wrap">
-                        <input type="text" id="reg-firstname" placeholder="Lan Anh">
-                        <i class='bx bxs-user field-icon'></i>
-                    </div>
-                    <div class="field-error" id="err-firstname"><i class='bx bx-error-circle'></i><span></span></div>
-                </div>
+            <div class="reg-benefits">
+                <div class="reg-benefit-item"><i class='bx bx-check-circle'></i> Đặt tour ngay lập tức</div>
+                <div class="reg-benefit-item"><i class='bx bx-gift'></i> Voucher chào mừng 500K</div>
+                <div class="reg-benefit-item"><i class='bx bx-shield-check'></i> Bảo mật bởi Google</div>
+                <div class="reg-benefit-item"><i class='bx bx-time-five'></i> Chỉ mất 10 giây</div>
             </div>
 
-            <div class="form-group">
-                <label for="reg-email">Email</label>
-                <div class="input-wrap">
-                    <input type="email" id="reg-email" placeholder="email@example.com" autocomplete="email">
-                    <i class='bx bxs-envelope field-icon'></i>
+            <div class="google-user-card" id="reg-google-user-card">
+                <div id="reg-google-avatar-wrap"></div>
+                <div class="google-user-info">
+                    <div class="google-user-name" id="reg-google-user-name"></div>
+                    <div class="google-user-email" id="reg-google-user-email"></div>
                 </div>
-                <div class="field-error" id="err-reg-email"><i class='bx bx-error-circle'></i><span></span></div>
+                <div class="google-user-badge"><i class='bx bxl-google'></i> Google</div>
             </div>
 
-            <div class="form-group">
-                <label for="reg-phone">Số điện thoại</label>
-                <div class="input-wrap">
-                    <input type="tel" id="reg-phone" placeholder="0912 345 678">
-                    <i class='bx bxs-phone field-icon'></i>
-                </div>
-                <div class="field-error" id="err-phone"><i class='bx bx-error-circle'></i><span></span></div>
-            </div>
-
-            <div class="form-group">
-                <label for="reg-pw">Mật khẩu</label>
-                <div class="input-wrap">
-                    <input type="password" id="reg-pw" placeholder="Tối thiểu 8 ký tự" oninput="checkPasswordStrength(this.value)" autocomplete="new-password">
-                    <i class='bx bxs-lock-alt field-icon'></i>
-                    <i class='bx bx-hide toggle-pw' onclick="togglePw('reg-pw', this)"></i>
-                </div>
-                <div class="pw-strength" id="pw-strength">
-                    <div class="pw-strength-bar"><div class="pw-strength-fill" id="pw-fill"></div></div>
-                    <div class="pw-strength-text" id="pw-text"></div>
-                </div>
-                <div class="field-error" id="err-reg-pw"><i class='bx bx-error-circle'></i><span></span></div>
-            </div>
-
-            <div class="form-group">
-                <label for="reg-pw2">Xác nhận mật khẩu</label>
-                <div class="input-wrap">
-                    <input type="password" id="reg-pw2" placeholder="Nhập lại mật khẩu" autocomplete="new-password">
-                    <i class='bx bxs-lock field-icon'></i>
-                    <i class='bx bx-hide toggle-pw' onclick="togglePw('reg-pw2', this)"></i>
-                </div>
-                <div class="field-error" id="err-reg-pw2"><i class='bx bx-error-circle'></i><span></span></div>
-            </div>
-
-            <div class="terms-wrap">
-                <label>
-                    <input type="checkbox" id="reg-terms">
-                    <span>Tôi đồng ý với <a href="#">Điều khoản dịch vụ</a> và <a href="#">Chính sách bảo mật</a> của WanderViet.</span>
-                </label>
-                <div class="field-error" id="err-terms"><i class='bx bx-error-circle'></i><span></span></div>
-            </div>
-
-            <button class="btn-submit" id="btn-register" onclick="handleRegister()">
-                <div class="btn-spinner"></div>
-                <span class="btn-label"><i class='bx bx-user-plus'></i> Tạo Tài Khoản</span>
+            <button class="btn-google-reg" id="btn-google-reg" onclick="handleGoogleRegister()">
+                <svg width="20" height="20" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                <span id="btn-google-reg-label">Đăng ký với Google</span>
+                <div class="google-spinner" id="reg-google-spinner"></div>
             </button>
+
+            <button class="btn-google-continue" id="btn-reg-continue" style="display:none" onclick="continueRegisterWithGoogle()">
+                <i class='bx bx-check-circle'></i> Hoàn tất đăng ký
+            </button>
+            <span class="google-disconnect" id="reg-google-disconnect" style="display:none" onclick="disconnectRegGoogle()">Dùng tài khoản khác</span>
+
+            <div class="reg-divider-note">
+                <i class='bx bx-lock-alt'></i>
+                WanderViet không lưu mật khẩu Google của bạn
+            </div>
 
             <div class="auth-footer">
                 Đã có tài khoản? <a href="#" onclick="switchTab('login')">Đăng nhập</a>
@@ -872,6 +847,134 @@ async function handleLogin() {
         showAuthToast('Lỗi kết nối. Vui lòng thử lại sau.', 'error');
         console.error('Login error:', err);
     }
+}
+
+// ============================================================
+// GOOGLE REGISTER (đăng ký chỉ qua Google)
+// ============================================================
+let regGoogleUser = null;
+
+function handleGoogleRegister() {
+    if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
+        showAuthToast('⚠️ Vui lòng cấu hình GOOGLE_CLIENT_ID', 'error');
+        return;
+    }
+    const spinner = document.getElementById('reg-google-spinner');
+    const label   = document.getElementById('btn-google-reg-label');
+    if (spinner) spinner.style.display = 'inline-block';
+    if (label)   label.textContent = 'Đang kết nối...';
+
+    if (typeof google === 'undefined') {
+        showAuthToast('Không thể tải Google SDK.', 'error');
+        if (spinner) spinner.style.display = 'none';
+        if (label)   label.textContent = 'Đăng ký với Google';
+        return;
+    }
+    google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+        callback: onRegGoogleTokenReceived,
+        error_callback: (err) => {
+            if (spinner) spinner.style.display = 'none';
+            if (label)   label.textContent = 'Đăng ký với Google';
+            if (err.type !== 'popup_closed') showAuthToast('Đăng ký Google thất bại.', 'error');
+        }
+    }).requestAccessToken();
+}
+
+async function onRegGoogleTokenReceived(tokenResponse) {
+    const spinner = document.getElementById('reg-google-spinner');
+    const label   = document.getElementById('btn-google-reg-label');
+    try {
+        const res = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${tokenResponse.access_token}`);
+        if (!res.ok) throw new Error();
+        const profile = await res.json();
+        regGoogleUser = { id: profile.sub, name: profile.name, email: profile.email, picture: profile.picture, token: tokenResponse.access_token };
+
+        // Hiển thị card
+        const avatarWrap = document.getElementById('reg-google-avatar-wrap');
+        if (profile.picture) {
+            avatarWrap.innerHTML = `<img class="google-user-avatar" src="${profile.picture}" alt="${profile.name}" referrerpolicy="no-referrer">`;
+        } else {
+            const initials = profile.name.split(' ').map(n=>n[0]).slice(-2).join('').toUpperCase();
+            avatarWrap.innerHTML = `<div class="google-user-avatar-placeholder">${initials}</div>`;
+        }
+        document.getElementById('reg-google-user-name').textContent = profile.name;
+        document.getElementById('reg-google-user-email').textContent = profile.email;
+
+        const card = document.getElementById('reg-google-user-card');
+        card.classList.add('visible'); card.style.display = 'flex';
+        document.getElementById('btn-google-reg').style.display = 'none';
+        document.getElementById('btn-reg-continue').style.display = 'flex';
+        document.getElementById('reg-google-disconnect').style.display = 'block';
+
+        if (spinner) spinner.style.display = 'none';
+        showAuthToast(`Xin chào, ${profile.name.split(' ').pop()}! Nhấn hoàn tất để đăng ký 🎉`);
+    } catch (err) {
+        if (spinner) spinner.style.display = 'none';
+        if (label)   label.textContent = 'Đăng ký với Google';
+        showAuthToast('Không lấy được thông tin Google.', 'error');
+    }
+}
+
+async function continueRegisterWithGoogle() {
+    if (!regGoogleUser) return;
+    setLoading(true);
+    try {
+        // Kiểm tra đã tồn tại chưa
+        const existing = await fetch(`${MEMBERS_API}/members?email=${encodeURIComponent(regGoogleUser.email)}`);
+        const list = await existing.json();
+        if (Array.isArray(list) && list.length > 0) {
+            // Đã có tài khoản → đăng nhập luôn
+            localStorage.setItem('authToken', regGoogleUser.token);
+            localStorage.setItem('googleUser', JSON.stringify(regGoogleUser));
+            setLoading(false);
+            showAuthToast('Tài khoản đã tồn tại, đang đăng nhập...', 'info');
+            setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+            return;
+        }
+        // Tạo mới
+        const nameParts = regGoogleUser.name.split(' ');
+        const newMember = {
+            email: regGoogleUser.email,
+            firstName: nameParts.pop() || '',
+            lastName: nameParts.join(' ') || '',
+            avatar: regGoogleUser.picture || '',
+            googleId: regGoogleUser.id,
+            createdAt: new Date().toISOString()
+        };
+        await fetch(`${MEMBERS_API}/members`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newMember)
+        });
+        localStorage.setItem('authToken', regGoogleUser.token);
+        localStorage.setItem('googleUser', JSON.stringify(regGoogleUser));
+        setLoading(false);
+        showAuthToast(`🎉 Tạo tài khoản thành công! Xin chào, ${regGoogleUser.name.split(' ').pop()}!`, 'success');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1400);
+    } catch (err) {
+        setLoading(false);
+        // Dù API lỗi vẫn cho vào (frontend-only fallback)
+        localStorage.setItem('authToken', regGoogleUser.token);
+        localStorage.setItem('googleUser', JSON.stringify(regGoogleUser));
+        showAuthToast(`🎉 Chào mừng, ${regGoogleUser.name.split(' ').pop()}!`, 'success');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1400);
+    }
+}
+
+function disconnectRegGoogle() {
+    if (regGoogleUser && typeof google !== 'undefined') {
+        google.accounts.oauth2.revoke(regGoogleUser.token, () => {});
+    }
+    regGoogleUser = null;
+    document.getElementById('reg-google-user-card').classList.remove('visible');
+    document.getElementById('reg-google-user-card').style.display = 'none';
+    document.getElementById('btn-reg-continue').style.display = 'none';
+    document.getElementById('reg-google-disconnect').style.display = 'none';
+    document.getElementById('btn-google-reg').style.display = 'flex';
+    const label = document.getElementById('btn-google-reg-label');
+    if (label) label.textContent = 'Đăng ký với Google';
 }
 
 // ============================================================
