@@ -24,8 +24,44 @@
       <a href="#notes" class="hide-mobile">Ghi chú</a>
       <a href="admin.html" class="btn btn-accent btn-sm"><i class='bx bx-lock-alt'></i> Quản trị</a>
     </div>
+    <button class="pub-hamburger" id="pub-hamburger" aria-label="Mở menu" onclick="togglePubMenu()">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
+
+<!-- MOBILE MENU OVERLAY -->
+<div class="mobile-menu-overlay" id="pub-mobile-overlay" onclick="closePubMenu()"></div>
+<div class="mobile-menu" id="pub-mobile-menu">
+  <div class="mobile-menu-header">
+    <div class="pub-logo">
+      <div class="pub-logo-icon" style="background:var(--primary-pale);"><i class='bx bx-map-alt' style="color:var(--primary)"></i></div>
+      <span class="pub-logo-text" style="color:var(--dark);">Trip<em>Sync</em></span>
+    </div>
+    <button class="mobile-menu-close" onclick="closePubMenu()" aria-label="Đóng menu">
+      <i class='bx bx-x'></i>
+    </button>
+  </div>
+  <nav class="mobile-menu-nav">
+    <a href="#timeline" onclick="closePubMenu()"><i class='bx bx-calendar-event'></i> Timeline</a>
+    <a href="#places" onclick="closePubMenu()"><i class='bx bx-map-pin'></i> Địa điểm</a>
+    <a href="#notes" onclick="closePubMenu()"><i class='bx bx-notepad'></i> Ghi chú</a>
+    <a href="#budget" onclick="closePubMenu()"><i class='bx bx-wallet'></i> Ngân sách</a>
+    <a href="#members" onclick="closePubMenu()"><i class='bx bx-group'></i> Thành viên</a>
+  </nav>
+  <div class="mobile-menu-divider"></div>
+  <div class="mobile-menu-pages">
+    <p class="mobile-menu-section-label">Chuyển trang</p>
+    <a href="index.html"><i class='bx bx-home'></i> WanderViet — Trang chủ</a>
+    <a href="admin.html"><i class='bx bx-shield'></i> Quản trị Admin</a>
+    <a href="login.html"><i class='bx bx-log-in'></i> Đăng nhập</a>
+  </div>
+  <div class="mobile-menu-footer">
+    <a href="admin.html" class="btn btn-accent" style="width:100%;text-align:center;justify-content:center;display:flex;align-items:center;gap:8px;">
+      <i class='bx bx-lock-alt'></i> Vào trang Quản trị
+    </a>
+  </div>
+</div>
 
 <!-- TRIP BANNER -->
 <section class="trip-banner">
@@ -179,6 +215,26 @@
   window.addEventListener('scroll', () => {
     header.classList.toggle('scrolled', window.scrollY > 60);
   });
+
+  // ── Hamburger Menu ──
+  function togglePubMenu() {
+    const menu = document.getElementById('pub-mobile-menu');
+    const overlay = document.getElementById('pub-mobile-overlay');
+    const btn = document.getElementById('pub-hamburger');
+    if (menu.classList.contains('open')) { closePubMenu(); } else {
+      menu.classList.add('open');
+      overlay.classList.add('open');
+      btn.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+  function closePubMenu() {
+    document.getElementById('pub-mobile-menu').classList.remove('open');
+    document.getElementById('pub-mobile-overlay').classList.remove('open');
+    document.getElementById('pub-hamburger').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePubMenu(); });
 
   // ── Helpers ──
   const fmt = n => (n || 0).toLocaleString('vi-VN') + '₫';

@@ -7,6 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
@@ -23,72 +27,49 @@
             --white: #FFFFFF;
             --border: rgba(45, 90, 61, 0.18);
             --radius: 16px;
+            --error: #DC2626;
+            --error-bg: #FEF2F2;
         }
         html, body { height: 100%; font-family: 'DM Sans', sans-serif; }
         body { display: flex; background: var(--bg); color: var(--text); overflow: hidden; }
 
         /* ── LEFT PANEL ── */
         .auth-left {
-            width: 50%;
-            min-height: 100vh;
+            width: 50%; min-height: 100vh;
             background: linear-gradient(160deg, #1A3A28 0%, #2D5A3D 60%, #1E4532 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 48px;
-            position: relative;
-            overflow: hidden;
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 48px; position: relative; overflow: hidden;
         }
         .auth-left::before {
-            content: '';
-            position: absolute;
-            width: 500px; height: 500px;
-            background: var(--accent);
-            border-radius: 50%;
-            opacity: 0.08;
+            content: ''; position: absolute; width: 500px; height: 500px;
+            background: var(--accent); border-radius: 50%; opacity: 0.08;
             top: -200px; right: -100px;
         }
         .auth-left::after {
-            content: '';
-            position: absolute;
-            width: 300px; height: 300px;
-            background: #4A8C5C;
-            border-radius: 50%;
-            opacity: 0.12;
+            content: ''; position: absolute; width: 300px; height: 300px;
+            background: #4A8C5C; border-radius: 50%; opacity: 0.12;
             bottom: -100px; left: -50px;
         }
-
-        .auth-brand { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+        .auth-brand { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; text-decoration: none; }
         .auth-brand-icon { width: 44px; height: 44px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
         .auth-brand-icon i { color: var(--white); font-size: 22px; }
         .auth-brand-name { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 22px; color: var(--white); }
-
         .auth-hero { position: relative; z-index: 1; }
         .auth-hero h2 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 3vw, 44px); font-weight: 900; color: var(--white); line-height: 1.2; margin-bottom: 16px; }
         .auth-hero h2 span { color: var(--accent); }
         .auth-hero p { color: rgba(255,255,255,0.65); font-size: 16px; line-height: 1.7; max-width: 360px; margin-bottom: 32px; }
-
         .auth-features { display: flex; flex-direction: column; gap: 16px; }
         .auth-feature { display: flex; align-items: center; gap: 14px; }
         .auth-feature-icon { width: 38px; height: 38px; background: rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .auth-feature-icon i { color: var(--accent); font-size: 18px; }
         .auth-feature span { color: rgba(255,255,255,0.8); font-size: 14px; font-weight: 500; }
-
         .auth-img-row { display: flex; gap: 12px; position: relative; z-index: 1; }
         .auth-img { border-radius: 12px; overflow: hidden; flex: 1; height: 80px; }
         .auth-img img { width: 100%; height: 100%; object-fit: cover; }
 
         /* ── RIGHT PANEL ── */
-        .auth-right {
-            width: 50%;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 48px;
-            overflow-y: auto;
-        }
-        .auth-form-wrap { width: 100%; max-width: 420px; }
+        .auth-right { width: 50%; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 48px; overflow-y: auto; }
+        .auth-form-wrap { width: 100%; max-width: 440px; }
 
         .auth-tabs { display: flex; background: #F0F0EC; border-radius: 100px; padding: 4px; margin-bottom: 36px; }
         .auth-tab { flex: 1; text-align: center; padding: 10px; border-radius: 100px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.3s; color: var(--text-muted); border: none; background: transparent; font-family: 'DM Sans', sans-serif; }
@@ -98,15 +79,31 @@
         .auth-heading h3 { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
         .auth-heading p { font-size: 14px; color: var(--text-muted); }
 
-        .form-group { margin-bottom: 18px; }
+        .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; letter-spacing: 0.01em; }
         .input-wrap { position: relative; }
-        .input-wrap i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--text-muted); transition: color 0.3s; pointer-events: none; }
+        .input-wrap .field-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--text-muted); transition: color 0.3s; pointer-events: none; }
         .input-wrap input { width: 100%; padding: 13px 14px 13px 44px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--dark); background: var(--white); outline: none; transition: all 0.3s; }
         .input-wrap input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(45,90,61,0.08); }
-        .input-wrap input:focus ~ i, .input-wrap:focus-within i { color: var(--primary); }
+        .input-wrap input:focus + .field-icon { color: var(--primary); }
+        .input-wrap input.is-invalid { border-color: var(--error); background: var(--error-bg); }
         .input-wrap .toggle-pw { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); font-size: 18px; pointer-events: all; transition: color 0.3s; }
         .input-wrap .toggle-pw:hover { color: var(--primary); }
+
+        /* Inline error message */
+        .field-error { display: none; font-size: 12px; color: var(--error); margin-top: 5px; align-items: center; gap: 4px; }
+        .field-error.show { display: flex; }
+        .field-error i { font-size: 14px; flex-shrink: 0; }
+
+        /* Password strength */
+        .pw-strength { margin-top: 6px; display: none; }
+        .pw-strength.show { display: block; }
+        .pw-strength-bar { height: 4px; border-radius: 4px; background: #E5E7EB; overflow: hidden; margin-bottom: 4px; }
+        .pw-strength-fill { height: 100%; border-radius: 4px; transition: all 0.4s; width: 0%; }
+        .pw-strength-fill.weak { width: 33%; background: #EF4444; }
+        .pw-strength-fill.medium { width: 66%; background: #F59E0B; }
+        .pw-strength-fill.strong { width: 100%; background: #10B981; }
+        .pw-strength-text { font-size: 11px; color: var(--text-muted); }
 
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
@@ -119,6 +116,10 @@
         .btn-submit { width: 100%; padding: 15px; background: var(--primary); color: var(--white); border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-submit:hover { background: var(--primary-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,90,61,0.25); }
         .btn-submit:active { transform: translateY(0); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-submit .btn-spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+        .btn-submit.loading .btn-spinner { display: inline-block; }
+        .btn-submit.loading .btn-label { opacity: 0.7; }
 
         .divider { display: flex; align-items: center; gap: 14px; margin: 24px 0; }
         .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
@@ -128,8 +129,8 @@
         .btn-social { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1.5px solid var(--border); border-radius: 12px; background: var(--white); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: var(--text); transition: all 0.3s; }
         .btn-social:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-pale); }
         .btn-social i { font-size: 20px; }
-        .btn-social.google i { color: #EA4335; }
-        .btn-social.facebook i { color: #1877F2; }
+        .btn-social.google:hover { border-color: #EA4335; color: #EA4335; background: #FFF5F5; }
+        .btn-social.facebook:hover { border-color: #1877F2; color: #1877F2; background: #EFF6FF; }
 
         .auth-footer { text-align: center; margin-top: 24px; font-size: 14px; color: var(--text-muted); }
         .auth-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
@@ -138,105 +139,46 @@
         .form-panel { display: none; }
         .form-panel.active { display: block; }
 
-        /* ── GOOGLE BUTTON ── */
-        .btn-social.google {
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-social.google:hover {
-            border-color: #EA4335;
-            color: #EA4335;
-            background: #FFF5F5;
-        }
-        .btn-social.google.loading {
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        /* Google User Info Card (sau khi đăng nhập) */
-        .google-user-card {
-            display: none;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 16px;
-            background: linear-gradient(135deg, var(--primary-pale), #F0FAF2);
-            border: 1.5px solid rgba(45,90,61,0.2);
-            border-radius: 14px;
-            margin-bottom: 18px;
-            animation: slideIn 0.4s ease;
-        }
+        /* Google User Card */
+        .google-user-card { display: none; align-items: center; gap: 12px; padding: 14px 16px; background: linear-gradient(135deg, var(--primary-pale), #F0FAF2); border: 1.5px solid rgba(45,90,61,0.2); border-radius: 14px; margin-bottom: 18px; animation: slideIn 0.4s ease; }
         .google-user-card.visible { display: flex; }
-        .google-user-avatar {
-            width: 42px; height: 42px;
-            border-radius: 50%;
-            border: 2px solid var(--primary-light);
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-        .google-user-avatar-placeholder {
-            width: 42px; height: 42px;
-            border-radius: 50%;
-            background: var(--primary);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 700; font-size: 16px;
-            flex-shrink: 0;
-        }
+        .google-user-avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--primary-light); object-fit: cover; flex-shrink: 0; }
+        .google-user-avatar-placeholder { width: 42px; height: 42px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 16px; flex-shrink: 0; }
         .google-user-info { flex: 1; min-width: 0; }
-        .google-user-name { font-weight: 600; font-size: 14px; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .google-user-email { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .google-user-badge { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--primary); background: rgba(45,90,61,0.1); padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
-        .google-user-badge i { font-size: 13px; }
-
-        /* Google Sign-In success button */
-        .btn-google-continue {
-            width: 100%; padding: 15px;
-            background: linear-gradient(135deg, #4285F4, #34A853);
-            color: white; border: none; border-radius: 12px;
-            font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
-            cursor: pointer; transition: all 0.3s;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            margin-bottom: 16px;
-        }
-        .btn-google-continue:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(66,133,244,0.35); }
-        .btn-google-continue i { font-size: 20px; }
-
-        /* Disconnect link */
-        .google-disconnect {
-            display: block; text-align: center; font-size: 12px;
-            color: var(--text-muted); cursor: pointer; margin-bottom: 16px;
-            text-decoration: underline; transition: color 0.2s;
-        }
+        .google-user-name { font-weight: 600; font-size: 14px; color: var(--dark); }
+        .google-user-email { font-size: 12px; color: var(--text-muted); }
+        .google-user-badge { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--primary); background: rgba(45,90,61,0.1); padding: 3px 8px; border-radius: 20px; }
+        .btn-google-continue { width: 100%; padding: 15px; background: linear-gradient(135deg, #4285F4, #34A853); color: white; border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 16px; }
+        .btn-google-continue:hover { opacity: 0.9; transform: translateY(-2px); }
+        .google-disconnect { display: block; text-align: center; font-size: 12px; color: var(--text-muted); cursor: pointer; margin-bottom: 16px; text-decoration: underline; }
         .google-disconnect:hover { color: #EA4335; }
 
-        /* Google loading spinner inside button */
-        .google-spinner {
-            width: 16px; height: 16px;
-            border: 2px solid rgba(234,67,53,0.3);
-            border-top-color: #EA4335;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            display: none;
-        }
-        .btn-social.google.loading .google-spinner { display: inline-block; }
-        .btn-social.google.loading .google-btn-text { opacity: 0.6; }
-
         /* Toast notification */
-        .auth-toast {
-            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
-            padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 500;
-            display: flex; align-items: center; gap: 10px;
-            opacity: 0; pointer-events: none;
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-            z-index: 9999; min-width: 280px; max-width: 380px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.18);
-        }
+        .auth-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px; opacity: 0; pointer-events: none; transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 9999; min-width: 280px; max-width: 380px; box-shadow: 0 8px 30px rgba(0,0,0,0.18); }
         .auth-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .auth-toast.success { background: #1A3A28; color: white; }
         .auth-toast.error { background: #B91C1C; color: white; }
+        .auth-toast.info { background: #1D4ED8; color: white; }
         .auth-toast i { font-size: 20px; flex-shrink: 0; }
+
+        /* Loading overlay */
+        .api-loading { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 9998; align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
+        .api-loading.show { display: flex; }
+        .api-spinner { width: 44px; height: 44px; border: 3px solid rgba(45,90,61,0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+
+        /* Terms checkbox area */
+        .terms-wrap { margin-bottom: 20px; }
+        .terms-wrap label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+        .terms-wrap input { accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer; margin-top: 1px; flex-shrink: 0; }
+        .terms-wrap a { color: var(--primary); text-decoration: none; }
+        .terms-wrap a:hover { text-decoration: underline; }
+
+        .google-spinner { width: 16px; height: 16px; border: 2px solid rgba(234,67,53,0.3); border-top-color: #EA4335; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+        .btn-social.google.loading .google-spinner { display: inline-block; }
 
         @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
 
         @media (max-width: 900px) {
             body { overflow-y: auto; }
@@ -253,26 +195,15 @@
         <div class="auth-brand-icon"><i class='bx bx-trip'></i></div>
         <span class="auth-brand-name">WanderViet</span>
     </a>
-
     <div class="auth-hero">
         <h2>Hành Trình<br><span>Đáng Nhớ</span><br>Bắt Đầu Tại Đây</h2>
         <p>Đăng nhập để truy cập hàng trăm tour độc đáo, quản lý đặt chỗ và nhận ưu đãi đặc biệt chỉ dành cho thành viên.</p>
         <div class="auth-features">
-            <div class="auth-feature">
-                <div class="auth-feature-icon"><i class='bx bx-check-shield'></i></div>
-                <span>Đặt tour an toàn & bảo mật 100%</span>
-            </div>
-            <div class="auth-feature">
-                <div class="auth-feature-icon"><i class='bx bx-gift'></i></div>
-                <span>Nhận voucher độc quyền cho thành viên</span>
-            </div>
-            <div class="auth-feature">
-                <div class="auth-feature-icon"><i class='bx bx-support'></i></div>
-                <span>Hỗ trợ 24/7 trong suốt hành trình</span>
-            </div>
+            <div class="auth-feature"><div class="auth-feature-icon"><i class='bx bx-check-shield'></i></div><span>Đặt tour an toàn & bảo mật 100%</span></div>
+            <div class="auth-feature"><div class="auth-feature-icon"><i class='bx bx-gift'></i></div><span>Nhận voucher độc quyền cho thành viên</span></div>
+            <div class="auth-feature"><div class="auth-feature-icon"><i class='bx bx-support'></i></div><span>Hỗ trợ 24/7 trong suốt hành trình</span></div>
         </div>
     </div>
-
     <div class="auth-img-row">
         <div class="auth-img"><img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=200&h=100&fit=crop" alt="Hội An"></div>
         <div class="auth-img"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=200&h=100&fit=crop" alt="Hạ Long"></div>
@@ -285,11 +216,11 @@
     <div class="auth-form-wrap">
 
         <div class="auth-tabs">
-            <button class="auth-tab active" onclick="switchTab('login')">Đăng Nhập</button>
-            <button class="auth-tab" onclick="switchTab('register')">Đăng Ký</button>
+            <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Đăng Nhập</button>
+            <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Đăng Ký</button>
         </div>
 
-        <!-- LOGIN FORM -->
+        <!-- ══════════════ LOGIN FORM ══════════════ -->
         <div class="form-panel active" id="panel-login">
             <div class="auth-heading">
                 <h3>Chào mừng trở lại 👋</h3>
@@ -297,36 +228,39 @@
             </div>
 
             <div class="form-group">
-                <label>Email</label>
+                <label for="login-email">Email</label>
                 <div class="input-wrap">
-                    <i class='bx bxs-envelope'></i>
-                    <input type="email" placeholder="email@example.com">
+                    <input type="email" id="login-email" placeholder="email@example.com" autocomplete="email">
+                    <i class='bx bxs-envelope field-icon'></i>
                 </div>
+                <div class="field-error" id="err-login-email"><i class='bx bx-error-circle'></i><span></span></div>
             </div>
 
             <div class="form-group">
-                <label>Mật khẩu</label>
+                <label for="login-pw">Mật khẩu</label>
                 <div class="input-wrap">
-                    <i class='bx bxs-lock-alt'></i>
-                    <input type="password" id="login-pw" placeholder="Nhập mật khẩu">
+                    <input type="password" id="login-pw" placeholder="Nhập mật khẩu" autocomplete="current-password">
+                    <i class='bx bxs-lock-alt field-icon'></i>
                     <i class='bx bx-hide toggle-pw' onclick="togglePw('login-pw', this)"></i>
                 </div>
+                <div class="field-error" id="err-login-pw"><i class='bx bx-error-circle'></i><span></span></div>
             </div>
 
             <div class="form-extra">
                 <label class="remember-me">
-                    <input type="checkbox"> Ghi nhớ đăng nhập
+                    <input type="checkbox" id="login-remember"> Ghi nhớ đăng nhập
                 </label>
                 <a href="#" class="forgot-link">Quên mật khẩu?</a>
             </div>
 
-            <button class="btn-submit">
-                <i class='bx bx-log-in'></i> Đăng Nhập
+            <button class="btn-submit" id="btn-login" onclick="handleLogin()">
+                <div class="btn-spinner"></div>
+                <span class="btn-label"><i class='bx bx-log-in'></i> Đăng Nhập</span>
             </button>
 
             <div class="divider"><span>Hoặc đăng nhập với</span></div>
 
-            <!-- Google User Card (hiện sau khi đăng nhập Google) -->
+            <!-- Google User Card -->
             <div class="google-user-card" id="google-user-card">
                 <div id="google-avatar-wrap"></div>
                 <div class="google-user-info">
@@ -335,18 +269,15 @@
                 </div>
                 <div class="google-user-badge"><i class='bx bxl-google'></i> Google</div>
             </div>
-
-            <!-- Nút tiếp tục với Google (hiện sau khi xác thực) -->
             <button class="btn-google-continue" id="btn-google-continue" style="display:none" onclick="continueWithGoogle()">
-                <i class='bx bx-check-circle'></i>
-                Tiếp tục với tài khoản này
+                <i class='bx bx-check-circle'></i> Tiếp tục với tài khoản này
             </button>
             <span class="google-disconnect" id="google-disconnect" style="display:none" onclick="disconnectGoogle()">Dùng tài khoản khác</span>
 
             <div class="social-btns" id="social-btns-login">
                 <button class="btn-social google" id="btn-google-login" onclick="handleGoogleLogin()">
-                    <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-                    <span class="google-btn-text">Google</span>
+                    <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                    <span>Google</span>
                     <div class="google-spinner"></div>
                 </button>
                 <button class="btn-social facebook">
@@ -359,7 +290,7 @@
             </div>
         </div>
 
-        <!-- REGISTER FORM -->
+        <!-- ══════════════ REGISTER FORM ══════════════ -->
         <div class="form-panel" id="panel-register">
             <div class="auth-heading">
                 <h3>Tạo tài khoản mới ✨</h3>
@@ -368,64 +299,76 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Họ</label>
+                    <label for="reg-lastname">Họ</label>
                     <div class="input-wrap">
-                        <i class='bx bxs-user'></i>
-                        <input type="text" placeholder="Nguyễn">
+                        <input type="text" id="reg-lastname" placeholder="Nguyễn">
+                        <i class='bx bxs-user field-icon'></i>
                     </div>
+                    <div class="field-error" id="err-lastname"><i class='bx bx-error-circle'></i><span></span></div>
                 </div>
                 <div class="form-group">
-                    <label>Tên</label>
+                    <label for="reg-firstname">Tên</label>
                     <div class="input-wrap">
-                        <i class='bx bxs-user'></i>
-                        <input type="text" placeholder="Lan Anh">
+                        <input type="text" id="reg-firstname" placeholder="Lan Anh">
+                        <i class='bx bxs-user field-icon'></i>
                     </div>
+                    <div class="field-error" id="err-firstname"><i class='bx bx-error-circle'></i><span></span></div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Email</label>
+                <label for="reg-email">Email</label>
                 <div class="input-wrap">
-                    <i class='bx bxs-envelope'></i>
-                    <input type="email" placeholder="email@example.com">
+                    <input type="email" id="reg-email" placeholder="email@example.com" autocomplete="email">
+                    <i class='bx bxs-envelope field-icon'></i>
                 </div>
+                <div class="field-error" id="err-reg-email"><i class='bx bx-error-circle'></i><span></span></div>
             </div>
 
             <div class="form-group">
-                <label>Số điện thoại</label>
+                <label for="reg-phone">Số điện thoại</label>
                 <div class="input-wrap">
-                    <i class='bx bxs-phone'></i>
-                    <input type="tel" placeholder="0912 345 678">
+                    <input type="tel" id="reg-phone" placeholder="0912 345 678">
+                    <i class='bx bxs-phone field-icon'></i>
                 </div>
+                <div class="field-error" id="err-phone"><i class='bx bx-error-circle'></i><span></span></div>
             </div>
 
             <div class="form-group">
-                <label>Mật khẩu</label>
+                <label for="reg-pw">Mật khẩu</label>
                 <div class="input-wrap">
-                    <i class='bx bxs-lock-alt'></i>
-                    <input type="password" id="reg-pw" placeholder="Tối thiểu 8 ký tự">
+                    <input type="password" id="reg-pw" placeholder="Tối thiểu 8 ký tự" oninput="checkPasswordStrength(this.value)" autocomplete="new-password">
+                    <i class='bx bxs-lock-alt field-icon'></i>
                     <i class='bx bx-hide toggle-pw' onclick="togglePw('reg-pw', this)"></i>
                 </div>
+                <div class="pw-strength" id="pw-strength">
+                    <div class="pw-strength-bar"><div class="pw-strength-fill" id="pw-fill"></div></div>
+                    <div class="pw-strength-text" id="pw-text"></div>
+                </div>
+                <div class="field-error" id="err-reg-pw"><i class='bx bx-error-circle'></i><span></span></div>
             </div>
 
             <div class="form-group">
-                <label>Xác nhận mật khẩu</label>
+                <label for="reg-pw2">Xác nhận mật khẩu</label>
                 <div class="input-wrap">
-                    <i class='bx bxs-lock'></i>
-                    <input type="password" id="reg-pw2" placeholder="Nhập lại mật khẩu">
+                    <input type="password" id="reg-pw2" placeholder="Nhập lại mật khẩu" autocomplete="new-password">
+                    <i class='bx bxs-lock field-icon'></i>
                     <i class='bx bx-hide toggle-pw' onclick="togglePw('reg-pw2', this)"></i>
                 </div>
+                <div class="field-error" id="err-reg-pw2"><i class='bx bx-error-circle'></i><span></span></div>
             </div>
 
-            <div style="margin-bottom: 20px;">
-                <label class="remember-me" style="align-items: flex-start; gap: 10px;">
-                    <input type="checkbox" style="margin-top: 2px;">
-                    <span style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">Tôi đồng ý với <a href="#" style="color: var(--primary);">Điều khoản dịch vụ</a> và <a href="#" style="color: var(--primary);">Chính sách bảo mật</a> của WanderViet.</span>
+            <div class="terms-wrap">
+                <label>
+                    <input type="checkbox" id="reg-terms">
+                    <span>Tôi đồng ý với <a href="#">Điều khoản dịch vụ</a> và <a href="#">Chính sách bảo mật</a> của WanderViet.</span>
                 </label>
+                <div class="field-error" id="err-terms"><i class='bx bx-error-circle'></i><span></span></div>
             </div>
 
-            <button class="btn-submit">
-                <i class='bx bx-user-plus'></i> Tạo Tài Khoản
+            <button class="btn-submit" id="btn-register" onclick="handleRegister()">
+                <div class="btn-spinner"></div>
+                <span class="btn-label"><i class='bx bx-user-plus'></i> Tạo Tài Khoản</span>
             </button>
 
             <div class="auth-footer">
@@ -436,27 +379,194 @@
     </div>
 </div>
 
+<!-- API Loading Overlay -->
+<div class="api-loading" id="api-loading">
+    <div class="api-spinner"></div>
+    <p style="color:var(--text-muted);font-size:14px;font-weight:500">Đang xử lý...</p>
+</div>
+
+<!-- Toast -->
+<div class="auth-toast" id="auth-toast"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 // ============================================================
-// CẤU HÌNH GOOGLE OAUTH
-// Thay YOUR_GOOGLE_CLIENT_ID bằng Client ID thực từ Google Cloud Console
-// Hướng dẫn: https://console.cloud.google.com/apis/credentials
+// CẤU HÌNH
 // ============================================================
 const GOOGLE_CLIENT_ID = '1014023750706-f9marjiuupk68t2dtd1r5pd1iuojm4ii.apps.googleusercontent.com';
+
+// MockAPI endpoint cho members (tài khoản người dùng)
+// Schema: id, email, password, firstName, lastName, phone, createdAt, avatar
+const MEMBERS_API = 'https://6a157e8991ff9a63de083fe6.mockapi.io/api/v1';
 
 // ── State ──────────────────────────────────────────────────
 let googleUser = null;
 
-// ── Tab switching ──────────────────────────────────────────
+// ============================================================
+// UTILITY FUNCTIONS (JavaScript thuần)
+// ============================================================
+
+/**
+ * Hiển thị toast thông báo
+ * @param {string} message - Nội dung thông báo
+ * @param {string} type - 'success' | 'error' | 'info'
+ */
+function showAuthToast(message, type = 'success') {
+    const icons = { success: 'bx-check-circle', error: 'bx-x-circle', info: 'bx-info-circle' };
+    const toast = document.getElementById('auth-toast');
+    toast.innerHTML = `<i class='bx ${icons[type] || icons.info}'></i><span>${message}</span>`;
+    toast.className = `auth-toast ${type}`;
+    void toast.offsetWidth; // reflow
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+/**
+ * Hiện/ẩn loading overlay
+ * @param {boolean} show
+ */
+function setLoading(show) {
+    const overlay = document.getElementById('api-loading');
+    if (show) overlay.classList.add('show');
+    else overlay.classList.remove('show');
+}
+
+/**
+ * Hiện/ẩn nút loading spinner
+ * @param {string} btnId - ID của button
+ * @param {boolean} show
+ */
+function setBtnLoading(btnId, show) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    if (show) {
+        btn.classList.add('loading');
+        btn.disabled = true;
+    } else {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+    }
+}
+
+/**
+ * Hiện lỗi inline dưới trường nhập liệu
+ * @param {string} fieldId - ID field error
+ * @param {string} message - Thông báo lỗi
+ */
+function showFieldError(fieldId, message) {
+    const errEl = document.getElementById(fieldId);
+    if (!errEl) return;
+    errEl.querySelector('span').textContent = message;
+    errEl.classList.add('show');
+    // Tô đỏ input
+    const input = errEl.previousElementSibling?.querySelector('input') || errEl.previousElementSibling;
+    if (input && input.tagName === 'DIV') {
+        input.querySelector('input')?.classList.add('is-invalid');
+    }
+}
+
+/**
+ * Xóa lỗi inline
+ * @param {string} fieldId
+ */
+function clearFieldError(fieldId) {
+    const errEl = document.getElementById(fieldId);
+    if (!errEl) return;
+    errEl.classList.remove('show');
+    const wrap = errEl.previousElementSibling;
+    if (wrap) wrap.querySelector('input')?.classList.remove('is-invalid');
+}
+
+/**
+ * Validate email format
+ * @param {string} email
+ * @returns {boolean}
+ */
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+/**
+ * Validate số điện thoại Việt Nam
+ * @param {string} phone
+ * @returns {boolean}
+ */
+function isValidPhone(phone) {
+    return /^(0|\+84)[3-9][0-9]{8}$/.test(phone.replace(/\s/g, ''));
+}
+
+/**
+ * Hash đơn giản password (thực tế nên dùng bcrypt ở server)
+ * Ở đây dùng base64 encode để không lưu plaintext
+ * @param {string} pw
+ * @returns {string}
+ */
+function hashPassword(pw) {
+    return btoa(unescape(encodeURIComponent(pw)));
+}
+
+// ============================================================
+// PASSWORD STRENGTH CHECKER
+// ============================================================
+function checkPasswordStrength(value) {
+    const strengthWrap = document.getElementById('pw-strength');
+    const fill = document.getElementById('pw-fill');
+    const text = document.getElementById('pw-text');
+
+    if (!value) {
+        strengthWrap.classList.remove('show');
+        return;
+    }
+    strengthWrap.classList.add('show');
+
+    let score = 0;
+    if (value.length >= 8) score++;
+    if (/[A-Z]/.test(value)) score++;
+    if (/[0-9]/.test(value)) score++;
+    if (/[^A-Za-z0-9]/.test(value)) score++;
+
+    const levels = [
+        { cls: '', label: '' },
+        { cls: 'weak', label: '🔴 Yếu — Thêm chữ hoa, số hoặc ký tự đặc biệt' },
+        { cls: 'medium', label: '🟡 Trung bình — Gần đạt yêu cầu bảo mật' },
+        { cls: 'strong', label: '🟢 Mạnh — Mật khẩu an toàn!' },
+        { cls: 'strong', label: '🟢 Rất mạnh — Tuyệt vời!' },
+    ];
+
+    const level = levels[Math.min(score, 4)];
+    fill.className = `pw-strength-fill ${level.cls}`;
+    text.textContent = level.label;
+}
+
+// ============================================================
+// TAB SWITCHING (với jQuery fadeIn/slideDown)
+// ============================================================
 function switchTab(tab) {
+    // Vanilla JS cho tabs
     document.querySelectorAll('.auth-tab').forEach((t, i) => {
         t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
     });
-    document.getElementById('panel-login').classList.toggle('active', tab === 'login');
-    document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+
+    // jQuery cho animation
+    const showPanel = tab === 'login' ? '#panel-login' : '#panel-register';
+    const hidePanel = tab === 'login' ? '#panel-register' : '#panel-login';
+
+    $(hidePanel).fadeOut(200, function() {
+        $(hidePanel).removeClass('active');
+        $(showPanel).addClass('active').hide().fadeIn(300);
+    });
+
+    // Clear tất cả errors khi chuyển tab
+    document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
+    document.querySelectorAll('input.is-invalid').forEach(e => e.classList.remove('is-invalid'));
 }
 
-// ── Password toggle ────────────────────────────────────────
+// ============================================================
+// PASSWORD TOGGLE
+// ============================================================
 function togglePw(inputId, icon) {
     const input = document.getElementById(inputId);
     const isHidden = input.type === 'password';
@@ -465,91 +575,350 @@ function togglePw(inputId, icon) {
     icon.classList.toggle('bx-show', isHidden);
 }
 
-// ── Toast notification ─────────────────────────────────────
-function showAuthToast(message, type = 'success') {
-    let toast = document.getElementById('auth-toast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'auth-toast';
-        toast.className = 'auth-toast';
-        document.body.appendChild(toast);
-    }
-    const icon = type === 'success' ? 'bx-check-circle' : 'bx-x-circle';
-    toast.innerHTML = `<i class='bx ${icon}'></i><span>${message}</span>`;
-    toast.className = `auth-toast ${type}`;
-    // Trigger reflow
-    void toast.offsetWidth;
-    toast.classList.add('show');
-    clearTimeout(toast._timer);
-    toast._timer = setTimeout(() => toast.classList.remove('show'), 3500);
+// ============================================================
+// FETCH API WRAPPER
+// ============================================================
+
+/**
+ * GET tất cả members từ MockAPI
+ * @returns {Promise<Array>}
+ */
+async function apiGetMembers() {
+    const response = await fetch(MEMBERS_API);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response.json();
 }
 
-// ── Google Login ───────────────────────────────────────────
-function handleGoogleLogin() {
-    const btn = document.getElementById('btn-google-login');
+/**
+ * POST thêm member mới vào MockAPI
+ * @param {object} memberData
+ * @returns {Promise<object>}
+ */
+async function apiCreateMember(memberData) {
+    const response = await fetch(MEMBERS_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(memberData)
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response.json();
+}
 
-    // Kiểm tra Client ID đã cấu hình chưa
-    if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
-        showAuthToast('⚠️ Vui lòng cấu hình GOOGLE_CLIENT_ID trong file login.html', 'error');
-        openGoogleSetupGuide();
-        return;
+// ============================================================
+// REGISTER HANDLER
+// ============================================================
+
+/**
+ * Validate form đăng ký
+ * @returns {boolean} - true nếu hợp lệ
+ */
+function validateRegisterForm() {
+    let isValid = true;
+
+    // Xóa errors cũ
+    ['err-lastname', 'err-firstname', 'err-reg-email', 'err-phone', 'err-reg-pw', 'err-reg-pw2', 'err-terms']
+        .forEach(id => clearFieldError(id));
+
+    const lastName  = document.getElementById('reg-lastname').value.trim();
+    const firstName = document.getElementById('reg-firstname').value.trim();
+    const email     = document.getElementById('reg-email').value.trim();
+    const phone     = document.getElementById('reg-phone').value.trim();
+    const pw        = document.getElementById('reg-pw').value;
+    const pw2       = document.getElementById('reg-pw2').value;
+    const terms     = document.getElementById('reg-terms').checked;
+
+    // Họ
+    if (!lastName) {
+        showFieldError('err-lastname', 'Vui lòng nhập họ');
+        isValid = false;
+    } else if (lastName.length < 2) {
+        showFieldError('err-lastname', 'Họ phải có ít nhất 2 ký tự');
+        isValid = false;
     }
 
-    btn.classList.add('loading');
+    // Tên
+    if (!firstName) {
+        showFieldError('err-firstname', 'Vui lòng nhập tên');
+        isValid = false;
+    }
 
-    // Khởi tạo Google Identity Services
+    // Email
+    if (!email) {
+        showFieldError('err-reg-email', 'Vui lòng nhập email');
+        isValid = false;
+    } else if (!isValidEmail(email)) {
+        showFieldError('err-reg-email', 'Email không đúng định dạng (vd: abc@gmail.com)');
+        isValid = false;
+    }
+
+    // Điện thoại
+    if (!phone) {
+        showFieldError('err-phone', 'Vui lòng nhập số điện thoại');
+        isValid = false;
+    } else if (!isValidPhone(phone)) {
+        showFieldError('err-phone', 'Số điện thoại không hợp lệ (vd: 0912345678)');
+        isValid = false;
+    }
+
+    // Mật khẩu
+    if (!pw) {
+        showFieldError('err-reg-pw', 'Vui lòng nhập mật khẩu');
+        isValid = false;
+    } else if (pw.length < 8) {
+        showFieldError('err-reg-pw', 'Mật khẩu phải có ít nhất 8 ký tự');
+        isValid = false;
+    }
+
+    // Xác nhận mật khẩu
+    if (!pw2) {
+        showFieldError('err-reg-pw2', 'Vui lòng xác nhận mật khẩu');
+        isValid = false;
+    } else if (pw !== pw2) {
+        showFieldError('err-reg-pw2', 'Mật khẩu xác nhận không khớp');
+        isValid = false;
+    }
+
+    // Điều khoản
+    if (!terms) {
+        showFieldError('err-terms', 'Bạn cần đồng ý với điều khoản để tiếp tục');
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+/**
+ * Xử lý đăng ký tài khoản mới
+ * Lưu tài khoản lên MockAPI
+ */
+async function handleRegister() {
+    if (!validateRegisterForm()) return;
+
+    const email     = document.getElementById('reg-email').value.trim();
+    const phone     = document.getElementById('reg-phone').value.trim();
+    const pw        = document.getElementById('reg-pw').value;
+    const lastName  = document.getElementById('reg-lastname').value.trim();
+    const firstName = document.getElementById('reg-firstname').value.trim();
+
+    setBtnLoading('btn-register', true);
+    setLoading(true);
+
+    try {
+        // 1. Kiểm tra email đã tồn tại chưa (GET)
+        const members = await apiGetMembers();
+        const existing = members.find(m => m.email && m.email.toLowerCase() === email.toLowerCase());
+
+        if (existing) {
+            showFieldError('err-reg-email', 'Email này đã được đăng ký. Hãy thử đăng nhập.');
+            setBtnLoading('btn-register', false);
+            setLoading(false);
+            return;
+        }
+
+        // 2. Tạo member mới (POST)
+        const newMember = {
+            email: email,
+            password: hashPassword(pw),
+            firstName: firstName,
+            lastName: lastName,
+            phone: phone,
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName + '+' + lastName)}&background=2D5A3D&color=fff`,
+            createdAt: new Date().toISOString(),
+            role: 'user'
+        };
+
+        const created = await apiCreateMember(newMember);
+
+        // 3. Lưu session
+        const sessionUser = {
+            id: created.id,
+            name: `${firstName} ${lastName}`,
+            email: email,
+            avatar: newMember.avatar,
+            role: 'user'
+        };
+        localStorage.setItem('currentUser', JSON.stringify(sessionUser));
+
+        // 4. Reset form
+        ['reg-lastname','reg-firstname','reg-email','reg-phone','reg-pw','reg-pw2'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
+        document.getElementById('reg-terms').checked = false;
+        document.getElementById('pw-strength').classList.remove('show');
+
+        // 5. Thông báo & chuyển về tab login (jQuery slideDown effect)
+        setLoading(false);
+        setBtnLoading('btn-register', false);
+        showAuthToast(`🎉 Tạo tài khoản thành công! Xin chào, ${firstName}!`, 'success');
+
+        // jQuery: hiệu ứng thành công rồi chuyển tab
+        setTimeout(() => {
+            switchTab('login');
+            // jQuery: tự điền email vào form login
+            $('#login-email').val(email).trigger('focus');
+            // jQuery slideDown để hiển thị gợi ý
+            $('<div id="login-prefill-tip" class="d-flex align-items-center gap-2 p-2 mb-3" style="background:#E8F2EB;border-radius:10px;font-size:13px;color:#2D5A3D"><i class="bx bx-check-circle"></i>Email đã được điền sẵn. Hãy nhập mật khẩu để đăng nhập!</div>')
+                .insertBefore('#login-email').closest('.form-group')
+                .parent()
+                .prepend($('<div id="login-prefill-tip" class="d-flex align-items-center gap-2 p-2 mb-2" style="background:#E8F2EB;border-radius:10px;font-size:13px;color:#2D5A3D;display:none"><i class="bx bx-check-circle"></i> Email đã được điền sẵn. Hãy nhập mật khẩu!</div>').slideDown(400));
+        }, 1500);
+
+    } catch (err) {
+        setLoading(false);
+        setBtnLoading('btn-register', false);
+        showAuthToast('Không thể tạo tài khoản. Kiểm tra kết nối và thử lại.', 'error');
+        console.error('Register error:', err);
+    }
+}
+
+// ============================================================
+// LOGIN HANDLER
+// ============================================================
+
+/**
+ * Validate form đăng nhập
+ * @returns {boolean}
+ */
+function validateLoginForm() {
+    let isValid = true;
+    clearFieldError('err-login-email');
+    clearFieldError('err-login-pw');
+
+    const email = document.getElementById('login-email').value.trim();
+    const pw    = document.getElementById('login-pw').value;
+
+    if (!email) {
+        showFieldError('err-login-email', 'Vui lòng nhập email');
+        isValid = false;
+    } else if (!isValidEmail(email)) {
+        showFieldError('err-login-email', 'Email không đúng định dạng');
+        isValid = false;
+    }
+
+    if (!pw) {
+        showFieldError('err-login-pw', 'Vui lòng nhập mật khẩu');
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+/**
+ * Xử lý đăng nhập
+ * Kiểm tra tài khoản từ MockAPI
+ */
+async function handleLogin() {
+    if (!validateLoginForm()) return;
+
+    const email    = document.getElementById('login-email').value.trim();
+    const pw       = document.getElementById('login-pw').value;
+    const remember = document.getElementById('login-remember').checked;
+
+    setBtnLoading('btn-login', true);
+    setLoading(true);
+
+    try {
+        // GET danh sách members và tìm tài khoản
+        const members = await apiGetMembers();
+        const member = members.find(m =>
+            m.email && m.email.toLowerCase() === email.toLowerCase() &&
+            m.password === hashPassword(pw)
+        );
+
+        if (!member) {
+            setLoading(false);
+            setBtnLoading('btn-login', false);
+
+            // Kiểm tra email có tồn tại không
+            const emailExists = members.find(m => m.email && m.email.toLowerCase() === email.toLowerCase());
+            if (emailExists) {
+                showFieldError('err-login-pw', 'Mật khẩu không đúng. Vui lòng thử lại.');
+                // jQuery: shake effect
+                $('#login-pw').closest('.input-wrap').addClass('animate__animated animate__shakeX');
+            } else {
+                showFieldError('err-login-email', 'Email chưa được đăng ký. Hãy tạo tài khoản mới.');
+            }
+            return;
+        }
+
+        // Đăng nhập thành công
+        const sessionUser = {
+            id: member.id,
+            name: `${member.firstName || ''} ${member.lastName || ''}`.trim() || member.email,
+            email: member.email,
+            avatar: member.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.firstName || 'User')}&background=2D5A3D&color=fff`,
+            role: member.role || 'user'
+        };
+
+        // Lưu session
+        if (remember) {
+            localStorage.setItem('currentUser', JSON.stringify(sessionUser));
+            localStorage.setItem('rememberLogin', '1');
+        } else {
+            sessionStorage.setItem('currentUser', JSON.stringify(sessionUser));
+            localStorage.removeItem('rememberLogin');
+        }
+
+        setLoading(false);
+        setBtnLoading('btn-login', false);
+        showAuthToast(`Xin chào, ${sessionUser.name.split(' ').pop()}! 👋`, 'success');
+
+        // Chuyển hướng sau 1.2s
+        setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+
+    } catch (err) {
+        setLoading(false);
+        setBtnLoading('btn-login', false);
+        showAuthToast('Lỗi kết nối. Vui lòng thử lại sau.', 'error');
+        console.error('Login error:', err);
+    }
+}
+
+// ============================================================
+// GOOGLE LOGIN (giữ nguyên logic cũ)
+// ============================================================
+function handleGoogleLogin() {
+    const btn = document.getElementById('btn-google-login');
+    if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
+        showAuthToast('⚠️ Vui lòng cấu hình GOOGLE_CLIENT_ID', 'error');
+        return;
+    }
+    btn.classList.add('loading');
     if (typeof google === 'undefined') {
-        showAuthToast('Không thể tải Google SDK. Kiểm tra kết nối mạng.', 'error');
+        showAuthToast('Không thể tải Google SDK.', 'error');
         btn.classList.remove('loading');
         return;
     }
-
     google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
         scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
         callback: onGoogleTokenReceived,
         error_callback: (err) => {
             btn.classList.remove('loading');
-            if (err.type !== 'popup_closed') {
-                showAuthToast('Đăng nhập Google thất bại. Vui lòng thử lại.', 'error');
-            }
+            if (err.type !== 'popup_closed') showAuthToast('Đăng nhập Google thất bại.', 'error');
         }
     }).requestAccessToken();
 }
 
-// ── Nhận token và lấy thông tin user ──────────────────────
 async function onGoogleTokenReceived(tokenResponse) {
     const btn = document.getElementById('btn-google-login');
     try {
         const res = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${tokenResponse.access_token}`);
-        if (!res.ok) throw new Error('Không lấy được thông tin người dùng');
+        if (!res.ok) throw new Error();
         const profile = await res.json();
-
-        googleUser = {
-            id: profile.sub,
-            name: profile.name,
-            email: profile.email,
-            picture: profile.picture,
-            token: tokenResponse.access_token
-        };
-
-        // Lưu token vào localStorage
+        googleUser = { id: profile.sub, name: profile.name, email: profile.email, picture: profile.picture, token: tokenResponse.access_token };
         localStorage.setItem('authToken', tokenResponse.access_token);
         localStorage.setItem('googleUser', JSON.stringify(googleUser));
-
         renderGoogleUserCard(googleUser);
         btn.classList.remove('loading');
         showAuthToast(`Xin chào, ${profile.name.split(' ').pop()}! 🎉`);
-
     } catch (err) {
         btn.classList.remove('loading');
-        showAuthToast('Không lấy được thông tin Google. Thử lại.', 'error');
+        showAuthToast('Không lấy được thông tin Google.', 'error');
     }
 }
 
-// ── Hiển thị thẻ user Google ──────────────────────────────
 function renderGoogleUserCard(user) {
-    // Avatar
     const avatarWrap = document.getElementById('google-avatar-wrap');
     if (user.picture) {
         avatarWrap.innerHTML = `<img class="google-user-avatar" src="${user.picture}" alt="${user.name}" referrerpolicy="no-referrer">`;
@@ -557,26 +926,20 @@ function renderGoogleUserCard(user) {
         const initials = user.name.split(' ').map(n => n[0]).slice(-2).join('').toUpperCase();
         avatarWrap.innerHTML = `<div class="google-user-avatar-placeholder">${initials}</div>`;
     }
-
     document.getElementById('google-user-name').textContent = user.name;
     document.getElementById('google-user-email').textContent = user.email;
-
-    // Ẩn nút social, hiện card + nút tiếp tục
-    document.getElementById('social-btns-login').style.display = 'none';
-    document.getElementById('google-user-card').classList.add('visible');
-    document.getElementById('btn-google-continue').style.display = 'flex';
-    document.getElementById('google-disconnect').style.display = 'block';
+    $('#social-btns-login').fadeOut(200);
+    $('#google-user-card').addClass('visible').hide().fadeIn(400);
+    $('#btn-google-continue').show();
+    $('#google-disconnect').show();
 }
 
-// ── Tiếp tục với tài khoản Google đã xác thực ─────────────
 function continueWithGoogle() {
     if (!googleUser) return;
     showAuthToast('Đang chuyển hướng...');
-    // Redirect sau 1.2s — thay 'index.html' bằng trang đích thực của bạn
     setTimeout(() => { window.location.href = 'index.html'; }, 1200);
 }
 
-// ── Ngắt kết nối Google ───────────────────────────────────
 function disconnectGoogle() {
     if (googleUser && typeof google !== 'undefined') {
         google.accounts.oauth2.revoke(googleUser.token, () => {});
@@ -584,84 +947,55 @@ function disconnectGoogle() {
     googleUser = null;
     localStorage.removeItem('authToken');
     localStorage.removeItem('googleUser');
-
-    document.getElementById('google-user-card').classList.remove('visible');
-    document.getElementById('btn-google-continue').style.display = 'none';
-    document.getElementById('google-disconnect').style.display = 'none';
-    document.getElementById('social-btns-login').style.display = 'flex';
+    $('#google-user-card').fadeOut(200, function() { $(this).removeClass('visible'); });
+    $('#btn-google-continue').hide();
+    $('#google-disconnect').hide();
+    $('#social-btns-login').fadeIn(300);
 }
 
-// ── Hướng dẫn cấu hình (mở trong tab mới) ─────────────────
-function openGoogleSetupGuide() {
-    // Hiển thị modal hướng dẫn
-    let modal = document.getElementById('setup-modal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'setup-modal';
-        modal.style.cssText = `
-            position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10000;
-            display:flex;align-items:center;justify-content:center;padding:20px;
-            animation:fadeIn 0.2s ease;
-        `;
-        modal.innerHTML = `
-            <div style="background:white;border-radius:20px;padding:32px;max-width:460px;width:100%;position:relative;box-shadow:0 24px 60px rgba(0,0,0,0.25)">
-                <button onclick="this.closest('#setup-modal').remove()" style="position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;font-size:22px;color:#888">✕</button>
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
-                    <div style="width:44px;height:44px;background:#FEE2E2;border-radius:12px;display:flex;align-items:center;justify-content:center">
-                        <svg width="22" height="22" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                    </div>
-                    <div>
-                        <div style="font-weight:700;font-size:17px;color:#1A1A2E">Cấu hình Google OAuth</div>
-                        <div style="font-size:13px;color:#888">3 bước đơn giản</div>
-                    </div>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px">
-                    ${[
-                        ['1', 'Truy cập Google Cloud Console', 'console.cloud.google.com/apis/credentials'],
-                        ['2', 'Tạo OAuth 2.0 Client ID', 'Chọn Application type: <strong>Web application</strong>'],
-                        ['3', 'Thêm Authorized origins', `Thêm domain của bạn, ví dụ: <code style="background:#f0f0ec;padding:2px 6px;border-radius:4px">http://localhost:5500</code>`],
-                    ].map(([num, title, desc]) => `
-                        <div style="display:flex;gap:12px;align-items:flex-start">
-                            <div style="width:26px;height:26px;background:#2D5A3D;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:1px">${num}</div>
-                            <div>
-                                <div style="font-weight:600;font-size:14px;color:#1A1A2E;margin-bottom:3px">${title}</div>
-                                <div style="font-size:13px;color:#666">${desc}</div>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                <div style="background:#F0F7FF;border-radius:10px;padding:12px 14px;font-size:13px;color:#1D4ED8;margin-bottom:20px">
-                    <strong>Sau khi có Client ID:</strong> Mở file <code>login.html</code> và thay dòng<br>
-                    <code style="background:#DBEAFE;padding:2px 6px;border-radius:4px;display:inline-block;margin-top:4px">GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID...'</code>
-                </div>
-                <a href="https://console.cloud.google.com/apis/credentials" target="_blank"
-                   style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:#2D5A3D;color:white;border-radius:12px;text-decoration:none;font-weight:600;font-size:15px;transition:opacity 0.2s"
-                   onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-                    <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg>
-                    Mở Google Cloud Console
-                </a>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
-    }
-}
+// ============================================================
+// JQUERY EVENT HANDLERS
+// ============================================================
+$(document).ready(function() {
+    // jQuery event: xóa lỗi khi người dùng bắt đầu nhập
+    $('#login-email').on('input', function() { clearFieldError('err-login-email'); });
+    $('#login-pw').on('input', function() { clearFieldError('err-login-pw'); });
+    $('#reg-email').on('input', function() { clearFieldError('err-reg-email'); });
+    $('#reg-lastname').on('input', function() { clearFieldError('err-lastname'); });
+    $('#reg-firstname').on('input', function() { clearFieldError('err-firstname'); });
+    $('#reg-phone').on('input', function() { clearFieldError('err-phone'); });
+    $('#reg-pw').on('input', function() { clearFieldError('err-reg-pw'); });
+    $('#reg-pw2').on('input', function() { clearFieldError('err-reg-pw2'); });
+    $('#reg-terms').on('change', function() { if ($(this).is(':checked')) clearFieldError('err-terms'); });
 
-// ── Auto-restore session nếu đã đăng nhập trước đó ────────
-(function restoreSession() {
+    // jQuery: Enter key để submit
+    $('#login-pw').on('keydown', function(e) {
+        if (e.key === 'Enter') handleLogin();
+    });
+    $('#reg-pw2').on('keydown', function(e) {
+        if (e.key === 'Enter') handleRegister();
+    });
+
+    // Khôi phục session Google
     try {
         const saved = localStorage.getItem('googleUser');
         if (saved) {
-            const user = JSON.parse(saved);
-            googleUser = user;
-            renderGoogleUserCard(user);
+            googleUser = JSON.parse(saved);
+            renderGoogleUserCard(googleUser);
         }
     } catch(e) {}
-})();
-</script>
-<style>
-@keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
-</style>
 
+    // Nếu đã đăng nhập (remember me) → redirect thẳng
+    const remembered = localStorage.getItem('rememberLogin');
+    const savedUser  = localStorage.getItem('currentUser');
+    if (remembered && savedUser) {
+        try {
+            const user = JSON.parse(savedUser);
+            showAuthToast(`Đang đăng nhập với ${user.name}...`, 'info');
+            setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+        } catch(e) {}
+    }
+});
+</script>
 </body>
 </html>

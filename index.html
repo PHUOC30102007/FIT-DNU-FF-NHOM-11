@@ -29,11 +29,95 @@
         </ul>
         <div class="nav-actions">
             <a href="public.html" class="nav-login" style="display:flex;align-items:center;gap:6px;"><i class='bx bx-trip' style="font-size:16px"></i> TripSync</a>
-            <a href="login.html" class="nav-login">Đăng nhập</a>
-            <a href="login.html" class="btn nav-cta">Đăng ký</a>
+
+            <!-- Khi chưa đăng nhập -->
+            <div id="nav-guest">
+                <a href="login.html" class="nav-login">Đăng nhập</a>
+                <a href="login.html" class="btn nav-cta">Đăng ký</a>
+            </div>
+
+            <!-- Khi đã đăng nhập -->
+            <div id="nav-user" class="nav-user-wrap" style="display:none;">
+                <button class="nav-avatar-btn" id="nav-avatar-btn" onclick="toggleUserDropdown()" aria-label="Tài khoản">
+                    <img id="nav-avatar-img" src="" alt="Avatar" class="nav-avatar-img" referrerpolicy="no-referrer">
+                    <span id="nav-user-name" class="nav-user-name"></span>
+                    <i class='bx bx-chevron-down nav-chevron' id="nav-chevron"></i>
+                </button>
+                <div class="nav-user-dropdown" id="nav-user-dropdown">
+                    <div class="nav-dropdown-header">
+                        <img id="nav-drop-avatar" src="" alt="Avatar" referrerpolicy="no-referrer">
+                        <div>
+                            <div id="nav-drop-name" class="nav-drop-name"></div>
+                            <div id="nav-drop-email" class="nav-drop-email"></div>
+                        </div>
+                    </div>
+                    <div class="nav-dropdown-divider"></div>
+                    <a href="public.html" class="nav-dropdown-item">
+                        <i class='bx bx-trip'></i> Chuyến đi của tôi
+                    </a>
+                    <a href="#" class="nav-dropdown-item" onclick="showToast('Tính năng đang phát triển!','info');return false;">
+                        <i class='bx bx-user'></i> Hồ sơ cá nhân
+                    </a>
+                    <a href="#" class="nav-dropdown-item" onclick="showToast('Tính năng đang phát triển!','info');return false;">
+                        <i class='bx bx-cog'></i> Cài đặt
+                    </a>
+                    <div class="nav-dropdown-divider"></div>
+                    <button class="nav-dropdown-item nav-dropdown-logout" onclick="handleLogout()">
+                        <i class='bx bx-log-out'></i> Đăng xuất
+                    </button>
+                </div>
+            </div>
         </div>
+        <button class="nav-hamburger" id="nav-hamburger" aria-label="Mở menu" onclick="toggleMobileMenu()">
+            <span></span><span></span><span></span>
+        </button>
     </div>
 </nav>
+
+<!-- MOBILE MENU OVERLAY -->
+<div class="mobile-menu-overlay" id="mobile-overlay" onclick="closeMobileMenu()"></div>
+<div class="mobile-menu" id="mobile-menu">
+    <div class="mobile-menu-header">
+        <div class="nav-logo">
+            <div class="nav-logo-icon"><i class='bx bx-trip'></i></div>
+            <span class="nav-logo-text" style="color:var(--dark)">WanderViet</span>
+        </div>
+        <button class="mobile-menu-close" onclick="closeMobileMenu()" aria-label="Đóng menu">
+            <i class='bx bx-x'></i>
+        </button>
+    </div>
+    <nav class="mobile-menu-nav">
+        <a href="#tours" onclick="closeMobileMenu()"><i class='bx bx-map-alt'></i> Tour</a>
+        <a href="#destinations" onclick="closeMobileMenu()"><i class='bx bx-compass'></i> Điểm Đến</a>
+        <a href="#about" onclick="closeMobileMenu()"><i class='bx bx-info-circle'></i> Về Chúng Tôi</a>
+        <a href="#blog" onclick="closeMobileMenu()"><i class='bx bx-news'></i> Blog</a>
+        <a href="#contact" onclick="closeMobileMenu()"><i class='bx bx-envelope'></i> Liên Hệ</a>
+    </nav>
+    <div class="mobile-menu-divider"></div>
+    <div class="mobile-menu-pages">
+        <p class="mobile-menu-section-label">Chuyển trang</p>
+        <a href="public.html"><i class='bx bx-trip'></i> TripSync — Xem chuyến đi</a>
+        <a href="login.html"><i class='bx bx-log-in'></i> Đăng nhập</a>
+        <a href="admin.html"><i class='bx bx-shield'></i> Quản trị Admin</a>
+    </div>
+    <div class="mobile-menu-footer" id="mobile-footer-guest">
+        <a href="login.html" class="btn btn-accent" style="width:100%;text-align:center;justify-content:center;">
+            <i class='bx bx-user-plus'></i> Đăng ký ngay
+        </a>
+    </div>
+    <div class="mobile-menu-footer" id="mobile-footer-user" style="display:none;">
+        <div class="mobile-user-info">
+            <img id="mobile-avatar" src="" alt="Avatar" class="mobile-user-avatar" referrerpolicy="no-referrer">
+            <div>
+                <div id="mobile-user-name" style="font-weight:600;font-size:14px;color:var(--dark)"></div>
+                <div id="mobile-user-email" style="font-size:12px;color:var(--text-muted)"></div>
+            </div>
+        </div>
+        <button onclick="handleLogout()" class="btn" style="width:100%;text-align:center;justify-content:center;background:#FEF2F2;color:#DC2626;border:1.5px solid #FECACA;margin-top:10px;">
+            <i class='bx bx-log-out'></i> Đăng xuất
+        </button>
+    </div>
+</div>
 
 <!-- ── HERO ── -->
 <section class="hero">
@@ -457,9 +541,9 @@
             <div class="footer-col">
                 <h4>Liên Hệ</h4>
                 <ul>
-                    <li><a href="#"><i class='bx bx-map' style="margin-right:6px"></i>123 Hàng Bài, Hà Nội</a></li>
-                    <li><a href="#"><i class='bx bx-phone' style="margin-right:6px"></i>1800 1234 567</a></li>
-                    <li><a href="#"><i class='bx bx-envelope' style="margin-right:6px"></i>hello@wanderviet.vn</a></li>
+                    <li><a href="#"><i class='bx bx-map' style="margin-right:6px"></i>Hà Đông, Hà Nội</a></li>
+                    <li><a href="#"><i class='bx bx-phone' style="margin-right:6px"></i>0337 596 407</a></li>
+                    <li><a href="#"><i class='bx bx-envelope' style="margin-right:6px"></i>phuoc30102007@gmail.com</a></li>
                     <li style="margin-top:16px;">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Google_Play_Store_badge_EN.svg/200px-Google_Play_Store_badge_EN.svg.png" alt="Google Play" style="height:36px; width:auto; border-radius:6px; margin-bottom:8px;">
                     </li>
@@ -582,6 +666,27 @@ window.addEventListener('scroll', () => {
   navbar.classList.toggle('scrolled', window.scrollY > 60);
   document.getElementById('scroll-top-btn').classList.toggle('visible', window.scrollY > 400);
 });
+
+// ── Hamburger Menu ──
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const overlay = document.getElementById('mobile-overlay');
+  const btn = document.getElementById('nav-hamburger');
+  const isOpen = menu.classList.contains('open');
+  if (isOpen) { closeMobileMenu(); } else {
+    menu.classList.add('open');
+    overlay.classList.add('open');
+    btn.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+}
+function closeMobileMenu() {
+  document.getElementById('mobile-menu').classList.remove('open');
+  document.getElementById('mobile-overlay').classList.remove('open');
+  document.getElementById('nav-hamburger').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileMenu(); });
 
 // ── Tour data ──
 const toursData = [
@@ -850,6 +955,159 @@ document.querySelectorAll('[onclick*="booking"]').forEach(el => {
 });
 
 console.log('WanderViet scripts loaded ✅');
+</script>
+
+
+<!-- ══════════════════════════════════════════
+     USER AUTH — NAVBAR AVATAR & DROPDOWN
+══════════════════════════════════════════ -->
+<style>
+.nav-user-wrap { position: relative; display: flex; align-items: center; }
+.nav-avatar-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    border-radius: 100px; padding: 5px 12px 5px 5px;
+    cursor: pointer; transition: all 0.3s;
+    color: var(--white); font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600;
+}
+.navbar.scrolled .nav-avatar-btn {
+    background: var(--primary-pale);
+    border-color: rgba(45,90,61,0.2); color: var(--dark);
+}
+.nav-avatar-btn:hover { background: rgba(255,255,255,0.22); }
+.navbar.scrolled .nav-avatar-btn:hover { background: #d8ead2; }
+.nav-avatar-img {
+    width: 32px; height: 32px; border-radius: 50%;
+    object-fit: cover; border: 2px solid rgba(255,255,255,0.5); display: block;
+}
+.nav-avatar-placeholder {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--accent); color: var(--dark);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; flex-shrink: 0;
+}
+.nav-user-name { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-chevron { font-size: 18px; transition: transform 0.3s; }
+.nav-chevron.open { transform: rotate(180deg); }
+.nav-user-dropdown {
+    position: absolute; top: calc(100% + 12px); right: 0; width: 240px;
+    background: var(--white); border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.14);
+    border: 1px solid var(--border); overflow: hidden;
+    opacity: 0; pointer-events: none; transform: translateY(-8px);
+    transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1); z-index: 2000;
+}
+.nav-user-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+.nav-dropdown-header {
+    display: flex; align-items: center; gap: 12px; padding: 16px;
+    background: var(--primary-pale);
+}
+.nav-dropdown-header img {
+    width: 44px; height: 44px; border-radius: 50%; object-fit: cover;
+    border: 2px solid var(--primary); flex-shrink: 0;
+}
+.nav-drop-name { font-weight: 700; font-size: 14px; color: var(--dark); line-height: 1.3; }
+.nav-drop-email { font-size: 11px; color: var(--text-muted); margin-top: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
+.nav-dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+.nav-dropdown-item {
+    display: flex; align-items: center; gap: 10px; padding: 11px 16px;
+    font-size: 14px; font-weight: 500; color: var(--text);
+    background: none; border: none; width: 100%; text-align: left;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s, color 0.2s; text-decoration: none;
+}
+.nav-dropdown-item i { font-size: 18px; color: var(--text-muted); }
+.nav-dropdown-item:hover { background: var(--primary-pale); color: var(--primary); }
+.nav-dropdown-item:hover i { color: var(--primary); }
+.nav-dropdown-logout { color: #DC2626 !important; }
+.nav-dropdown-logout i { color: #DC2626 !important; }
+.nav-dropdown-logout:hover { background: #FEF2F2 !important; }
+.mobile-user-info { display: flex; align-items: center; gap: 12px; padding: 12px 0 4px; }
+.mobile-user-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+</style>
+
+<script>
+(function initAuthState() {
+    try {
+        var raw = localStorage.getItem('googleUser') || localStorage.getItem('currentUser');
+        if (!raw) return;
+        var user = JSON.parse(raw);
+        if (!user) return;
+        renderNavUser(user);
+    } catch(e) { console.warn('Auth init error:', e); }
+})();
+
+function renderNavUser(user) {
+    var guestEl    = document.getElementById('nav-guest');
+    var userEl     = document.getElementById('nav-user');
+    var avatarImg  = document.getElementById('nav-avatar-img');
+    var nameEl     = document.getElementById('nav-user-name');
+    var dropAvatar = document.getElementById('nav-drop-avatar');
+    var dropName   = document.getElementById('nav-drop-name');
+    var dropEmail  = document.getElementById('nav-drop-email');
+
+    if (guestEl) guestEl.style.display = 'none';
+    if (userEl)  userEl.style.display  = 'flex';
+
+    var firstName = (user.name || '').split(' ').pop() || 'Tôi';
+    if (nameEl) nameEl.textContent = firstName;
+
+    var picSrc = user.picture || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name||'U') + '&background=E8A838&color=1A1A2E&size=64');
+    if (avatarImg)  avatarImg.src  = picSrc;
+    if (dropAvatar) dropAvatar.src = picSrc;
+    if (dropName)   dropName.textContent  = user.name  || '';
+    if (dropEmail)  dropEmail.textContent = user.email || '';
+
+    var mobileGuest  = document.getElementById('mobile-footer-guest');
+    var mobileUser   = document.getElementById('mobile-footer-user');
+    var mobileAvatar = document.getElementById('mobile-avatar');
+    var mobileName   = document.getElementById('mobile-user-name');
+    var mobileEmail  = document.getElementById('mobile-user-email');
+
+    if (mobileGuest) mobileGuest.style.display = 'none';
+    if (mobileUser)  mobileUser.style.display  = 'block';
+    if (mobileAvatar) mobileAvatar.src = picSrc;
+    if (mobileName)  mobileName.textContent  = user.name  || '';
+    if (mobileEmail) mobileEmail.textContent = user.email || '';
+}
+
+function toggleUserDropdown() {
+    var dropdown = document.getElementById('nav-user-dropdown');
+    var chevron  = document.getElementById('nav-chevron');
+    if (dropdown) dropdown.classList.toggle('open');
+    if (chevron)  chevron.classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+    var wrap     = document.getElementById('nav-user');
+    var dropdown = document.getElementById('nav-user-dropdown');
+    if (wrap && !wrap.contains(e.target)) {
+        if (dropdown) dropdown.classList.remove('open');
+        var ch = document.getElementById('nav-chevron');
+        if (ch) ch.classList.remove('open');
+    }
+});
+
+function handleLogout() {
+    try {
+        var raw = localStorage.getItem('googleUser');
+        if (raw) {
+            var gUser = JSON.parse(raw);
+            if (gUser.token && typeof google !== 'undefined') {
+                google.accounts.oauth2.revoke(gUser.token, function(){});
+            }
+        }
+    } catch(e) {}
+    localStorage.removeItem('googleUser');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('rememberLogin');
+    showToast('Đã đăng xuất thành công!', 'success');
+    setTimeout(function(){ window.location.href = 'login.html'; }, 1200);
+}
 </script>
 
 </body>
