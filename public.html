@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <link rel="stylesheet" href="css/public.css">
+  <script src="authGuard.js"></script>
 </head>
 <body>
 
@@ -22,6 +23,16 @@
       <a href="#timeline" class="hide-mobile">Timeline</a>
       <a href="#places" class="hide-mobile">Địa điểm</a>
       <a href="#notes" class="hide-mobile">Ghi chú</a>
+      <!-- Hiển thị khi chưa đăng nhập -->
+      <a href="login.html" id="pub-btn-login" class="btn btn-sm hide-mobile" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);">
+        <i class='bx bx-log-in'></i> Đăng nhập
+      </a>
+      <!-- Hiển thị khi đã đăng nhập -->
+      <div id="pub-user-chip" style="display:none;align-items:center;gap:8px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:999px;padding:4px 12px 4px 4px;cursor:pointer;" onclick="handlePubLogout()">
+        <img id="pub-user-avatar" src="" alt="Avatar" referrerpolicy="no-referrer" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">
+        <span id="pub-user-name" style="font-size:13px;font-weight:600;color:#fff;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+        <i class='bx bx-log-out' style="color:rgba(255,255,255,0.7);font-size:14px;" title="Đăng xuất"></i>
+      </div>
       <a href="admin.html" class="btn btn-accent btn-sm"><i class='bx bx-lock-alt'></i> Quản trị</a>
     </div>
     <button class="pub-hamburger" id="pub-hamburger" aria-label="Mở menu" onclick="togglePubMenu()">
@@ -54,7 +65,7 @@
     <p class="mobile-menu-section-label">Chuyển trang</p>
     <a href="index.html"><i class='bx bx-home'></i> WanderViet — Trang chủ</a>
     <a href="admin.html"><i class='bx bx-shield'></i> Quản trị Admin</a>
-    <a href="login.html"><i class='bx bx-log-in'></i> Đăng nhập</a>
+    <a href="login.html" id="pub-auth-link"><i class='bx bx-log-in'></i> Đăng nhập</a>
   </div>
   <div class="mobile-menu-footer">
     <a href="admin.html" class="btn btn-accent" style="width:100%;text-align:center;justify-content:center;display:flex;align-items:center;gap:8px;">
@@ -489,7 +500,38 @@
     renderMembers(data);
     renderBudget(data);
     renderNotes(data);
+
+    // Hiển thị thông tin user đã đăng nhập
+    const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+
+    // Header desktop: chip avatar/tên
+    const chip       = document.getElementById('pub-user-chip');
+    const btnLogin   = document.getElementById('pub-btn-login');
+    const chipAvatar = document.getElementById('pub-user-avatar');
+    const chipName   = document.getElementById('pub-user-name');
+
+    if (user) {
+      if (chip)     { chip.style.display = 'flex'; }
+      if (btnLogin) { btnLogin.style.display = 'none'; }
+      if (chipAvatar) chipAvatar.src = user.avatar || user.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name||'U')}&background=2D5A3D&color=fff`;
+      if (chipName)   chipName.textContent = user.name ? user.name.split(' ').pop() : user.email;
+    }
+
+    // Mobile menu: đổi link đăng nhập → đăng xuất
+    const authLink = document.getElementById('pub-auth-link');
+    if (authLink && user) {
+      authLink.href = '#';
+      authLink.innerHTML = `<i class='bx bx-log-out'></i> Đăng xuất (${user.name ? user.name.split(' ').pop() : user.email})`;
+      authLink.onclick = (e) => { e.preventDefault(); handlePubLogout(); };
+    }
   })();
+
+  function handlePubLogout() {
+    ['googleUser','authToken','currentUser','rememberLogin','sessionOnly'].forEach(k => {
+      localStorage.removeItem(k); sessionStorage.removeItem(k);
+    });
+    window.location.href = 'login.html';
+  }
 </script>
 
 </body>

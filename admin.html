@@ -6,6 +6,7 @@
   <title>TripSync Admin – Quản Lý Chuyến Đi</title>
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <link rel="stylesheet" href="css/admin.css" />
+  <script src="authGuard.js"></script>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -58,12 +59,12 @@
     </nav>
 
     <div class="sidebar-user">
-      <div class="sidebar-user-avatar">MT</div>
+      <div class="sidebar-user-avatar" data-auth="initials">?</div>
       <div>
-        <div class="sidebar-user-name">Minh Tuấn</div>
-        <div class="sidebar-user-role">Trưởng nhóm</div>
+        <div class="sidebar-user-name" data-auth="name">...</div>
+        <div class="sidebar-user-role" data-auth="role">Thành viên</div>
       </div>
-      <i class='bx bx-log-out sidebar-user-logout' title="Đăng xuất" onclick="window.location.href='login.html'" style="cursor:pointer"></i>
+      <i class='bx bx-log-out sidebar-user-logout' title="Đăng xuất" onclick="logout()" style="cursor:pointer"></i>
     </div>
   </aside>
 
@@ -926,6 +927,7 @@ function confirmDelete(item){
 document.querySelector('.panel-header-actions .btn-ghost')?.addEventListener('click',()=>showTab('trips'));
 
 // ── Init ──
+initPageAuth(); // kiểm tra login + hiện thông tin user từ session
 renderDashboard();
 renderTripsTab();
 renderPlacesTab();

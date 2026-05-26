@@ -161,28 +161,28 @@
         <div class="hero-visual">
             <div class="hero-img-grid">
                 <div class="hero-img-card">
-                    <img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&h=300&fit=crop" alt="Hội An">
+                    <img src="media/HoiAn.jpg" alt="Hội An">
                     <div class="hero-img-overlay">
                         <span>Hội An</span>
                         <span class="rating">★ 4.9</span>
                     </div>
                 </div>
                 <div class="hero-img-card">
-                    <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=300&fit=crop" alt="Hạ Long">
+                    <img src="media/VinhHaLong.jpg" alt="Hạ Long">
                     <div class="hero-img-overlay">
                         <span>Hạ Long</span>
                         <span class="rating">★ 4.8</span>
                     </div>
                 </div>
                 <div class="hero-img-card">
-                    <img src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=400&h=300&fit=crop" alt="Sapa">
+                    <img src="media/SaPa.jpg" alt="Sapa">
                     <div class="hero-img-overlay">
                         <span>Sapa</span>
                         <span class="rating">★ 4.7</span>
                     </div>
                 </div>
                 <div class="hero-img-card">
-                    <img src="https://images.unsplash.com/photo-1604925702334-3d8a2a5e1d3e?w=400&h=300&fit=crop" alt="Đà Lạt">
+                    <img src="media/DaLat.png" alt="Đà Lạt">
                     <div class="hero-img-overlay">
                         <span>Đà Lạt</span>
                         <span class="rating">★ 4.8</span>
@@ -392,7 +392,7 @@
                 </div>
             </div>
             <div class="dest-card">
-                <img src="https://images.unsplash.com/photo-1560840386-e3a13a1e63ef?w=400&h=300&fit=crop" alt="Hà Nội">
+                <img src="media/hoGuomHaNoi.jpg" alt="Hà Nội">
                 <div class="dest-overlay">
                     <h3>Hà Nội</h3>
                     <p>98 tour khả dụng</p>
@@ -406,7 +406,7 @@
                 </div>
             </div>
             <div class="dest-card">
-                <img src="https://images.unsplash.com/photo-1596397249329-5c5f8f2398f2?w=400&h=300&fit=crop" alt="TP.HCM">
+                <img src="media/TPHCM.jpg" alt="TP.HCM">
                 <div class="dest-overlay">
                     <h3>TP. Hồ Chí Minh</h3>
                     <p>85 tour khả dụng</p>
@@ -1032,10 +1032,15 @@ console.log('WanderViet scripts loaded ✅');
 <script>
 (function initAuthState() {
     try {
-        var raw = localStorage.getItem('googleUser') || localStorage.getItem('currentUser');
+        // Ưu tiên currentUser (chuẩn chung), fallback googleUser (tương thích cũ)
+        var raw = sessionStorage.getItem('currentUser')
+               || localStorage.getItem('currentUser')
+               || localStorage.getItem('googleUser');
         if (!raw) return;
         var user = JSON.parse(raw);
         if (!user) return;
+        // Đảm bảo field picture tồn tại (dùng avatar nếu không có picture)
+        user.picture = user.picture || user.avatar || '';
         renderNavUser(user);
     } catch(e) { console.warn('Auth init error:', e); }
 })();
@@ -1055,7 +1060,7 @@ function renderNavUser(user) {
     var firstName = (user.name || '').split(' ').pop() || 'Tôi';
     if (nameEl) nameEl.textContent = firstName;
 
-    var picSrc = user.picture || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name||'U') + '&background=E8A838&color=1A1A2E&size=64');
+    var picSrc = user.picture || user.avatar || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name||'U') + '&background=E8A838&color=1A1A2E&size=64');
     if (avatarImg)  avatarImg.src  = picSrc;
     if (dropAvatar) dropAvatar.src = picSrc;
     if (dropName)   dropName.textContent  = user.name  || '';
@@ -1093,18 +1098,19 @@ document.addEventListener('click', function(e) {
 
 function handleLogout() {
     try {
-        var raw = localStorage.getItem('googleUser');
+        var raw = localStorage.getItem('googleUser') || localStorage.getItem('currentUser');
         if (raw) {
             var gUser = JSON.parse(raw);
-            if (gUser.token && typeof google !== 'undefined') {
+            if (gUser && gUser.token && typeof google !== 'undefined') {
                 google.accounts.oauth2.revoke(gUser.token, function(){});
             }
         }
     } catch(e) {}
-    localStorage.removeItem('googleUser');
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('rememberLogin');
+    // Xóa tất cả key liên quan đến session
+    ['googleUser','authToken','currentUser','rememberLogin','sessionOnly'].forEach(function(k) {
+        localStorage.removeItem(k);
+        sessionStorage.removeItem(k);
+    });
     showToast('Đã đăng xuất thành công!', 'success');
     setTimeout(function(){ window.location.href = 'login.html'; }, 1200);
 }

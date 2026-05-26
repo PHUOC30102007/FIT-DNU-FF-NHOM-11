@@ -363,6 +363,8 @@
 <!-- Toast -->
 <div class="auth-toast" id="auth-toast"></div>
 
+<!-- Auth Guard — load trước script chính -->
+<script src="authGuard.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -1039,6 +1041,24 @@ function renderGoogleUserCard(user) {
 
 function continueWithGoogle() {
     if (!googleUser) return;
+
+    // Chuẩn hóa object user — dùng chung cho tất cả trang
+    const userObj = {
+        id:      googleUser.id,
+        name:    googleUser.name,
+        email:   googleUser.email,
+        avatar:  googleUser.picture || '',
+        picture: googleUser.picture || '',   // index.html đọc field "picture"
+        role:    'user',
+    };
+    const json = JSON.stringify(userObj);
+
+    // Lưu vào CẢ BA key để tương thích với mọi trang
+    localStorage.setItem('currentUser',   json);   // authGuard.js (admin, public)
+    localStorage.setItem('googleUser',    json);   // index.html initAuthState()
+    localStorage.setItem('rememberLogin', '1');    // nhớ đăng nhập
+    sessionStorage.setItem('currentUser', json);   // tab mới
+
     showAuthToast('Đang chuyển hướng...');
     setTimeout(() => { window.location.href = 'index.html'; }, 1200);
 }
@@ -1048,8 +1068,10 @@ function disconnectGoogle() {
         google.accounts.oauth2.revoke(googleUser.token, () => {});
     }
     googleUser = null;
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('googleUser');
+    ['authToken','googleUser','currentUser','rememberLogin','sessionOnly'].forEach(k => {
+        localStorage.removeItem(k);
+        sessionStorage.removeItem(k);
+    });
     $('#google-user-card').fadeOut(200, function() { $(this).removeClass('visible'); });
     $('#btn-google-continue').hide();
     $('#google-disconnect').hide();

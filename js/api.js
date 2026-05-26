@@ -4,8 +4,7 @@
  */
 
 const API_CONFIG = {
-    // === THAY ĐỔI URL NÀY THÀNH API THỰC TẾ CỦA BẠN ===
-    baseUrl: 'https://6a0367ff2afe8349b4b52e50.mockapi.io/api/v1', // Thay bằng URL MockAPI.io của bạn
+    baseUrl: 'https://6a0367ff2afe8349b4b52e50.mockapi.io/api/v1', 
     endpoints: {
         trips: '/trips',
         places: '/places',
