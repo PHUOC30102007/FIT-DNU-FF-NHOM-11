@@ -11,6 +11,23 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
     <link rel="stylesheet" href="css/app.css">
+    <script>
+        // Chạy sớm nhất có thể (trước khi render DOM) để tránh flash chữ "Đăng nhập"
+        (function() {
+            try {
+                var raw = sessionStorage.getItem('currentUser')
+                    || localStorage.getItem('currentUser')
+                    || localStorage.getItem('googleUser');
+                if (raw && JSON.parse(raw)) {
+                    // Inject style tạm thời ẩn nav-guest ngay lập tức
+                    var s = document.createElement('style');
+                    s.id = '_auth_pre';
+                    s.textContent = '#nav-guest { display: none !important; } #mobile-login-link { display: none !important; }';
+                    document.head.appendChild(s);
+                }
+            } catch(e) {}
+        })();
+    </script>
 </head>
 
 <body>
@@ -102,7 +119,7 @@
         <div class="mobile-menu-pages">
             <p class="mobile-menu-section-label">Chuyển trang</p>
             <a href="public.html"><i class='bx bx-trip'></i> TripSync — Xem chuyến đi</a>
-            <a href="login.html"><i class='bx bx-log-in'></i> Đăng nhập</a>
+            <a href="login.html" id="mobile-login-link"><i class='bx bx-log-in'></i> Đăng nhập</a>
             <a href="admin.html"><i class='bx bx-shield'></i> Quản trị Admin</a>
         </div>
         <div class="mobile-menu-footer" id="mobile-footer-guest">
@@ -1449,8 +1466,23 @@
                 if (!raw) return;
                 var user = JSON.parse(raw);
                 if (!user) return;
-                // Đảm bảo field picture tồn tại (dùng avatar nếu không có picture)
+                // Đảm bảo field picture/avatar tồn tại
                 user.picture = user.picture || user.avatar || '';
+                user.avatar  = user.avatar  || user.picture || '';
+                // Nếu chưa có currentUser (chỉ có googleUser), lưu ngược lại
+                // để public.html / admin.html (dùng authGuard) đọc được
+                if (!sessionStorage.getItem('currentUser') && !localStorage.getItem('currentUser')) {
+                    var normalized = {
+                        id:      user.id || user.sub || '',
+                        name:    user.name || '',
+                        email:   user.email || '',
+                        avatar:  user.picture || user.avatar || '',
+                        picture: user.picture || user.avatar || '',
+                        role:    user.role || 'user'
+                    };
+                    localStorage.setItem('currentUser', JSON.stringify(normalized));
+                    localStorage.setItem('rememberLogin', '1');
+                }
                 renderNavUser(user);
             } catch (e) { console.warn('Auth init error:', e); }
         })();
@@ -1466,6 +1498,9 @@
 
             if (guestEl) guestEl.style.display = 'none';
             if (userEl) userEl.style.display = 'flex';
+            // Xóa style tạm đã inject từ <head>
+            var preStyle = document.getElementById('_auth_pre');
+            if (preStyle) preStyle.remove();
 
             var firstName = (user.name || '').split(' ').pop() || 'Tôi';
             if (nameEl) nameEl.textContent = firstName;
@@ -1487,6 +1522,10 @@
             if (mobileAvatar) mobileAvatar.src = picSrc;
             if (mobileName) mobileName.textContent = user.name || '';
             if (mobileEmail) mobileEmail.textContent = user.email || '';
+
+            // Ẩn link "Đăng nhập" trong mobile menu pages
+            var mobileLoginLink = document.getElementById('mobile-login-link');
+            if (mobileLoginLink) mobileLoginLink.style.display = 'none';
         }
 
         function toggleUserDropdown() {

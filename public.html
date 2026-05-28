@@ -9,6 +9,22 @@
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <link rel="stylesheet" href="css/public.css">
   <script src="authGuard.js"></script>
+  <script>
+    // Ẩn sớm nút "Đăng nhập" nếu đã có session (tránh flash)
+    (function() {
+      try {
+        var raw = sessionStorage.getItem('currentUser')
+          || localStorage.getItem('currentUser')
+          || localStorage.getItem('googleUser');
+        if (raw && JSON.parse(raw)) {
+          var s = document.createElement('style');
+          s.id = '_pub_auth_pre';
+          s.textContent = '#pub-btn-login { display: none !important; } #pub-auth-link { display: none !important; } #pub-footer-guest { display: none !important; }';
+          document.head.appendChild(s);
+        }
+      } catch(e) {}
+    })();
+  </script>
 </head>
 <body>
 
@@ -29,7 +45,7 @@
       </a>
       <!-- Hiển thị khi đã đăng nhập -->
       <div id="pub-user-chip" style="display:none;align-items:center;gap:8px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:999px;padding:4px 12px 4px 4px;cursor:pointer;" onclick="handlePubLogout()">
-        <img id="pub-user-avatar" src="" alt="Avatar" referrerpolicy="no-referrer" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">
+        <img id="pub-user-avatar" src="" alt="Avatar" referrerpolicy="no-referrer" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid #286cc5;">
         <span id="pub-user-name" style="font-size:13px;font-weight:600;color:#fff;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
         <i class='bx bx-log-out' style="color:rgba(255,255,255,0.7);font-size:14px;" title="Đăng xuất"></i>
       </div>
@@ -67,10 +83,24 @@
     <a href="admin.html"><i class='bx bx-shield'></i> Quản trị Admin</a>
     <a href="login.html" id="pub-auth-link"><i class='bx bx-log-in'></i> Đăng nhập</a>
   </div>
-  <div class="mobile-menu-footer">
-    <a href="admin.html" class="btn btn-accent" style="width:100%;text-align:center;justify-content:center;display:flex;align-items:center;gap:8px;">
-      <i class='bx bx-lock-alt'></i> Vào trang Quản trị
+  <div class="mobile-menu-footer" id="pub-footer-guest">
+    <a href="login.html" class="btn btn-accent" style="width:100%;text-align:center;justify-content:center;display:flex;align-items:center;gap:8px;">
+      <i class='bx bx-log-in'></i> Đăng nhập
     </a>
+  </div>
+  <div class="mobile-menu-footer" id="pub-footer-user" style="display:none;">
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 0 4px;">
+      <img id="pub-mobile-avatar" src="" alt="Avatar" referrerpolicy="no-referrer"
+        style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #286cc5;flex-shrink:0;">
+      <div>
+        <div id="pub-mobile-name" style="font-weight:600;font-size:14px;color:#1A1A2E;"></div>
+        <div id="pub-mobile-email" style="font-size:12px;color:#7A7A96;"></div>
+      </div>
+    </div>
+    <button onclick="handlePubLogout()" class="btn"
+      style="width:100%;text-align:center;justify-content:center;background:#FEF2F2;color:#DC2626;border:1.5px solid #FECACA;margin-top:10px;">
+      <i class='bx bx-log-out'></i> Đăng xuất
+    </button>
   </div>
 </div>
 
@@ -502,7 +532,33 @@
     renderNotes(data);
 
     // Hiển thị thông tin user đã đăng nhập
-    const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    // Ưu tiên getCurrentUser() (authGuard), fallback đọc thẳng googleUser
+    function getAnyUser() {
+      try {
+        if (typeof getCurrentUser === 'function') {
+          const u = getCurrentUser();
+          if (u) return u;
+        }
+        // Fallback: đọc googleUser (lưu khi đăng nhập Google ở index.html)
+        const raw = localStorage.getItem('googleUser');
+        if (!raw) return null;
+        const gu = JSON.parse(raw);
+        if (!gu) return null;
+        // Chuẩn hóa sang format chung và lưu lại để các lần sau dùng được
+        const normalized = {
+          id:      gu.id || gu.sub || '',
+          name:    gu.name || '',
+          email:   gu.email || '',
+          avatar:  gu.picture || gu.avatar || '',
+          picture: gu.picture || gu.avatar || '',
+          role:    gu.role || 'user'
+        };
+        localStorage.setItem('currentUser', JSON.stringify(normalized));
+        localStorage.setItem('rememberLogin', '1');
+        return normalized;
+      } catch(e) { return null; }
+    }
+    const user = getAnyUser();
 
     // Header desktop: chip avatar/tên
     const chip       = document.getElementById('pub-user-chip');
@@ -515,14 +571,26 @@
       if (btnLogin) { btnLogin.style.display = 'none'; }
       if (chipAvatar) chipAvatar.src = user.avatar || user.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name||'U')}&background=2D5A3D&color=fff`;
       if (chipName)   chipName.textContent = user.name ? user.name.split(' ').pop() : user.email;
-    }
+      // Dọn style tạm từ <head>
+      var preStyle = document.getElementById('_pub_auth_pre');
+      if (preStyle) preStyle.remove();
 
-    // Mobile menu: đổi link đăng nhập → đăng xuất
-    const authLink = document.getElementById('pub-auth-link');
-    if (authLink && user) {
-      authLink.href = '#';
-      authLink.innerHTML = `<i class='bx bx-log-out'></i> Đăng xuất (${user.name ? user.name.split(' ').pop() : user.email})`;
-      authLink.onclick = (e) => { e.preventDefault(); handlePubLogout(); };
+      // Mobile footer: ẩn guest, hiện user
+      const pubFooterGuest  = document.getElementById('pub-footer-guest');
+      const pubFooterUser   = document.getElementById('pub-footer-user');
+      const pubMobileAvatar = document.getElementById('pub-mobile-avatar');
+      const pubMobileName   = document.getElementById('pub-mobile-name');
+      const pubMobileEmail  = document.getElementById('pub-mobile-email');
+      if (pubFooterGuest) pubFooterGuest.style.display = 'none';
+      if (pubFooterUser)  pubFooterUser.style.display = 'block';
+      const avatarSrc = user.avatar || user.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name||'U')}&background=2D5A3D&color=fff`;
+      if (pubMobileAvatar) pubMobileAvatar.src = avatarSrc;
+      if (pubMobileName)   pubMobileName.textContent = user.name || '';
+      if (pubMobileEmail)  pubMobileEmail.textContent = user.email || '';
+
+      // Mobile menu: ẩn link "Đăng nhập"
+      const authLink = document.getElementById('pub-auth-link');
+      if (authLink) authLink.style.display = 'none';
     }
   })();
 

@@ -7,12 +7,178 @@
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <link rel="stylesheet" href="css/admin.css" />
   <script src="authGuard.js"></script>
+  <style>
+    /* ── NO HORIZONTAL SCROLL ── */
+    html, body { overflow-x: hidden !important; max-width: 100vw; }
+    .admin-wrapper { overflow-x: hidden !important; max-width: 100vw; }
+    .admin-sidebar { overflow-x: hidden; will-change: transform; }
+
+    /* ── DRAWER OVERLAY ── */
+    .sidebar-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(2px);
+      z-index: 1000;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-overlay.open { opacity: 1; pointer-events: all; }
+
+    /* ── SIDEBAR AS DRAWER ── */
+    .admin-sidebar {
+      position: fixed !important;
+      left: 0; top: 0; bottom: 0;
+      z-index: 1001;
+      transform: translateX(-100%);
+      transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: none;
+    }
+    .admin-sidebar.open {
+      transform: translateX(0);
+      box-shadow: 4px 0 32px rgba(0,0,0,0.22);
+    }
+
+    /* ── MAIN takes full width now (no sidebar offset) ── */
+    .admin-main { margin-left: 0 !important; width: 100% !important; }
+
+    /* ── HAMBURGER BUTTON in topbar ── */
+    .topbar-hamburger {
+      display: flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px;
+      background: none; border: none; cursor: pointer;
+      border-radius: 10px;
+      color: var(--text, #3D3D52);
+      font-size: 22px;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .topbar-hamburger:hover { background: var(--bg-2, #f0f0ec); }
+
+    /* ── SIDEBAR CLOSE BUTTON ── */
+    .sidebar-close-btn {
+      position: absolute; top: 14px; right: 14px;
+      width: 32px; height: 32px;
+      background: rgba(255,255,255,0.1); border: none; border-radius: 8px;
+      color: rgba(255,255,255,0.8); font-size: 20px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .sidebar-close-btn:hover { background: rgba(255,255,255,0.2); }
+
+    /* ══════════════════════════════════════
+       MOBILE RESPONSIVE
+    ══════════════════════════════════════ */
+    @media (max-width: 640px) {
+
+      /* Topbar gọn lại */
+      .admin-topbar {
+        padding: 0 12px;
+        gap: 8px;
+        height: 56px;
+      }
+      .topbar-title {
+        font-size: 16px;
+        font-weight: 700;
+        flex: 1;
+      }
+      /* Ẩn ô tìm kiếm trên mobile */
+      .topbar-search { display: none !important; }
+      /* Ẩn nút globe trên mobile */
+      .topbar-icon-btn[title="Xem Public"] { display: none !important; }
+      /* Nút "Thêm chuyến đi" rút gọn chỉ còn icon */
+      .topbar-actions .btn span,
+      .topbar-actions .btn-primary span { display: none; }
+      .topbar-actions .btn-primary {
+        padding: 0;
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        justify-content: center;
+      }
+      .topbar-actions { gap: 6px; }
+
+      /* Content padding nhỏ hơn */
+      .admin-content { padding: 12px !important; }
+
+      /* Stats: 2 cột thay vì 4 */
+      .stats-row {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+      }
+      .stat-card {
+        padding: 12px !important;
+        gap: 10px !important;
+      }
+      .stat-icon {
+        width: 36px !important; height: 36px !important;
+        font-size: 18px !important;
+        flex-shrink: 0;
+      }
+      .stat-val { font-size: 20px !important; }
+      .stat-label { font-size: 11px !important; }
+      .stat-change { font-size: 10px !important; }
+
+      /* Admin grid: 1 cột */
+      .admin-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+
+      /* Table: scroll ngang trong panel */
+      .panel-body { overflow-x: auto !important; }
+      .trip-table { min-width: 480px; }
+      .trip-table th, .trip-table td {
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+      }
+
+      /* Panel header */
+      .panel-header {
+        padding: 12px 14px !important;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .panel-header h3 { font-size: 14px !important; }
+
+      /* Budget tab */
+      .form-row { grid-template-columns: 1fr !important; }
+      .budget-total-display { padding: 14px !important; }
+      .btd-val { font-size: 22px !important; }
+
+      /* Member manage */
+      .member-manage-row {
+        flex-wrap: wrap;
+        gap: 6px !important;
+      }
+      .member-role-select { max-width: 100% !important; }
+
+      /* Modal full width */
+      .modal { width: 95vw !important; max-height: 90vh; overflow-y: auto; }
+      .modal-body { padding: 16px !important; }
+
+      /* Place rows trong modal */
+      .place-row-inputs { flex-wrap: wrap; }
+      .place-row-inputs input[style*="max-width:100px"] { max-width: 80px !important; }
+    }
+
+    @media (max-width: 400px) {
+      /* Rất nhỏ: stats 1 cột */
+      .stats-row { grid-template-columns: 1fr !important; }
+    }
+  </style>
 </head>
 <body>
+
+<!-- OVERLAY -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
 <div class="admin-wrapper">
 
-  <!-- SIDEBAR -->
+  <!-- SIDEBAR DRAWER -->
   <aside class="admin-sidebar" id="sidebar">
+    <button class="sidebar-close-btn" onclick="closeSidebar()" title="Đóng menu">
+      <i class='bx bx-x'></i>
+    </button>
     <div class="sidebar-brand">
       <div class="sidebar-brand-icon"><i class='bx bx-map-alt'></i></div>
       <div>
@@ -72,6 +238,9 @@
   <main class="admin-main">
     <!-- TOPBAR -->
     <header class="admin-topbar">
+      <button class="topbar-hamburger" onclick="openSidebar()" title="Mở menu">
+        <i class='bx bx-menu'></i>
+      </button>
       <div class="topbar-title" id="page-title">Dashboard</div>
       <div class="topbar-search">
         <i class='bx bx-search'></i>
@@ -86,7 +255,7 @@
           <i class='bx bx-globe'></i>
         </div>
         <button class="btn btn-primary btn-sm" onclick="openModal('trip')">
-          <i class='bx bx-plus'></i> Thêm chuyến đi
+          <i class='bx bx-plus'></i> <span>Thêm chuyến đi</span>
         </button>
       </div>
     </header>
@@ -257,9 +426,8 @@
                 <div class="form-row">
                   <div class="form-group">
                     <label class="form-label">Chuyến đi</label>
-                    <select class="form-control">
-                      <option>Đà Nẵng – Hội An 2025</option>
-                      <option>Phú Quốc 2025</option>
+                    <select class="form-control" id="budget-trip-select" onchange="onBudgetTripChange()">
+                      <option value="">-- Chọn chuyến đi --</option>
                     </select>
                   </div>
                   <div class="form-group">
@@ -479,6 +647,7 @@ function showTab(tab) {
   event?.target?.classList.add('active');
   const titles={dashboard:'Dashboard',trips:'Chuyến đi',places:'Địa điểm',members:'Thành viên',budget:'Ngân sách'};
   document.getElementById('page-title').textContent=titles[tab]||tab;
+  closeSidebar();
   if(tab==='trips') renderTripsTab();
   if(tab==='places') renderPlacesTab();
   if(tab==='members') renderMembersTab();
@@ -797,7 +966,6 @@ function updateMember(id,field,val){
   if(m){ m[field]=val; saveData(); }
 }
 function deleteMember(id){
-  if(!confirm('Xóa thành viên này?')) return;
   appData.members=appData.members.filter(m=>m.id!==id);
   saveData(); renderMembersTab(); renderDashboard();
   showToast('Đã xóa thành viên','error');
@@ -834,8 +1002,38 @@ document.querySelector('#tab-members .btn-primary')?.addEventListener('click',()
   showToast('Đã lưu danh sách thành viên','success');
 });
 
+function onBudgetTripChange(){
+  const sel = document.getElementById('budget-trip-select');
+  const tripId = sel ? parseInt(sel.value) : null;
+  appData.budget.tripId = tripId || null;
+  // Cập nhật số thành viên theo chuyến đi
+  const trip = appData.trips.find(t => t.id === tripId);
+  if(trip && trip.members && trip.members.length){
+    appData.budget.memberCount = trip.members.length;
+    const mc = document.getElementById('member-count');
+    if(mc) mc.value = trip.members.length;
+  }
+  saveData();
+  recalcBudget();
+}
+
 // ── BUDGET ──
 function renderBudgetTab(){
+  // Populate trip select
+  const sel = document.getElementById('budget-trip-select');
+  if(sel){
+    const curVal = sel.value;
+    sel.innerHTML = '<option value="">-- Chọn chuyến đi --</option>';
+    appData.trips.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.name + (t.dest ? ' — ' + t.dest : '');
+      sel.appendChild(opt);
+    });
+    // Khôi phục lựa chọn hoặc chọn trip đang được lưu
+    if(appData.budget.tripId) sel.value = appData.budget.tripId;
+    else if(curVal) sel.value = curVal;
+  }
   const cats=document.getElementById('budget-cats');
   cats.innerHTML=appData.budget.categories.map((c,i)=>`
     <div class="budget-cat-row">
@@ -925,6 +1123,49 @@ function confirmDelete(item){
 
 // ── Dashboard action buttons ──
 document.querySelector('.panel-header-actions .btn-ghost')?.addEventListener('click',()=>showTab('trips'));
+
+// ── AuthGuard Fallback (phòng khi authGuard.js không load được khi chạy local) ──
+if (typeof initPageAuth === 'undefined') {
+  window.getCurrentUser = function() {
+    try {
+      const raw = sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser');
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  };
+  window.logout = function() {
+    ['currentUser','rememberLogin','sessionOnly','googleUser','authToken']
+      .forEach(k => { localStorage.removeItem(k); sessionStorage.removeItem(k); });
+    window.location.href = 'login.html';
+  };
+  window.initPageAuth = function() {
+    const user = getCurrentUser();
+    if (!user) return; // local dev: không redirect
+    document.querySelectorAll('[data-auth]').forEach(el => {
+      const f = el.getAttribute('data-auth');
+      if (f === 'name')     el.textContent = user.name || user.email || '?';
+      if (f === 'email')    el.textContent = user.email || '';
+      if (f === 'role')     el.textContent = user.role === 'admin' ? 'Quản trị viên' : 'Thành viên';
+      if (f === 'initials') el.textContent = (user.name || 'U').trim().split(/\s+/).map(w=>w[0]).slice(-2).join('').toUpperCase();
+      if (f === 'avatar' && el.tagName === 'IMG')
+        el.src = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name||'U')}&background=2D5A3D&color=fff`;
+    });
+    return user;
+  };
+}
+
+// ── Sidebar Drawer ──
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+// Close on Escape
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
 
 // ── Init ──
 initPageAuth(); // kiểm tra login + hiện thông tin user từ session
