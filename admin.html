@@ -225,10 +225,10 @@
     </nav>
 
     <div class="sidebar-user">
-      <div class="sidebar-user-avatar" data-auth="initials">?</div>
-      <div>
+      <div class="sidebar-user-avatar" id="sidebar-avatar-wrap" data-auth="initials">?</div>
+      <div style="min-width:0;flex:1;">
         <div class="sidebar-user-name" data-auth="name">...</div>
-        <div class="sidebar-user-role" data-auth="role">Thành viên</div>
+        <div class="sidebar-user-role" data-auth="email" style="font-size:11px;color:rgba(255,255,255,0.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       </div>
       <i class='bx bx-log-out sidebar-user-logout' title="Đăng xuất" onclick="logout()" style="cursor:pointer"></i>
     </div>
@@ -1128,8 +1128,19 @@ document.querySelector('.panel-header-actions .btn-ghost')?.addEventListener('cl
 if (typeof initPageAuth === 'undefined') {
   window.getCurrentUser = function() {
     try {
-      const raw = sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser');
-      return raw ? JSON.parse(raw) : null;
+      const raw = sessionStorage.getItem('currentUser')
+        || localStorage.getItem('currentUser')
+        || localStorage.getItem('googleUser');
+      if (!raw) return null;
+      const u = JSON.parse(raw);
+      // Chuẩn hóa googleUser nếu cần
+      if (!localStorage.getItem('currentUser')) {
+        const norm = { id: u.id||u.sub||'', name: u.name||'', email: u.email||'',
+                       avatar: u.picture||u.avatar||'', role: u.role||'user' };
+        localStorage.setItem('currentUser', JSON.stringify(norm));
+        return norm;
+      }
+      return u;
     } catch(e) { return null; }
   };
   window.logout = function() {
@@ -1139,7 +1150,7 @@ if (typeof initPageAuth === 'undefined') {
   };
   window.initPageAuth = function() {
     const user = getCurrentUser();
-    if (!user) return; // local dev: không redirect
+    if (!user) return;
     document.querySelectorAll('[data-auth]').forEach(el => {
       const f = el.getAttribute('data-auth');
       if (f === 'name')     el.textContent = user.name || user.email || '?';
@@ -1149,6 +1160,18 @@ if (typeof initPageAuth === 'undefined') {
       if (f === 'avatar' && el.tagName === 'IMG')
         el.src = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name||'U')}&background=2D5A3D&color=fff`;
     });
+    // Render avatar thật lên sidebar (thay chữ tắt bằng <img> nếu có ảnh)
+    const avatarSrc = user.avatar || user.picture || '';
+    const wrap = document.getElementById('sidebar-avatar-wrap');
+    if (wrap && avatarSrc) {
+      wrap.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = avatarSrc;
+      img.alt = user.name || 'Avatar';
+      img.referrerPolicy = 'no-referrer';
+      img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
+      wrap.appendChild(img);
+    }
     return user;
   };
 }

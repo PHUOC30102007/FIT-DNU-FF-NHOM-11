@@ -1,3 +1,5 @@
+//authGuard.js
+
 /**
  * auth-guard.js — Quản lý session đăng nhập toàn trang
  * Nhúng vào: index.html, admin.html, public.html (trước các script khác)
