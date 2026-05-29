@@ -6,6 +6,7 @@
   <title>TripSync Admin – Quản Lý Chuyến Đi</title>
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <link rel="stylesheet" href="css/admin.css" />
+  <style>.toast.warning{border-color:#F59E0B}.toast.warning i{color:#F59E0B}</style>
   <script src="authGuard.js"></script>
   <style>
     /* ── NO HORIZONTAL SCROLL ── */
@@ -224,13 +225,20 @@
       </button>
     </nav>
 
-    <div class="sidebar-user">
+    <!-- Khi đã đăng nhập -->
+    <div class="sidebar-user" id="sidebar-user-logged">
       <div class="sidebar-user-avatar" id="sidebar-avatar-wrap" data-auth="initials">?</div>
       <div style="min-width:0;flex:1;">
         <div class="sidebar-user-name" data-auth="name">...</div>
         <div class="sidebar-user-role" data-auth="email" style="font-size:11px;color:rgba(255,255,255,0.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       </div>
-      <i class='bx bx-log-out sidebar-user-logout' title="Đăng xuất" onclick="logout()" style="cursor:pointer"></i>
+    </div>
+    <!-- Khi chưa đăng nhập -->
+    <div class="sidebar-user" id="sidebar-user-guest" style="display:none;">
+      <a href="login.html" style="display:flex;align-items:center;gap:10px;width:100%;text-decoration:none;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:10px 14px;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+        <i class='bx bx-log-in' style="font-size:20px;color:rgba(255,255,255,0.6);"></i>
+        <span style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.8);">Đăng nhập</span>
+      </a>
     </div>
   </aside>
 
@@ -254,7 +262,7 @@
         <div class="topbar-icon-btn" title="Xem Public" onclick="window.open('public.html','_blank')">
           <i class='bx bx-globe'></i>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="openModal('trip')">
+        <button class="btn btn-primary btn-sm" onclick="openTripModalGuarded()">
           <i class='bx bx-plus'></i> <span>Thêm chuyến đi</span>
         </button>
       </div>
@@ -622,15 +630,70 @@
 <!-- TOAST -->
 <div class="toast-container" id="toast-container"></div>
 
+<!-- MODAL: Yêu cầu đăng nhập -->
+<div id="modal-auth-required" style="display:none;position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);">
+  <div style="background:#fff;border-radius:20px;padding:36px 32px;max-width:360px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.2);text-align:center;animation:modalPop .25s cubic-bezier(.34,1.56,.64,1);">
+    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#FEF3C7,#FDE68A);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+      <i class='bx bx-lock-alt' style="font-size:28px;color:#D97706;"></i>
+    </div>
+    <h3 style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 8px;">Cần đăng nhập</h3>
+    <p style="font-size:14px;color:#64748B;margin:0 0 24px;line-height:1.6;">Bạn cần đăng nhập để sử dụng tính năng này. Đăng nhập ngay để tiếp tục.</p>
+    <div style="display:flex;gap:10px;">
+      <button onclick="document.getElementById('modal-auth-required').style.display='none'" style="flex:1;padding:11px;border-radius:10px;border:1.5px solid #E2E8F0;background:#fff;color:#64748B;font-size:14px;font-weight:600;cursor:pointer;">Để sau</button>
+      <a href="login.html" style="flex:1;padding:11px;border-radius:10px;background:linear-gradient(135deg,#2D5A3D,#4CAF50);color:#fff;font-size:14px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <i class='bx bx-log-in'></i> Đăng nhập
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Xác nhận xóa -->
+<div id="modal-confirm-delete" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);">
+  <div style="background:#fff;border-radius:20px;padding:36px 32px;max-width:360px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.2);text-align:center;animation:modalPop .25s cubic-bezier(.34,1.56,.64,1);">
+    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#FEE2E2,#FECACA);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+      <i class='bx bx-trash' style="font-size:28px;color:#DC2626;"></i>
+    </div>
+    <h3 id="modal-confirm-title" style="font-size:18px;font-weight:700;color:#1A1A2E;margin:0 0 8px;">Xác nhận xóa</h3>
+    <p id="modal-confirm-desc" style="font-size:14px;color:#64748B;margin:0 0 24px;line-height:1.6;">Bạn có chắc muốn xóa mục này?</p>
+    <div style="display:flex;gap:10px;">
+      <button onclick="document.getElementById('modal-confirm-delete').style.display='none'" style="flex:1;padding:11px;border-radius:10px;border:1.5px solid #E2E8F0;background:#fff;color:#64748B;font-size:14px;font-weight:600;cursor:pointer;">Hủy</button>
+      <button id="modal-confirm-btn" style="flex:1;padding:11px;border-radius:10px;background:linear-gradient(135deg,#DC2626,#EF4444);color:#fff;font-size:14px;font-weight:600;cursor:pointer;border:none;">Xóa</button>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes modalPop {
+  from { opacity:0; transform:scale(0.85) translateY(16px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+</style>
+
 <script>
 // ── App State ──
-let appData = JSON.parse(localStorage.getItem('tripsync_admin') || 'null') || {
+
+// Tạo storage key theo user đang đăng nhập
+function getStorageKey() {
+  try {
+    const raw = sessionStorage.getItem('currentUser')
+      || localStorage.getItem('currentUser')
+      || localStorage.getItem('googleUser');
+    if (!raw) return 'tripsync_admin_guest';
+    const u = JSON.parse(raw);
+    const uid = u.id || u.sub || u.email || 'guest';
+    return 'tripsync_admin_' + uid.replace(/[^a-zA-Z0-9@._-]/g, '_');
+  } catch(e) { return 'tripsync_admin_guest'; }
+}
+
+const STORAGE_KEY = getStorageKey();
+
+let appData = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || {
   trips: [],
   places: [],
   members: [],
   budget: { tripId: null, memberCount: 1, categories: [] },
 };
-function saveData(){ localStorage.setItem('tripsync_admin', JSON.stringify(appData)); }
+function saveData(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
 
 let editingTripId = null;
 let editingPlaceId = null;
@@ -657,7 +720,7 @@ function showTab(tab) {
 
 // ── Toast ──
 function showToast(msg, type='success') {
-  const icons={success:'bx-check-circle',error:'bx-x-circle',info:'bx-info-circle'};
+  const icons={success:'bx-check-circle',error:'bx-x-circle',info:'bx-info-circle',warning:'bx-error'};
   const toast=document.createElement('div');
   toast.className=`toast ${type}`;
   toast.innerHTML=`<i class='bx ${icons[type]}'></i> ${msg}`;
@@ -666,12 +729,47 @@ function showToast(msg, type='success') {
   setTimeout(()=>{toast.classList.remove('show');setTimeout(()=>toast.remove(),400);},3000);
 }
 
+// Hiện modal yêu cầu đăng nhập
+function showAuthRequired() {
+  const m = document.getElementById('modal-auth-required');
+  m.style.display = 'flex';
+  m.addEventListener('click', function(e) {
+    if(e.target === m) m.style.display = 'none';
+  }, { once: true });
+}
+
+// Hiện modal xác nhận xóa
+function showConfirm(desc, onConfirm) {
+  const m   = document.getElementById('modal-confirm-delete');
+  const btn = document.getElementById('modal-confirm-btn');
+  document.getElementById('modal-confirm-desc').textContent = desc;
+  m.style.display = 'flex';
+  const newBtn = btn.cloneNode(true); // reset listener cũ
+  btn.parentNode.replaceChild(newBtn, btn);
+  newBtn.addEventListener('click', () => {
+    m.style.display = 'none';
+    onConfirm();
+  });
+  m.addEventListener('click', function(e) {
+    if(e.target === m) m.style.display = 'none';
+  }, { once: true });
+}
+
+
 // ── Modals ──
 function openModal(type){
-  if(type==='trip') resetTripForm();
-  if(type==='place') resetPlaceForm();
+  // Kiểm tra đăng nhập khi thêm chuyến đi
+  if(type==='trip') {
+    const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if(!user) {
+      showAuthRequired();
+      return;
+    }
+    resetTripForm();
+  } else if(type==='place') resetPlaceForm();
   document.getElementById('modal-'+type).classList.add('open');
 }
+
 function closeModal(type){
   document.getElementById('modal-'+type).classList.remove('open');
   if(type==='trip') editingTripId=null;
@@ -860,12 +958,12 @@ function saveTrip(){
   saveData(); closeModal('trip'); renderTripsTab(); renderDashboard();
 }
 function deleteTrip(id){
-  if(!confirm('Bạn có chắc muốn xóa chuyến đi này?')) return;
-  appData.trips=appData.trips.filter(t=>t.id!==id);
-  saveData(); renderTripsTab(); renderDashboard();
-  showToast('Đã xóa chuyến đi','error');
+  showConfirm('Bạn có chắc muốn xóa chuyến đi này? Hành động này không thể hoàn tác.', () => {
+    appData.trips=appData.trips.filter(t=>t.id!==id);
+    saveData(); renderTripsTab(); renderDashboard();
+    showToast('Đã xóa chuyến đi','error');
+  });
 }
-
 // ── PLACES ──
 function renderPlacesTab(){
   const tbody=document.getElementById('places-tbody');
@@ -941,12 +1039,12 @@ function savePlace(){
   saveData(); closeModal('place'); renderPlacesTab(); renderDashboard();
 }
 function deletePlace(id){
-  if(!confirm('Bạn có chắc muốn xóa địa điểm này?')) return;
-  appData.places=appData.places.filter(p=>p.id!==id);
-  saveData(); renderPlacesTab(); renderDashboard();
-  showToast('Đã xóa địa điểm','error');
+  showConfirm('Bạn có chắc muốn xóa địa điểm này? Hành động này không thể hoàn tác.', () => {
+    appData.places=appData.places.filter(p=>p.id!==id);
+    saveData(); renderPlacesTab(); renderDashboard();
+    showToast('Đã xóa địa điểm','error');
+  });
 }
-
 // ── MEMBERS ──
 function renderMembersTab(){
   const list=document.getElementById('member-manage-list');
@@ -1118,7 +1216,7 @@ document.querySelector('.place-row-del:not([onclick])')?.addEventListener('click
 
 // ── Confirm delete (legacy) ──
 function confirmDelete(item){
-  if(confirm(`Bạn có chắc muốn xóa ${item}?`)) showToast(`Đã xóa ${item}`,'error');
+  showConfirm(`Bạn có chắc muốn xóa ${item}?`, () => showToast(`Đã xóa ${item}`,'error'));
 }
 
 // ── Dashboard action buttons ──
@@ -1172,9 +1270,25 @@ if (typeof initPageAuth === 'undefined') {
       img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
       wrap.appendChild(img);
     }
+    // Hiện sidebar user, ẩn guest
+    const sidebarLogged = document.getElementById('sidebar-user-logged');
+    const sidebarGuest  = document.getElementById('sidebar-user-guest');
+    if (sidebarLogged) sidebarLogged.style.display = 'flex';
+    if (sidebarGuest)  sidebarGuest.style.display  = 'none';
     return user;
   };
 }
+
+// Nếu chưa đăng nhập: hiện nút đăng nhập
+(function checkGuestSidebar() {
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  if (!user) {
+    const sidebarLogged = document.getElementById('sidebar-user-logged');
+    const sidebarGuest  = document.getElementById('sidebar-user-guest');
+    if (sidebarLogged) sidebarLogged.style.display = 'none';
+    if (sidebarGuest)  sidebarGuest.style.display  = 'flex';
+  }
+})();
 
 // ── Sidebar Drawer ──
 function openSidebar() {
@@ -1189,6 +1303,17 @@ function closeSidebar() {
 }
 // Close on Escape
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+
+// ── Guard: chỉ cho thêm chuyến đi khi đã đăng nhập ──
+function openTripModalGuarded() {
+  const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  if (!user) {
+    // Hiện thông báo và hỏi muốn đăng nhập không
+    showAuthRequired();
+    return;
+  }
+  openModal('trip');
+}
 
 // ── Init ──
 initPageAuth(); // kiểm tra login + hiện thông tin user từ session
