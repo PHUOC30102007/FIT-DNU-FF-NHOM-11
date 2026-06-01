@@ -652,7 +652,43 @@ if (typeof module !== 'undefined' && module.exports) {
         'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
     ];
     const BADGES = ['Bán Chạy', 'Hot', '', 'Mới', 'Ưu Đãi'];
-    let allTrips = [], shownCount = 6;
+    let allTrips = [], originalOrder = [], shownCount = 6;
+    let likedIds = JSON.parse(localStorage.getItem('wv_wishlist') || '[]');
+
+    function sortTripsByLiked() {
+        // Dùng index gốc làm key vì id từ MockAPI có thể bị NaN
+        allTrips = [
+            ...originalOrder.filter((t, i) => likedIds.includes(_getTripKey(t, i))),
+            ...originalOrder.filter((t, i) => !likedIds.includes(_getTripKey(t, i)))
+        ];
+    }
+
+    // Tạo key duy nhất cho mỗi trip: ưu tiên id hợp lệ, fallback dùng name+destination
+    function _getTripKey(trip, index) {
+        const id = trip.id || trip._id || '';
+        if (id && id !== 'NaN' && id !== 'undefined') return String(id);
+        const name = trip.name || trip.title || trip.tripName || '';
+        const dest = trip.destination || trip.location || '';
+        return `${name}__${dest}` || `idx_${index}`;
+    }
+
+    function toggleLike(tripKey) {
+        if (likedIds.includes(tripKey)) {
+            likedIds = likedIds.filter(id => id !== tripKey);
+            showToast('Đã xóa khỏi danh sách yêu thích', 'info');
+        } else {
+            likedIds.push(tripKey);
+            showToast('Đã thêm vào danh sách yêu thích ❤️', 'success');
+        }
+        localStorage.setItem('wv_wishlist', JSON.stringify(likedIds));
+        sortTripsByLiked();
+        renderTours();
+        // Nếu modal đang mở thì render lại modal cũng không fetch lại API
+        const modal = document.getElementById('all-trips-modal');
+        if (modal && modal.style.display === 'flex') {
+            filterModalTrips();
+        }
+    }
 
     async function loadTours() {
         const loadingEl = document.getElementById('tours-loading');
@@ -665,7 +701,12 @@ if (typeof module !== 'undefined' && module.exports) {
             // Gọi API 1, nếu có thêm API 2 thì gộp vào
             const { combined } = await apiGetBoth(API_CONFIG.endpoints.trips);
             if (!combined.length) throw new Error('Không có dữ liệu');
-            allTrips = combined;
+            originalOrder = combined;
+            sortTripsByLiked();
+            if (typeof toursData !== 'undefined') {
+                toursData.length = 0;
+                toursData.push(...combined);
+            }
             renderTours();
             loadingEl.style.display = 'none';
             gridEl.style.display    = 'grid';
@@ -697,12 +738,21 @@ if (typeof module !== 'undefined' && module.exports) {
         const srcLabel = trip._label || src;
         const priceStr = price ? Number(price).toLocaleString('vi-VN') + 'đ' : 'Liên hệ';
 
+        const origIdx = originalOrder.indexOf(trip);
+        const tripKey = _getTripKey(trip, origIdx >= 0 ? origIdx : index);
+        const isLiked = likedIds.includes(tripKey);
+        const heartIcon  = isLiked ? 'bxs-heart' : 'bx-heart';
+        const heartStyle = isLiked ? 'background:#E84848;' : '';
+        const heartColor = isLiked ? 'color:white;' : '';
+
         return `
         <div class="tour-card" onclick="window.location.href='public.html'" style="cursor:pointer">
             <div class="tour-img">
                 <img src="${img}" alt="${name}" onerror="this.src='${FALLBACK_IMGS[index%FALLBACK_IMGS.length]}'">
                 ${badge ? `<span class="tour-badge${badge==='Hot'?' hot':''}">${badge}</span>` : ''}
-                <button class="tour-wishlist" onclick="event.stopPropagation()"><i class='bx bx-heart'></i></button>
+                <button class="tour-wishlist" style="${heartStyle}" onclick="event.stopPropagation();toggleLike('${tripKey.replace(/'/g, "\\'")}')">
+                    <i class='bx ${heartIcon}' style="${heartColor}"></i>
+                </button>
             </div>
             <div class="tour-body">
                 <div class="tour-location"><i class='bx bx-map-pin'></i> ${loc}</div>
@@ -1249,35 +1299,7 @@ if (typeof module !== 'undefined' && module.exports) {
             });
         }
 
-        // ── Wishlist ──
-        document.querySelectorAll('.tour-wishlist').forEach((btn, i) => {
-            const tourId = toursData[i]?.id;
-            if (wishlist.includes(tourId)) {
-                const icon = btn.querySelector('i');
-                icon.classList.replace('bx-heart', 'bxs-heart');
-                btn.style.background = '#E84848';
-                icon.style.color = 'white';
-            }
-            btn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const icon = this.querySelector('i');
-                const isFav = icon.classList.contains('bxs-heart');
-                icon.classList.toggle('bx-heart', isFav);
-                icon.classList.toggle('bxs-heart', !isFav);
-                if (!isFav) {
-                    this.style.background = '#E84848';
-                    icon.style.color = 'white';
-                    if (tourId && !wishlist.includes(tourId)) wishlist.push(tourId);
-                    showToast('Đã thêm vào danh sách yêu thích ❤️', 'success');
-                } else {
-                    this.style.background = 'rgba(255,255,255,0.9)';
-                    icon.style.color = '';
-                    wishlist = wishlist.filter(id => id !== tourId);
-                    showToast('Đã xóa khỏi danh sách yêu thích', 'info');
-                }
-                localStorage.setItem('wv_wishlist', JSON.stringify(wishlist));
-            });
-        });
+        // ── Wishlist — xử lý bởi toggleLike() trong buildTourCard ──
 
         // ── Tour card click → detail modal ──
         document.querySelectorAll('.tour-card').forEach((card, i) => {
@@ -1820,7 +1842,7 @@ if (typeof module !== 'undefined' && module.exports) {
             modal.style.transform = 'translateX(-50%) scale(1)';
         });
         if (_modalTrips.length) {
-            renderModalTrips(_modalTrips);
+            filterModalTrips();
         } else {
             loadModalTrips();
         }

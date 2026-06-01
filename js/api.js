@@ -39,6 +39,7 @@ async function fetchAPI(url, options = {}) {
     const config = {
         method: 'GET',
         headers: getHeaders(),
+        cache: 'no-store',
         ...options,
     };
     if (config.body && typeof config.body === 'object') {
