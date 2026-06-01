@@ -6,291 +6,174 @@
  */
 
 const API_CONFIG = {
-    baseUrl: 'https://6a0367ff2afe8349b4b52e50.mockapi.io/api/v1', 
+    baseUrl:  'https://6a0367ff2afe8349b4b52e50.mockapi.io/api/v1',
+    baseUrl2: 'https://6a03c8fe2afe8349b4b57ae0.mockapi.io/api/v1',
     endpoints: {
-        trips: '/trips',
-        places: '/places',
+        trips:   '/trips',
+        places:  '/places',
         members: '/members',
         budgets: '/budgets',
-        notes: '/notes'
+        notes:   '/notes'
     },
-    timeout: 10000, // 10 seconds
+    timeout: 10000,
 };
 
-// Biến toàn cục để quản lý trạng thái
 let apiState = {
     loading: false,
     error: null,
-    cache: new Map() // Cache dữ liệu nếu cần
+    cache: new Map()
 };
 
-/**
- * Helper tạo URL đầy đủ
- * @param {string} endpoint - Đường dẫn endpoint
- * @returns {string} URL đầy đủ
- */
-function getFullUrl(endpoint) {
-    return `${API_CONFIG.baseUrl}${endpoint}`;
-}
+function getFullUrl(endpoint)  { return `${API_CONFIG.baseUrl}${endpoint}`; }
+function getFullUrl2(endpoint) { return `${API_CONFIG.baseUrl2}${endpoint}`; }
 
-/**
- * Tạo headers cho request
- * @param {boolean} isJson - Có phải JSON không
- * @returns {object} Headers object
- */
-function getHeaders(isJson = true) {
-    const headers = {
-        'Content-Type': 'application/json',
-    };
-    // Thêm Authorization token nếu có
+function getHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('authToken');
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-    }
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     return headers;
 }
 
-/**
- * Fetch API với xử lý đầy đủ
- * @param {string} url - URL đầy đủ
- * @param {object} options - Options cho fetch
- * @returns {Promise} Promise trả về data hoặc lỗi
- */
+// ─── Core fetch (showLoading mặc định TẮT để tránh crash khi DOM chưa sẵn sàng) ───
 async function fetchAPI(url, options = {}) {
-    const defaultOptions = {
+    const config = {
         method: 'GET',
-        headers: getHeaders(true),
+        headers: getHeaders(),
+        ...options,
     };
-
-    const config = { ...defaultOptions, ...options };
-    
-    // Xử lý body nếu có
     if (config.body && typeof config.body === 'object') {
         config.body = JSON.stringify(config.body);
     }
 
-    return new Promise((resolve, reject) => {
-        // Hiển thị loading nếu cần
-        if (options.showLoading !== false) {
-            showAppLoading(true);
-        }
+    const controller = new AbortController();
+    const timeoutId  = setTimeout(() => controller.abort(), API_CONFIG.timeout);
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
-        fetch(url, { ...config, signal: controller.signal })
-            .then(response => {
-                clearTimeout(timeoutId);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                return response.json();
-            })
-            .then(data => {
-                showAppLoading(false);
-                resolve(data);
-            })
-            .catch(error => {
-                clearTimeout(timeoutId);
-                showAppLoading(false);
-                
-                // Xử lý các loại lỗi
-                let errorMessage = 'Đã xảy ra lỗi kết nối';
-                if (error.name === 'AbortError') {
-                    errorMessage = 'Yêu cầu bị hết thời gian chờ';
-                } else if (error.message.includes('HTTP')) {
-                    errorMessage = error.message;
-                }
-                
-                reject(new Error(errorMessage));
-            });
-    });
+    try {
+        const response = await fetch(url, { ...config, signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        return await response.json();
+    } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') throw new Error('Yêu cầu bị hết thời gian chờ');
+        throw error;
+    }
 }
 
-// ==================== CRUD Operations ====================
-
-/**
- * GET - Lấy danh sách hoặc một bản ghi
- * @param {string} endpoint - Endpoint
- * @param {string|number} id - ID (tùy chọn)
- * @returns {Promise}
- */
+// ─── CRUD — API 1 ───
 async function apiGet(endpoint, id = null) {
     const url = id ? `${getFullUrl(endpoint)}/${id}` : getFullUrl(endpoint);
-    return fetchAPI(url, { method: 'GET' });
+    return fetchAPI(url);
 }
-
-/**
- * POST - Tạo mới bản ghi
- * @param {string} endpoint - Endpoint  
- * @param {object} data - Dữ liệu tạo mới
- * @returns {Promise}
- */
 async function apiPost(endpoint, data) {
-    return fetchAPI(getFullUrl(endpoint), {
-        method: 'POST',
-        body: data
-    });
+    return fetchAPI(getFullUrl(endpoint), { method: 'POST', body: data });
 }
-
-/**
- * PUT - Cập nhật bản ghi
- * @param {string} endpoint - Endpoint
- * @param {string|number} id - ID bản ghi
- * @param {object} data - Dữ liệu cập nhật
- * @returns {Promise}
- */
 async function apiPut(endpoint, id, data) {
-    return fetchAPI(`${getFullUrl(endpoint)}/${id}`, {
-        method: 'PUT',
-        body: data
-    });
+    return fetchAPI(`${getFullUrl(endpoint)}/${id}`, { method: 'PUT', body: data });
 }
-
-/**
- * DELETE - Xóa bản ghi
- * @param {string} endpoint - Endpoint
- * @param {string|number} id - ID bản ghi
- * @returns {Promise}
- */
 async function apiDelete(endpoint, id) {
-    return fetchAPI(`${getFullUrl(endpoint)}/${id}`, {
-        method: 'DELETE'
-    });
+    return fetchAPI(`${getFullUrl(endpoint)}/${id}`, { method: 'DELETE' });
 }
 
-/**
- * Hiển thị/ẩn loading spinner
- * @param {boolean} show - Hiển thị hay không
- */
+// ─── CRUD — API 2 ───
+async function apiGet2(endpoint, id = null) {
+    const url = id ? `${getFullUrl2(endpoint)}/${id}` : getFullUrl2(endpoint);
+    return fetchAPI(url);
+}
+async function apiPost2(endpoint, data) {
+    return fetchAPI(getFullUrl2(endpoint), { method: 'POST', body: data });
+}
+async function apiPut2(endpoint, id, data) {
+    return fetchAPI(`${getFullUrl2(endpoint)}/${id}`, { method: 'PUT', body: data });
+}
+async function apiDelete2(endpoint, id) {
+    return fetchAPI(`${getFullUrl2(endpoint)}/${id}`, { method: 'DELETE' });
+}
+
+// ─── Gọi cả 2 API đồng thời ───
+async function apiGetBoth(endpoint, id = null) {
+    const [res1, res2] = await Promise.allSettled([
+        apiGet(endpoint, id),
+        apiGet2(endpoint, id)
+    ]);
+    const api1 = res1.status === 'fulfilled'
+        ? (Array.isArray(res1.value) ? res1.value : [res1.value]).map(i => ({ ...i, _source: 'api1' }))
+        : [];
+    const api2 = res2.status === 'fulfilled'
+        ? (Array.isArray(res2.value) ? res2.value : [res2.value]).map(i => ({ ...i, _source: 'api2' }))
+        : [];
+    if (res1.status === 'rejected') console.warn('[API 1 lỗi]', res1.reason?.message);
+    if (res2.status === 'rejected') console.warn('[API 2 lỗi]', res2.reason?.message);
+    return { api1, api2, combined: [...api1, ...api2] };
+}
+
+async function getAllPlaces() {
+    const { combined } = await apiGetBoth(API_CONFIG.endpoints.places);
+    return combined;
+}
+
+async function getAllTrips() {
+    const { combined } = await apiGetBoth(API_CONFIG.endpoints.trips);
+    return combined;
+}
+
+// ─── UI Helpers ───
 function showAppLoading(show) {
     apiState.loading = show;
-    
-    // Tìm hoặc tạo spinner nếu chưa có
+    if (typeof document === 'undefined') return;
     let loader = document.getElementById('app-loader');
-    
     if (show) {
         if (!loader) {
             loader = document.createElement('div');
             loader.id = 'app-loader';
-            loader.className = 'position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-75';
-            loader.style.zIndex = '9999';
-            loader.innerHTML = `
-                <div class="text-center">
-                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
-                </div>
-            `;
-            // Thêm Bootstrap nếu chưa có
-            if (!document.querySelector('link[href*="bootstrap"]')) {
-                addBootstrapCSS();
-            }
+            loader.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.8);z-index:9999;';
+            loader.innerHTML = `<div style="text-align:center">
+                <div style="width:40px;height:40px;border:4px solid #e6e6ed;border-top-color:#2D5A3D;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto"></div>
+                <p style="margin-top:12px;color:#7A7A96;font-size:14px">Đang tải dữ liệu...</p>
+            </div>
+            <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
             document.body.appendChild(loader);
         }
-        loader.classList.remove('d-none');
+        loader.style.display = 'flex';
     } else if (loader) {
-        loader.classList.add('d-none');
+        loader.style.display = 'none';
     }
 }
 
-/**
- * Thêm Bootstrap CSS vào trang nếu chưa có
- */
-function addBootstrapCSS() {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css';
-    document.head.appendChild(link);
-}
-
-/**
- * Hiển thị thông báo lỗi (Toast)
- * @param {string} message - Thông báo lỗi
- * @param {string} type - Loại thông báo (error, success, warning, info)
- */
 function showToast(message, type = 'error') {
-    const toastContainer = document.getElementById('toast-container') || createToastContainer();
-    
-    const toast = document.createElement('div');
-    toast.className = `toast show position-relative`;
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
-    
-    const bgClass = {
-        error: 'bg-danger',
-        success: 'bg-success',
-        warning: 'bg-warning',
-        info: 'bg-info'
-    }[type] || 'bg-danger';
-    
-    const iconClass = {
-        error: 'bx-x-circle',
-        success: 'bx-check-circle',
-        warning: 'bx-exclamation-circle',
-        info: 'bx-info-circle'
-    }[type] || 'bx-x-circle';
-    
-    toast.innerHTML = `
-        <div class="toast-body d-flex align-items-center gap-2 ${bgClass} text-white p-3">
-            <i class="bx ${iconClass} fs-5"></i>
-            <span class="flex-grow-1">${message}</span>
-            <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="toast" aria-label="Close" onclick="this.closest('.toast').remove()"></button>
-        </div>
-    `;
-    
-    toastContainer.appendChild(toast);
-    
-    // Tự động xóa sau 5 giây
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.remove();
-        }
-    }, 5000);
+    if (typeof document === 'undefined') return;
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.style.cssText = 'position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:360px;';
+        document.body.appendChild(container);
+    }
+    const colors = { error:'#DC2626', success:'#2D5A3D', warning:'#D97706', info:'#2563EB' };
+    const icons  = { error:'bx-x-circle', success:'bx-check-circle', warning:'bx-error', info:'bx-info-circle' };
+    const toast  = document.createElement('div');
+    toast.style.cssText = `background:${colors[type]||colors.error};color:#fff;padding:12px 16px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,0.15);animation:slideIn 0.2s ease`;
+    toast.innerHTML = `<i class="bx ${icons[type]||icons.error}" style="font-size:18px;flex-shrink:0"></i><span style="flex:1">${message}</span><button onclick="this.parentNode.remove()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:18px;line-height:1;padding:0">&times;</button>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
 }
 
-/**
- * Tạo container cho toast
- * @returns {HTMLElement}
- */
-function createToastContainer() {
-    const container = document.createElement('div');
-    container.id = 'toast-container';
-    container.className = 'position-fixed top-0 end-0 p-3';
-    container.style.zIndex = '9999';
-    container.style.maxWidth = '400px';
-    document.body.appendChild(container);
-    return container;
-}
-
-// Export các hàm để sử dụng ở file khác
+// ─── Exports ───
 if (typeof window !== 'undefined') {
-    window.API_CONFIG = API_CONFIG;
-    window.apiState = apiState;
-    window.fetchAPI = fetchAPI;
-    window.apiGet = apiGet;
-    window.apiPost = apiPost;
-    window.apiPut = apiPut;
-    window.apiDelete = apiDelete;
-    window.showAppLoading = showAppLoading;
-    window.showToast = showToast;
+    Object.assign(window, {
+        API_CONFIG, apiState, fetchAPI,
+        apiGet, apiPost, apiPut, apiDelete,
+        apiGet2, apiPost2, apiPut2, apiDelete2,
+        apiGetBoth, getAllPlaces, getAllTrips,
+        showAppLoading, showToast
+    });
 }
-
-// Export dưới dạng module nếu dùng ES modules
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
-        API_CONFIG,
-        apiState,
-        fetchAPI,
-        apiGet,
-        apiPost,
-        apiPut,
-        apiDelete,
-        showAppLoading,
-        showToast
+        API_CONFIG, apiState, fetchAPI,
+        apiGet, apiPost, apiPut, apiDelete,
+        apiGet2, apiPost2, apiPut2, apiDelete2,
+        apiGetBoth, getAllPlaces, getAllTrips,
+        showAppLoading, showToast
     };
 }

@@ -350,98 +350,62 @@
                     <h2>Khám Phá Những<br>Điểm Đến Tuyệt Vời</h2>
                     <p>Lựa chọn từ hơn 500 tour du lịch khắp Việt Nam được thiết kế tỉ mỉ.</p>
                 </div>
-                <a href="#" class="btn btn-primary">Xem Tất Cả <i class='bx bx-right-arrow-alt'></i></a>
+                <button onclick="openAllTripsModal()" class="btn btn-primary">Xem Tất Cả <i class='bx bx-right-arrow-alt'></i></button>
             </div>
 
-            <div class="tours-filter">
-                <button class="filter-btn active">Tất Cả</button>
-                <button class="filter-btn">Biển & Đảo</button>
-                <button class="filter-btn">Núi & Cao Nguyên</button>
-                <button class="filter-btn">Phố Cổ</button>
-                <button class="filter-btn">Miền Tây</button>
-                <button class="filter-btn">Khám Phá Thiên Nhiên</button>
+            <!-- Loading skeleton -->
+            <div id="tours-loading" class="tours-grid">
+                <div class="tour-skeleton"></div>
+                <div class="tour-skeleton"></div>
+                <div class="tour-skeleton"></div>
             </div>
 
-            <div class="tours-grid">
-                <div class="tour-card" onclick="window.location.href='public.html'" style="cursor:pointer">
-                    <div class="tour-img">
-                        <img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&h=400&fit=crop"
-                            alt="Hội An">
-                        <span class="tour-badge">Bán Chạy</span>
-                        <button class="tour-wishlist"><i class='bx bx-heart'></i></button>
-                    </div>
-                    <div class="tour-body">
-                        <div class="tour-location"><i class='bx bx-map-pin'></i> Quảng Nam</div>
-                        <h3 class="tour-title">Phố Cổ Hội An & Thánh Địa Mỹ Sơn</h3>
-                        <div class="tour-meta">
-                            <div class="tour-meta-item"><i class='bx bx-time-five'></i> 4 ngày 3 đêm</div>
-                            <div class="tour-meta-item"><i class='bx bx-group'></i> Tối đa 20 người</div>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span>Từ</span><br>
-                                <strong>3.500.000đ</strong>
-                            </div>
-                            <div class="tour-rating">
-                                <i class='bx bxs-star'></i> 4.9 (128)
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Error state -->
+            <div id="tours-error" style="display:none;text-align:center;padding:48px 20px;">
+                <i class='bx bx-wifi-off' style="font-size:44px;color:#ccc;display:block;margin-bottom:10px;"></i>
+                <p style="color:#888">Không thể tải tour. <a href="#" onclick="loadTours();return false;" style="color:#2D5A3D;font-weight:600;">Thử lại</a></p>
+            </div>
 
-                <div class="tour-card">
-                    <div class="tour-img">
-                        <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=400&fit=crop"
-                            alt="Hạ Long">
-                        <span class="tour-badge hot">Hot</span>
-                        <button class="tour-wishlist"><i class='bx bx-heart'></i></button>
-                    </div>
-                    <div class="tour-body">
-                        <div class="tour-location"><i class='bx bx-map-pin'></i> Quảng Ninh</div>
-                        <h3 class="tour-title">Vịnh Hạ Long — Đêm Trên Du Thuyền 5 Sao</h3>
-                        <div class="tour-meta">
-                            <div class="tour-meta-item"><i class='bx bx-time-five'></i> 3 ngày 2 đêm</div>
-                            <div class="tour-meta-item"><i class='bx bx-group'></i> Tối đa 15 người</div>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span>Từ</span><br>
-                                <strong>6.200.000đ</strong>
-                            </div>
-                            <div class="tour-rating">
-                                <i class='bx bxs-star'></i> 4.8 (256)
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Tours grid (dynamic) -->
+            <div id="tours-grid" class="tours-grid" style="display:none;"></div>
 
-                <div class="tour-card">
-                    <div class="tour-img">
-                        <img src="https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&h=400&fit=crop"
-                            alt="Sapa">
-                        <button class="tour-wishlist"><i class='bx bx-heart'></i></button>
-                    </div>
-                    <div class="tour-body">
-                        <div class="tour-location"><i class='bx bx-map-pin'></i> Lào Cai</div>
-                        <h3 class="tour-title">Sapa Trekking — Ruộng Bậc Thang & Bản Làng</h3>
-                        <div class="tour-meta">
-                            <div class="tour-meta-item"><i class='bx bx-time-five'></i> 3 ngày 2 đêm</div>
-                            <div class="tour-meta-item"><i class='bx bx-group'></i> Tối đa 12 người</div>
-                        </div>
-                        <div class="tour-footer">
-                            <div class="tour-price">
-                                <span>Từ</span><br>
-                                <strong>2.800.000đ</strong>
-                            </div>
-                            <div class="tour-rating">
-                                <i class='bx bxs-star'></i> 4.7 (89)
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Xem thêm -->
+            <div id="tours-load-more" style="display:none;text-align:center;margin-top:36px;">
+                <button onclick="showMoreTours()" class="btn btn-outline" style="padding:14px 36px;">
+                    <i class='bx bx-plus-circle'></i> Xem Thêm Tour
+                </button>
             </div>
         </div>
     </section>
+
+    <style>
+        .tour-skeleton {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            min-height: 360px;
+        }
+        .tour-skeleton::before {
+            content: '';
+            display: block;
+            height: 220px;
+            background: linear-gradient(90deg, #f0f0f5 25%, #e4e4ee 50%, #f0f0f5 75%);
+            background-size: 200% 100%;
+            animation: shimmerT 1.4s infinite;
+        }
+        .tour-skeleton::after {
+            content: '';
+            display: block;
+            margin: 18px 20px;
+            height: 14px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #f0f0f5 25%, #e4e4ee 50%, #f0f0f5 75%);
+            background-size: 200% 100%;
+            animation: shimmerT 1.4s infinite;
+        }
+        @keyframes shimmerT { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+    </style>
 
     <section class="section destinations" id="destinations">
         <div class="container">
@@ -494,6 +458,271 @@
             </div>
         </div>
     </section>
+
+    <script>
+//api.js
+
+/**
+ * api.js - Cấu hình và helper cho Fetch API
+ * Áp dụng: JSON & Fetch API, Promise, Error Handling, Loading states
+ */
+
+const API_CONFIG = {
+    baseUrl:  'https://6a0367ff2afe8349b4b52e50.mockapi.io/api/v1',
+    baseUrl2: 'https://6a03c8fe2afe8349b4b57ae0.mockapi.io/api/v1',
+    endpoints: {
+        trips:   '/trips',
+        places:  '/places',
+        members: '/members',
+        budgets: '/budgets',
+        notes:   '/notes'
+    },
+    timeout: 10000,
+};
+
+let apiState = {
+    loading: false,
+    error: null,
+    cache: new Map()
+};
+
+function getFullUrl(endpoint)  { return `${API_CONFIG.baseUrl}${endpoint}`; }
+function getFullUrl2(endpoint) { return `${API_CONFIG.baseUrl2}${endpoint}`; }
+
+function getHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    const token = localStorage.getItem('authToken');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    return headers;
+}
+
+// ─── Core fetch (showLoading mặc định TẮT để tránh crash khi DOM chưa sẵn sàng) ───
+async function fetchAPI(url, options = {}) {
+    const config = {
+        method: 'GET',
+        headers: getHeaders(),
+        ...options,
+    };
+    if (config.body && typeof config.body === 'object') {
+        config.body = JSON.stringify(config.body);
+    }
+
+    const controller = new AbortController();
+    const timeoutId  = setTimeout(() => controller.abort(), API_CONFIG.timeout);
+
+    try {
+        const response = await fetch(url, { ...config, signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        return await response.json();
+    } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') throw new Error('Yêu cầu bị hết thời gian chờ');
+        throw error;
+    }
+}
+
+// ─── CRUD — API 1 ───
+async function apiGet(endpoint, id = null) {
+    const url = id ? `${getFullUrl(endpoint)}/${id}` : getFullUrl(endpoint);
+    return fetchAPI(url);
+}
+async function apiPost(endpoint, data) {
+    return fetchAPI(getFullUrl(endpoint), { method: 'POST', body: data });
+}
+async function apiPut(endpoint, id, data) {
+    return fetchAPI(`${getFullUrl(endpoint)}/${id}`, { method: 'PUT', body: data });
+}
+async function apiDelete(endpoint, id) {
+    return fetchAPI(`${getFullUrl(endpoint)}/${id}`, { method: 'DELETE' });
+}
+
+// ─── CRUD — API 2 ───
+async function apiGet2(endpoint, id = null) {
+    const url = id ? `${getFullUrl2(endpoint)}/${id}` : getFullUrl2(endpoint);
+    return fetchAPI(url);
+}
+async function apiPost2(endpoint, data) {
+    return fetchAPI(getFullUrl2(endpoint), { method: 'POST', body: data });
+}
+async function apiPut2(endpoint, id, data) {
+    return fetchAPI(`${getFullUrl2(endpoint)}/${id}`, { method: 'PUT', body: data });
+}
+async function apiDelete2(endpoint, id) {
+    return fetchAPI(`${getFullUrl2(endpoint)}/${id}`, { method: 'DELETE' });
+}
+
+// ─── Gọi cả 2 API đồng thời ───
+async function apiGetBoth(endpoint, id = null) {
+    const [res1, res2] = await Promise.allSettled([
+        apiGet(endpoint, id),
+        apiGet2(endpoint, id)
+    ]);
+    const api1 = res1.status === 'fulfilled'
+        ? (Array.isArray(res1.value) ? res1.value : [res1.value]).map(i => ({ ...i, _source: 'api1' }))
+        : [];
+    const api2 = res2.status === 'fulfilled'
+        ? (Array.isArray(res2.value) ? res2.value : [res2.value]).map(i => ({ ...i, _source: 'api2' }))
+        : [];
+    if (res1.status === 'rejected') console.warn('[API 1 lỗi]', res1.reason?.message);
+    if (res2.status === 'rejected') console.warn('[API 2 lỗi]', res2.reason?.message);
+    return { api1, api2, combined: [...api1, ...api2] };
+}
+
+async function getAllPlaces() {
+    const { combined } = await apiGetBoth(API_CONFIG.endpoints.places);
+    return combined;
+}
+
+async function getAllTrips() {
+    const { combined } = await apiGetBoth(API_CONFIG.endpoints.trips);
+    return combined;
+}
+
+// ─── UI Helpers ───
+function showAppLoading(show) {
+    apiState.loading = show;
+    if (typeof document === 'undefined') return;
+    let loader = document.getElementById('app-loader');
+    if (show) {
+        if (!loader) {
+            loader = document.createElement('div');
+            loader.id = 'app-loader';
+            loader.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.8);z-index:9999;';
+            loader.innerHTML = `<div style="text-align:center">
+                <div style="width:40px;height:40px;border:4px solid #e6e6ed;border-top-color:#2D5A3D;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto"></div>
+                <p style="margin-top:12px;color:#7A7A96;font-size:14px">Đang tải dữ liệu...</p>
+            </div>
+            <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
+            document.body.appendChild(loader);
+        }
+        loader.style.display = 'flex';
+    } else if (loader) {
+        loader.style.display = 'none';
+    }
+}
+
+function showToast(message, type = 'error') {
+    if (typeof document === 'undefined') return;
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.style.cssText = 'position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:360px;';
+        document.body.appendChild(container);
+    }
+    const colors = { error:'#DC2626', success:'#2D5A3D', warning:'#D97706', info:'#2563EB' };
+    const icons  = { error:'bx-x-circle', success:'bx-check-circle', warning:'bx-error', info:'bx-info-circle' };
+    const toast  = document.createElement('div');
+    toast.style.cssText = `background:${colors[type]||colors.error};color:#fff;padding:12px 16px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,0.15);animation:slideIn 0.2s ease`;
+    toast.innerHTML = `<i class="bx ${icons[type]||icons.error}" style="font-size:18px;flex-shrink:0"></i><span style="flex:1">${message}</span><button onclick="this.parentNode.remove()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:18px;line-height:1;padding:0">&times;</button>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+}
+
+// ─── Exports ───
+if (typeof window !== 'undefined') {
+    Object.assign(window, {
+        API_CONFIG, apiState, fetchAPI,
+        apiGet, apiPost, apiPut, apiDelete,
+        apiGet2, apiPost2, apiPut2, apiDelete2,
+        apiGetBoth, getAllPlaces, getAllTrips,
+        showAppLoading, showToast
+    });
+}
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        API_CONFIG, apiState, fetchAPI,
+        apiGet, apiPost, apiPut, apiDelete,
+        apiGet2, apiPost2, apiPut2, apiDelete2,
+        apiGetBoth, getAllPlaces, getAllTrips,
+        showAppLoading, showToast
+    };
+}
+</script>
+    <script>
+    // ============================================================
+    // TOURS NỔI BẬT — gộp từ 2 API dùng apiGetBoth('/trips')
+    // ============================================================
+    const FALLBACK_IMGS = [
+        'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1570366583862-f91883984fde?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
+    ];
+    const BADGES = ['Bán Chạy', 'Hot', '', 'Mới', 'Ưu Đãi'];
+    let allTrips = [], shownCount = 6;
+
+    async function loadTours() {
+        const loadingEl = document.getElementById('tours-loading');
+        const errorEl   = document.getElementById('tours-error');
+        const gridEl    = document.getElementById('tours-grid');
+        loadingEl.style.display = 'grid';
+        errorEl.style.display   = 'none';
+        gridEl.style.display    = 'none';
+        try {
+            // Gọi API 1, nếu có thêm API 2 thì gộp vào
+            const { combined } = await apiGetBoth(API_CONFIG.endpoints.trips);
+            if (!combined.length) throw new Error('Không có dữ liệu');
+            allTrips = combined;
+            renderTours();
+            loadingEl.style.display = 'none';
+            gridEl.style.display    = 'grid';
+        } catch (err) {
+            console.error('[Tours]', err);
+            loadingEl.style.display = 'none';
+            errorEl.style.display   = 'block';
+        }
+    }
+
+    function renderTours() {
+        const gridEl  = document.getElementById('tours-grid');
+        const moreBtn = document.getElementById('tours-load-more');
+        gridEl.innerHTML = allTrips.slice(0, shownCount).map(buildTourCard).join('');
+        if (moreBtn) moreBtn.style.display = allTrips.length > shownCount ? 'block' : 'none';
+    }
+
+    function buildTourCard(trip, index) {
+        const name    = trip.name || trip.title || trip.tripName || 'Tour Du Lịch';
+        const loc     = trip.location || trip.destination || trip.place || trip.city || 'Việt Nam';
+        const img     = trip.image || trip.imageUrl || trip.img || trip.cover || FALLBACK_IMGS[index % FALLBACK_IMGS.length];
+        const price   = trip.price || trip.budget || trip.cost || '';
+        const days    = trip.days || trip.duration || '';
+        const members = trip.maxMembers || trip.members || '';
+        const rating  = parseFloat(trip.rating || trip.rate || (4.5 + Math.random()*0.4)).toFixed(1);
+        const reviews = trip.reviews || Math.floor(Math.random()*200+30);
+        const badge   = trip.badge || BADGES[index % BADGES.length];
+        const src     = trip._source === 'api1' ? 'api1' : 'api2';
+        const srcLabel = trip._label || src;
+        const priceStr = price ? Number(price).toLocaleString('vi-VN') + 'đ' : 'Liên hệ';
+
+        return `
+        <div class="tour-card" onclick="window.location.href='public.html'" style="cursor:pointer">
+            <div class="tour-img">
+                <img src="${img}" alt="${name}" onerror="this.src='${FALLBACK_IMGS[index%FALLBACK_IMGS.length]}'">
+                ${badge ? `<span class="tour-badge${badge==='Hot'?' hot':''}">${badge}</span>` : ''}
+                <button class="tour-wishlist" onclick="event.stopPropagation()"><i class='bx bx-heart'></i></button>
+            </div>
+            <div class="tour-body">
+                <div class="tour-location"><i class='bx bx-map-pin'></i> ${loc}</div>
+                <h3 class="tour-title">${name}</h3>
+                <div class="tour-meta">
+                    ${days    ? `<div class="tour-meta-item"><i class='bx bx-time-five'></i> ${days} ngày</div>` : ''}
+                    ${members ? `<div class="tour-meta-item"><i class='bx bx-group'></i> Tối đa ${members} người</div>` : ''}
+                </div>
+                <div class="tour-footer">
+                    <div class="tour-price"><span>Từ</span><br><strong>${priceStr}</strong></div>
+                    <div class="tour-rating"><i class='bx bxs-star'></i> ${rating} (${reviews})</div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function showMoreTours() { shownCount += 3; renderTours(); }
+
+    document.addEventListener('DOMContentLoaded', loadTours);
+    </script>
 
     <section class="section testimonials">
         <div class="container">
@@ -1215,16 +1444,7 @@
             });
         });
 
-        // ── "Xem Tất Cả" section buttons ──
-        document.querySelectorAll('a[href="#"]').forEach(a => {
-            if (a.textContent.includes('Xem Tất Cả')) {
-                a.addEventListener('click', e => {
-                    e.preventDefault();
-                    document.querySelectorAll('.filter-btn')[0].click();
-                    document.querySelector('#tours').scrollIntoView({ behavior: 'smooth' });
-                });
-            }
-        });
+        // ── "Xem Tất Cả" section buttons (handled by openAllTripsModal) ──
 
         // ── "Xem Video" hero button ──
         document.querySelector('.btn-outline')?.addEventListener('click', e => {
@@ -1235,7 +1455,9 @@
         // ── Smooth scroll for anchor links ──
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
-                const target = document.querySelector(a.getAttribute('href'));
+                const href = a.getAttribute('href');
+                if (!href || href === '#') return;
+                const target = document.querySelector(href);
                 if (target) {
                     e.preventDefault();
                     target.scrollIntoView({ behavior: 'smooth' });
@@ -1455,6 +1677,234 @@
             border: 2px solid var(--primary);
         }
     </style>
+
+    <!-- ══════════════════════════════════════════
+         MODAL: TẤT CẢ CHUYẾN ĐI
+    ══════════════════════════════════════════ -->
+    <div id="all-trips-overlay" onclick="closeAllTripsModal()" style="
+        display:none; position:fixed; inset:0;
+        background:rgba(15,15,30,0.55); backdrop-filter:blur(6px);
+        z-index:3000; opacity:0; transition:opacity .3s;
+    "></div>
+
+    <div id="all-trips-modal" style="
+        display:none; position:fixed; top:0; left:50%; transform:translateX(-50%) scale(.96);
+        width:min(1100px,98vw); height:96vh; margin-top:2vh;
+        background:var(--bg); z-index:3001; border-radius:20px;
+        flex-direction:column;
+        box-shadow:0 24px 80px rgba(0,0,0,0.35);
+        opacity:0; transition:opacity .3s, transform .3s cubic-bezier(.34,1.2,.64,1);
+    ">
+        <!-- Header -->
+        <div style="
+            padding:24px 28px 20px; border-bottom:1px solid var(--border);
+            display:flex; align-items:center; gap:16px;
+            background:#fff; flex-shrink:0;
+        ">
+            <button onclick="closeAllTripsModal()" style="
+                width:38px;height:38px;border-radius:10px;
+                background:var(--bg-2);border:1px solid var(--border);
+                display:flex;align-items:center;justify-content:center;
+                cursor:pointer;font-size:22px;color:var(--text);
+                transition:all .2s; flex-shrink:0;
+            " onmouseover="this.style.background='#fee2e2';this.style.color='#dc2626'"
+               onmouseout="this.style.background='var(--bg-2)';this.style.color='var(--text)'">
+                <i class='bx bx-x'></i>
+            </button>
+            <div style="flex:1">
+                <h3 style="font-size:20px;margin:0;color:var(--dark)">Tất Cả Chuyến Đi</h3>
+                <p id="modal-trip-count" style="font-size:13px;color:var(--text-muted);margin:2px 0 0"></p>
+            </div>
+            <!-- Search box -->
+            <div style="
+                display:flex;align-items:center;gap:8px;
+                background:var(--bg-2);border:1px solid var(--border);
+                border-radius:100px;padding:8px 16px;width:220px;
+            ">
+                <i class='bx bx-search' style="color:var(--text-muted);font-size:16px;flex-shrink:0"></i>
+                <input id="modal-search" type="text" placeholder="Tìm kiếm chuyến đi..." oninput="filterModalTrips()" style="
+                    border:none;background:transparent;outline:none;
+                    font-size:14px;color:var(--text);width:100%;
+                    font-family:'DM Sans',sans-serif;
+                ">
+            </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div style="
+            padding:14px 28px; border-bottom:1px solid var(--border);
+            display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+            background:#fff; flex-shrink:0;
+        ">
+            <span style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-right:4px">Sắp xếp:</span>
+            <select id="modal-sort" onchange="filterModalTrips()" style="
+                border:1px solid var(--border);border-radius:100px;
+                padding:6px 14px;font-size:13px;font-family:'DM Sans',sans-serif;
+                color:var(--text);background:var(--bg-2);cursor:pointer;outline:none;
+            ">
+                <option value="default">Mặc định</option>
+                <option value="price-asc">Giá thấp → cao</option>
+                <option value="price-desc">Giá cao → thấp</option>
+                <option value="name">Tên A–Z</option>
+            </select>
+        </div>
+
+        <!-- Grid cuộn dài -->
+        <div id="modal-trips-list" style="flex:1;overflow-y:auto;padding:20px 20px;background:var(--bg-2);">
+            <div id="modal-trips-grid" style="
+                display:grid;
+                grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+                gap:20px;
+            "></div>
+            <p id="modal-showing" style="text-align:center;padding:20px 0 6px;font-size:13px;color:var(--text-muted)"></p>
+        </div>
+    </div>
+
+    <style>
+        .modal-filter-btn {
+            padding: 6px 16px;
+            border-radius: 100px;
+            border: 1.5px solid var(--border);
+            background: transparent;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: all .2s;
+        }
+        .modal-filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        .modal-filter-btn:hover:not(.active) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        /* ── Modal dùng lại tour-card gốc ── */
+        #modal-trips-list::-webkit-scrollbar { width: 6px; }
+        #modal-trips-list::-webkit-scrollbar-track { background: transparent; }
+        #modal-trips-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 3px; }
+        .modal-skeleton-card {
+            border-radius: 14px;
+            background: linear-gradient(90deg,#e8e8f0 25%,#d8d8e8 50%,#e8e8f0 75%);
+            background-size: 200% 100%;
+            animation: shimmerT 1.4s infinite;
+            height: 320px;
+        }
+        /* skeleton shimmer keyframe nếu chưa có */
+        @keyframes shimmerT { to { background-position: -200% 0; } }
+    </style>
+
+    <script>
+    // ── ALL TRIPS MODAL ──────────────────────────────────────────
+    let _modalTrips  = [];   // toàn bộ dữ liệu
+    const MODAL_FALLBACK = [
+        'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=300&h=200&fit=crop',
+        'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=300&h=200&fit=crop',
+        'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=300&h=200&fit=crop',
+        'https://images.unsplash.com/photo-1570366583862-f91883984fde?w=300&h=200&fit=crop',
+        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop',
+    ];
+
+    function openAllTripsModal() {
+        const overlay = document.getElementById('all-trips-overlay');
+        const modal   = document.getElementById('all-trips-modal');
+        overlay.style.display = 'block';
+        modal.style.display   = 'flex';
+        document.body.style.overflow = 'hidden';
+        requestAnimationFrame(() => {
+            overlay.style.opacity = '1';
+            modal.style.opacity   = '1';
+            modal.style.transform = 'translateX(-50%) scale(1)';
+        });
+        if (_modalTrips.length) {
+            renderModalTrips(_modalTrips);
+        } else {
+            loadModalTrips();
+        }
+    }
+
+    function closeAllTripsModal() {
+        const overlay = document.getElementById('all-trips-overlay');
+        const modal   = document.getElementById('all-trips-modal');
+        overlay.style.opacity = '0';
+        modal.style.opacity   = '0';
+        modal.style.transform = 'translateX(-50%) scale(.96)';
+        document.body.style.overflow = '';
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            modal.style.display   = 'none';
+        }, 300);
+    }
+
+    async function loadModalTrips() {
+        const grid    = document.getElementById('modal-trips-grid');
+        const countEl = document.getElementById('modal-trip-count');
+        countEl.textContent = 'Đang tải...';
+        // Skeleton: các card cao khác nhau tạo cảm giác masonry
+        grid.innerHTML = Array(8).fill('<div class="modal-skeleton-card"></div>').join('');
+        try {
+            const { combined } = await apiGetBoth(API_CONFIG.endpoints.trips);
+            if (!combined.length) throw new Error('Không có dữ liệu');
+            _modalTrips = combined;
+            renderModalTrips(_modalTrips);
+        } catch (err) {
+            grid.innerHTML = `<div style="text-align:center;padding:60px 20px;grid-column:1/-1">
+                <i class='bx bx-wifi-off' style="font-size:48px;color:#ccc;display:block;margin-bottom:12px"></i>
+                <p style="color:#999">Không thể tải dữ liệu.<br>
+                <a href="#" onclick="loadModalTrips();return false;" style="color:var(--primary);font-weight:600">Thử lại</a></p>
+            </div>`;
+            countEl.textContent = 'Lỗi tải dữ liệu';
+        }
+    }
+
+    function filterModalTrips() {
+        const q    = (document.getElementById('modal-search').value || '').toLowerCase().trim();
+        const sort = document.getElementById('modal-sort').value;
+        let trips  = _modalTrips.filter(t => {
+            if (q) {
+                const name = (t.name || t.title || t.tripName || '').toLowerCase();
+                const loc  = (t.location || t.destination || t.place || t.city || '').toLowerCase();
+                return name.includes(q) || loc.includes(q);
+            }
+            return true;
+        });
+        if (sort === 'price-asc')  trips.sort((a,b) => +(a.price||a.budget||0) - +(b.price||b.budget||0));
+        if (sort === 'price-desc') trips.sort((a,b) => +(b.price||b.budget||0) - +(a.price||a.budget||0));
+        if (sort === 'name')       trips.sort((a,b) => (a.name||a.title||'').localeCompare(b.name||b.title||'', 'vi'));
+        renderModalTrips(trips);
+    }
+
+    function renderModalTrips(trips) {
+        const grid    = document.getElementById('modal-trips-grid');
+        const countEl = document.getElementById('modal-trip-count');
+        const showEl  = document.getElementById('modal-showing');
+        const total   = _modalTrips.length;
+
+        countEl.textContent = total ? `${total} chuyến đi` : 'Không có dữ liệu';
+        showEl.textContent  = trips.length < total
+            ? `Hiển thị ${trips.length} / ${total} chuyến đi`
+            : `Tổng cộng ${trips.length} chuyến đi`;
+
+        if (!trips.length) {
+            grid.innerHTML = `<div style="text-align:center;padding:60px 0;grid-column:1/-1">
+                <i class='bx bx-search-alt' style="font-size:48px;color:#ccc;display:block;margin-bottom:12px"></i>
+                <p style="color:#999">Không tìm thấy chuyến đi phù hợp.</p>
+            </div>`;
+            return;
+        }
+
+        // Dùng lại hàm buildTourCard đã có sẵn
+        grid.innerHTML = trips.map((t, i) => buildTourCard(t, i)).join('');
+    }
+
+    // Đóng bằng Escape
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeAllTripsModal();
+    });
+    </script>
 
     <script>
         (function initAuthState() {
