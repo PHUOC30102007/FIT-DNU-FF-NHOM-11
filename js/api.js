@@ -9,11 +9,12 @@ const API_CONFIG = {
     baseUrl:  'https://6a0367ff2afe8349b4b52e50.mockapi.io/api/v1',
     baseUrl2: 'https://6a03c8fe2afe8349b4b57ae0.mockapi.io/api/v1',
     endpoints: {
-        trips:   '/trips',
-        places:  '/places',
-        members: '/members',
-        budgets: '/budgets',
-        notes:   '/notes'
+        trips:        '/trips',
+        places:       '/places',
+        destinations: '/destinations',
+        members:      '/members',
+        budgets:      '/budgets',
+        notes:        '/notes'
     },
     timeout: 10000,
 };
@@ -39,7 +40,6 @@ async function fetchAPI(url, options = {}) {
     const config = {
         method: 'GET',
         headers: getHeaders(),
-        cache: 'no-store',
         ...options,
     };
     if (config.body && typeof config.body === 'object') {
