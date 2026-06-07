@@ -59,14 +59,14 @@
                 <div id="nav-user" class="nav-user-wrap" style="display:none;">
                     <button class="nav-avatar-btn" id="nav-avatar-btn" onclick="toggleUserDropdown()"
                         aria-label="Tài khoản">
-                        <img id="nav-avatar-img" src="" alt="Avatar" class="nav-avatar-img"
+                        <img loading="lazy" id="nav-avatar-img" src="" alt="Avatar" class="nav-avatar-img"
                             referrerpolicy="no-referrer">
                         <span id="nav-user-name" class="nav-user-name"></span>
                         <i class='bx bx-chevron-down nav-chevron' id="nav-chevron"></i>
                     </button>
                     <div class="nav-user-dropdown" id="nav-user-dropdown">
                         <div class="nav-dropdown-header">
-                            <img id="nav-drop-avatar" src="" alt="Avatar" referrerpolicy="no-referrer">
+                            <img loading="lazy" id="nav-drop-avatar" src="" alt="Avatar" referrerpolicy="no-referrer">
                             <div>
                                 <div id="nav-drop-name" class="nav-drop-name"></div>
                                 <div id="nav-drop-email" class="nav-drop-email"></div>
@@ -129,7 +129,7 @@
         </div>
         <div class="mobile-menu-footer" id="mobile-footer-user" style="display:none;">
             <div class="mobile-user-info">
-                <img id="mobile-avatar" src="" alt="Avatar" class="mobile-user-avatar" referrerpolicy="no-referrer">
+                <img loading="lazy" id="mobile-avatar" src="" alt="Avatar" class="mobile-user-avatar" referrerpolicy="no-referrer">
                 <div>
                     <div id="mobile-user-name" style="font-weight:600;font-size:14px;color:var(--dark)"></div>
                     <div id="mobile-user-email" style="font-size:12px;color:var(--text-muted)"></div>
@@ -187,7 +187,7 @@
 
                     <div class="hero-img-card"
                         style="margin-top:0!important; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                        <img src="media/HoiAn.jpg" alt="Hội An"
+                        <img loading="lazy" src="media/HoiAn.jpg" alt="Hội An"
                             style="display:block;width:100%;height:160px;object-fit:cover;">
                         <div class="hero-img-info"
                             style="padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; background: #fff;">
@@ -200,7 +200,7 @@
 
                     <div class="hero-img-card"
                         style="margin-top:0!important; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                        <img src="media/VinhHaLong.jpg" alt="Hạ Long"
+                        <img loading="lazy" src="media/VinhHaLong.jpg" alt="Hạ Long"
                             style="display:block;width:100%;height:160px;object-fit:cover;">
                         <div class="hero-img-info"
                             style="padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; background: #fff;">
@@ -213,7 +213,7 @@
 
                     <div class="hero-img-card"
                         style="margin-top:0!important; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                        <img src="media/SaPa.jpg" alt="Sapa"
+                        <img loading="lazy" src="media/SaPa.jpg" alt="Sapa"
                             style="display:block;width:100%;height:160px;object-fit:cover;">
                         <div class="hero-img-info"
                             style="padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; background: #fff;">
@@ -226,7 +226,7 @@
 
                     <div class="hero-img-card"
                         style="margin-top:0!important; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                        <img src="media/DaLat.png" alt="Đà Lạt"
+                        <img loading="lazy" src="media/DaLat.png" alt="Đà Lạt"
                             style="display:block;width:100%;height:160px;object-fit:cover;">
                         <div class="hero-img-info"
                             style="padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; background: #fff;">
@@ -445,7 +445,7 @@
                     : '';
                 return `
                 <div class="dest-card" onclick="handleDestClick('${dest.slug || dest.name}', '${dest.name}')" title="${dest.description || dest.name}">
-                    <img src="${dest.image}" alt="${dest.name}"
+                    <img loading="lazy" src="${dest.image}" alt="${dest.name}"
                          onerror="this.src='https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&h=600&fit=crop'">
                     <div class="dest-overlay">
                         <div>${catBadge}</div>
@@ -577,8 +577,13 @@ async function apiDelete2(endpoint, id) {
     return fetchAPI(`${getFullUrl2(endpoint)}/${id}`, { method: 'DELETE' });
 }
 
-// ─── Gọi cả 2 API đồng thời ───
+// ─── Gọi cả 2 API đồng thời (có cache 5 phút) ───
+const _apiCache = new Map();
+const _API_CACHE_TTL = 5 * 60 * 1000;
 async function apiGetBoth(endpoint, id = null) {
+    const cacheKey = endpoint + (id || '');
+    const hit = _apiCache.get(cacheKey);
+    if (hit && Date.now() - hit.ts < _API_CACHE_TTL) return hit.value;
     const [res1, res2] = await Promise.allSettled([
         apiGet(endpoint, id),
         apiGet2(endpoint, id)
@@ -591,7 +596,9 @@ async function apiGetBoth(endpoint, id = null) {
         : [];
     if (res1.status === 'rejected') console.warn('[API 1 lỗi]', res1.reason?.message);
     if (res2.status === 'rejected') console.warn('[API 2 lỗi]', res2.reason?.message);
-    return { api1, api2, combined: [...api1, ...api2] };
+    const result = { api1, api2, combined: [...api1, ...api2] };
+    _apiCache.set(cacheKey, { value: result, ts: Date.now() });
+    return result;
 }
 
 async function getAllPlaces() {
@@ -748,7 +755,7 @@ if (typeof module !== 'undefined' && module.exports) {
         return `
         <div class="tour-card" onclick="openBookingForTour('${safeName}')" style="cursor:pointer">
             <div class="tour-img">
-                <img src="${img}" alt="${name}" onerror="this.src='${FALLBACK_IMGS[index%FALLBACK_IMGS.length]}'">
+                <img loading="lazy" src="${img}" alt="${name}" onerror="this.src='${FALLBACK_IMGS[index%FALLBACK_IMGS.length]}'">
                 ${badge ? `<span class="tour-badge${badge==='Hot'?' hot':''}">` + badge + `</span>` : ''}
                 <button class="tour-wishlist" data-trip-key="${safeKey}" style="${isFaved ? 'background:#E84848' : ''}" onclick="toggleTourWishlist(event, this)">
                     <i class='bx ${isFaved ? "bxs-heart" : "bx-heart"}' style="${isFaved ? 'color:white' : ''}"></i>
@@ -793,8 +800,19 @@ if (typeof module !== 'undefined' && module.exports) {
             msg = 'Đã bỏ ghim tour'; type = 'info';
         }
         localStorage.setItem('wv_trip_wishlist', JSON.stringify(tripWishlist));
+
+        // Chỉ update button được click, không render lại toàn bộ grid
+        const nowFav = tripWishlist.includes(tripKey);
+        icon.className = 'bx ' + (nowFav ? 'bxs-heart' : 'bx-heart');
+        icon.style.color = nowFav ? 'white' : '';
+        btn.style.background = nowFav ? '#E84848' : '';
+
+        // Sắp xếp lại phía sau bằng requestIdleCallback — không block UI
         sortTripsByLiked();
-        renderTours();
+        const reorder = () => renderTours();
+        if (window.requestIdleCallback) requestIdleCallback(reorder);
+        else setTimeout(reorder, 200);
+
         const modal = document.getElementById('all-trips-modal');
         if (modal && modal.style.display === 'flex') filterModalTrips();
         if (typeof showToast === 'function') showToast(msg, type);
@@ -823,7 +841,7 @@ if (typeof module !== 'undefined' && module.exports) {
                     <p class="testi-text">"Chuyến đi Hội An thật tuyệt vời! Hướng dẫn viên rất nhiệt tình, lịch trình
                         được sắp xếp chu đáo. Tôi sẽ quay lại lần nữa!"</p>
                     <div class="testi-author">
-                        <img class="testi-avatar" src="https://i.pravatar.cc/80?img=47" alt="Nguyễn Lan Anh">
+                        <img loading="lazy" class="testi-avatar" src="https://i.pravatar.cc/80?img=47" alt="Nguyễn Lan Anh">
                         <div>
                             <div class="testi-name">Nguyễn Lan Anh</div>
                             <div class="testi-location">Hà Nội, Việt Nam</div>
@@ -838,7 +856,7 @@ if (typeof module !== 'undefined' && module.exports) {
                     <p class="testi-text">"Du thuyền Hạ Long 5 sao là trải nghiệm không thể quên. Đồ ăn ngon, phòng đẹp,
                         nhân viên phục vụ rất chuyên nghiệp."</p>
                     <div class="testi-author">
-                        <img class="testi-avatar" src="https://i.pravatar.cc/80?img=32" alt="Trần Minh Khoa">
+                        <img loading="lazy" class="testi-avatar" src="https://i.pravatar.cc/80?img=32" alt="Trần Minh Khoa">
                         <div>
                             <div class="testi-name">Trần Minh Khoa</div>
                             <div class="testi-location">TP. Hồ Chí Minh, Việt Nam</div>
@@ -853,7 +871,7 @@ if (typeof module !== 'undefined' && module.exports) {
                     <p class="testi-text">"Trekking Sapa thật mạo hiểm và đáng giá! Phong cảnh đẹp mê hồn, người dân tộc
                         rất thân thiện. Cảm ơn WanderViet!"</p>
                     <div class="testi-author">
-                        <img class="testi-avatar" src="https://i.pravatar.cc/80?img=25" alt="Lê Thị Thu">
+                        <img loading="lazy" class="testi-avatar" src="https://i.pravatar.cc/80?img=25" alt="Lê Thị Thu">
                         <div>
                             <div class="testi-name">Lê Thị Thu</div>
                             <div class="testi-location">Đà Nẵng, Việt Nam</div>
@@ -937,7 +955,7 @@ if (typeof module !== 'undefined' && module.exports) {
                         <li><a href="mailto:phuoc30102007@gmail.com"><i class='bx bx-envelope'
                                     style="margin-right:6px"></i>phuoc30102007@gmail.com</a></li>
                         <li style="margin-top:16px;">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Google_Play_Store_badge_EN.svg/200px-Google_Play_Store_badge_EN.svg.png"
+                            <img loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Google_Play_Store_badge_EN.svg/200px-Google_Play_Store_badge_EN.svg.png"
                                 alt="Google Play"
                                 style="height:36px; width:auto; border-radius:6px; margin-bottom:8px;">
                         </li>
@@ -976,26 +994,6 @@ if (typeof module !== 'undefined' && module.exports) {
                 <button class="btn-confirm" onclick="submitBooking()"><i class='bx bx-send'></i> Gữi yêu cầu</button>
             </div>
         </div>
-    </div>    <div class="modal-overlay" id="modal-booking">
-        <div class="modal-box">
-            <h3>Đặt Tour Ngay</h3>
-            <p>Điền thông tin để chúng tôi liên hệ tư vấn miễn phí cho bạn</p>
-            <div class="form-group"><label>Họ và tên</label><input type="text" id="book-name"
-                    placeholder="Nguyễn Văn A"></div>
-            <div class="form-group"><label>Số điện thoại</label><input type="tel" id="book-phone"
-                    placeholder="0912 345 678"></div>
-            <div class="form-group"><label>Email</label><input type="email" id="book-email"
-                    placeholder="email@example.com"></div>
-            <div class="form-group"><label>Tour quan tâm</label><input type="text" id="book-tour"
-                    placeholder="Tên tour..."></div>
-            <div class="form-group"><label>Ngày khởi hành dự kiến</label><input type="date" id="book-date"></div>
-            <div class="form-group"><label>Ghi chú</label><textarea id="book-note"
-                    placeholder="Yêu cầu đặc biệt, số người..."></textarea></div>
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeModal('booking')">Huỷ</button>
-                <button class="btn-confirm" onclick="submitBooking()"><i class='bx bx-send'></i> Gửi yêu cầu</button>
-            </div>
-        </div>
     </div>
 
     <div class="modal-overlay" id="modal-tour-detail">
@@ -1020,6 +1018,280 @@ if (typeof module !== 'undefined' && module.exports) {
     </div>
 
     <div class="wv-toast-container" id="toast-container"></div>
+
+    <!-- CHATBOT WANDERVIET -->
+    <button id="chat-fab" onclick="toggleChat()" aria-label="Chat hỗ trợ">
+        <i class='bx bx-chat' id="chat-fab-icon"></i>
+    </button>
+
+    <div id="chat-panel">
+        <div id="chat-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div id="chat-avatar"><i class='bx bx-bot'></i></div>
+                <div>
+                    <div style="font-weight:700;font-size:15px;color:#fff;">WanderBot</div>
+                    <div style="font-size:11px;opacity:0.8;color:#fff;">● Đang hoạt động</div>
+                </div>
+            </div>
+            <button onclick="toggleChat()" id="chat-close"><i class='bx bx-x'></i></button>
+        </div>
+        <div id="chat-messages">
+            <div class="chat-msg bot">
+                <div class="chat-bubble">Xin chào! Tôi là WanderBot 🌿<br>Tôi có thể giúp bạn tìm tour, giải đáp thắc mắc hoặc hỗ trợ đặt tour. Bạn cần hỗ trợ gì?</div>
+            </div>
+        </div>
+        <div id="chat-input-wrap">
+            <input id="chat-input" type="text" placeholder="Nhập câu hỏi..." onkeydown="if(event.key==='Enter')sendChat()">
+            <button id="chat-send" onclick="sendChat()"><i class='bx bx-send'></i></button>
+        </div>
+    </div>
+
+    <style>
+    #chat-fab {
+        position: fixed; bottom: 24px; right: 24px;
+        width: 44px; height: 44px; border-radius: 50%;
+        background: var(--primary, #2D5A3D); border: none; color: #fff;
+        font-size: 22px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 16px rgba(45,90,61,0.4);
+        z-index: 989;
+        transition: bottom 0.3s ease, transform 0.2s, background 0.2s;
+    }
+    /* Khi scroll-top hien, day chat-fab len tren */
+    #chat-fab.shifted { bottom: 80px; }
+    #chat-fab:hover { background: #4A8C5C; transform: scale(1.08); }
+
+    #chat-panel {
+        position: fixed;
+        bottom: 80px;
+        right: 24px;
+        width: 300px;
+        max-height: calc(100vh - 160px);
+        height: min(380px, calc(100vh - 160px));
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 12px 48px rgba(0,0,0,0.18);
+        display: none;
+        flex-direction: column;
+        /* Thap hon navbar (1000) va mobile-menu (1100) */
+        z-index: 990;
+        overflow: hidden;
+        animation: chatPop 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #chat-panel.open { display: flex; }
+    @keyframes chatPop {
+        from { opacity:0; transform:scale(0.88) translateY(16px); }
+        to   { opacity:1; transform:scale(1) translateY(0); }
+    }
+    #chat-header {
+        background: linear-gradient(135deg,#2D5A3D,#4A8C5C);
+        padding: 14px 16px;
+        display: flex; align-items: center; justify-content: space-between;
+        flex-shrink: 0;
+    }
+    #chat-avatar {
+        width:36px; height:36px; background:rgba(255,255,255,0.2);
+        border-radius:50%; display:flex; align-items:center; justify-content:center;
+        font-size:20px; color:#fff;
+    }
+    #chat-close {
+        background:rgba(255,255,255,0.15); border:none; color:#fff;
+        width:28px; height:28px; border-radius:50%; cursor:pointer;
+        font-size:18px; display:flex; align-items:center; justify-content:center;
+        transition:background 0.2s;
+    }
+    #chat-close:hover { background:rgba(255,255,255,0.3); }
+
+    #chat-messages {
+        flex:1; overflow-y:auto; padding:14px 12px;
+        display:flex; flex-direction:column; gap:10px; background:#f8f9fb;
+    }
+    #chat-messages::-webkit-scrollbar { width:4px; }
+    #chat-messages::-webkit-scrollbar-thumb { background:#ddd; border-radius:2px; }
+
+    .chat-msg { display:flex; }
+    .chat-msg.bot  { justify-content:flex-start; }
+    .chat-msg.user { justify-content:flex-end; }
+    .chat-bubble {
+        max-width:82%; padding:10px 13px; border-radius:14px;
+        font-size:13.5px; line-height:1.55; word-break:break-word;
+    }
+    .chat-msg.bot  .chat-bubble {
+        background:#fff; color:#1A1A2E;
+        border-bottom-left-radius:4px;
+        box-shadow:0 1px 4px rgba(0,0,0,0.07);
+    }
+    .chat-msg.user .chat-bubble {
+        background:#2D5A3D; color:#fff;
+        border-bottom-right-radius:4px;
+    }
+    .chat-typing span {
+        display:inline-block; width:6px; height:6px;
+        background:#aaa; border-radius:50%; margin:0 2px;
+        animation:typingDot 1.2s infinite;
+    }
+    .chat-typing span:nth-child(2) { animation-delay:0.2s; }
+    .chat-typing span:nth-child(3) { animation-delay:0.4s; }
+    @keyframes typingDot {
+        0%,60%,100% { transform:translateY(0); opacity:0.4; }
+        30% { transform:translateY(-5px); opacity:1; }
+    }
+    #chat-input-wrap {
+        display:flex; align-items:center; gap:8px;
+        padding:10px 12px; border-top:1px solid #eee;
+        background:#fff; flex-shrink:0;
+    }
+    #chat-input {
+        flex:1; border:1.5px solid #e0e0e8; border-radius:100px;
+        padding:8px 14px; font-size:13.5px;
+        font-family:'DM Sans',sans-serif; outline:none;
+        transition:border-color 0.2s;
+    }
+    #chat-input:focus { border-color:#2D5A3D; }
+    #chat-send {
+        width:36px; height:36px; border-radius:50%;
+        background:#2D5A3D; border:none; color:#fff;
+        font-size:16px; cursor:pointer;
+        display:flex; align-items:center; justify-content:center;
+        flex-shrink:0; transition:background 0.2s;
+    }
+    #chat-send:hover { background:#4A8C5C; }
+    #chat-send:disabled { background:#aaa; cursor:not-allowed; }
+    @media(max-width:480px) {
+        #chat-panel {
+            width: calc(100vw - 20px);
+            right: 10px;
+            height: min(340px, calc(100vh - 150px));
+            max-height: calc(100vh - 150px);
+            bottom: 76px;
+        }
+        #chat-fab { bottom: 16px; right: 10px; }
+        #chat-fab.shifted { bottom: 72px; }
+    }
+    </style>
+
+    <script>
+    let _chatOpen = false;
+    const _chatHistory = [];
+
+    function toggleChat() {
+        _chatOpen = !_chatOpen;
+        document.getElementById('chat-panel').classList.toggle('open', _chatOpen);
+        document.getElementById('chat-fab-icon').className = _chatOpen ? 'bx bx-x' : 'bx bx-chat';
+        if (_chatOpen) setTimeout(() => document.getElementById('chat-input').focus(), 200);
+    }
+
+    function appendMsg(role, html) {
+        const box = document.getElementById('chat-messages');
+        const div = document.createElement('div');
+        div.className = 'chat-msg ' + role;
+        div.innerHTML = '<div class="chat-bubble">' + html + '</div>';
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+        return div;
+    }
+
+    function showTyping() {
+        return appendMsg('bot', '<span class="chat-typing"><span></span><span></span><span></span></span>');
+    }
+
+    async function sendChat() {
+        const input   = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('chat-send');
+        const text    = input.value.trim();
+        if (!text) return;
+
+        input.value = ''; input.disabled = true; sendBtn.disabled = true;
+        appendMsg('user', text);
+        _chatHistory.push({ role: 'user', content: text });
+        const typingEl = showTyping();
+
+        // Delay gia lap suy nghi
+        await new Promise(r => setTimeout(r, 600 + Math.random() * 800));
+
+        const reply = wanderBotReply(text, _chatHistory);
+        typingEl.remove();
+        appendMsg('bot', reply);
+        _chatHistory.push({ role: 'assistant', content: reply });
+        input.disabled = false; sendBtn.disabled = false; input.focus();
+    }
+
+    function wanderBotReply(text, history) {
+        const t = text.toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/\s+/g, ' ').trim();
+
+        // ── Chao hoi ──
+        if (/^(xin chao|chao|hello|hi|hey|alo|cho minh hoi|cho em hoi)/.test(t))
+            return 'Xin chào bạn! 😊 Tôi là WanderBot, trợ lý du lịch của WanderViet.<br>Bạn muốn tìm tour ở đâu, hay cần hỗ trợ gì?';
+
+        // ── Tour theo dia diem ──
+        if (/hoi an|pho co/.test(t))
+            return '🏮 <b>Tour Hội An</b> rất được yêu thích!<br>• <b>Khám phá phố cổ 3N2Đ</b> — từ 2.500.000đ<br>• <b>Hội An & Mỹ Sơn 4N3Đ</b> — từ 3.500.000đ<br><br>Bạn muốn đi vào tháng mấy? Tôi tư vấn lịch phù hợp nhé!';
+
+        if (/ha long|vinh|du thuyen/.test(t))
+            return '⛵ <b>Tour Vịnh Hạ Long</b> — kỳ quan thiên nhiên thế giới!<br>• <b>Du thuyền 2N1Đ</b> — từ 3.200.000đ<br>• <b>Du thuyền 5 sao 3N2Đ</b> — từ 6.200.000đ<br><br>Bạn thích tour bình dân hay cao cấp?';
+
+        if (/sapa|sa pa|ruong bac thang|fansipan/.test(t))
+            return '🏔️ <b>Tour Sapa</b> — ruộng bậc thang & bản làng!<br>• <b>Trekking Sapa 3N2Đ</b> — từ 2.800.000đ<br>• <b>Sapa & Fansipan 4N3Đ</b> — từ 3.900.000đ<br><br>Mùa lúa chín (tháng 9-10) là đẹp nhất bạn nhé!';
+
+        if (/da nang|ba na|cau vang/.test(t))
+            return '🌉 <b>Tour Đà Nẵng</b> — thành phố đáng sống!<br>• <b>Đà Nẵng 3N2Đ</b> — từ 2.200.000đ<br>• <b>Đà Nẵng + Bà Nà Hills</b> — từ 2.900.000đ<br><br>Tour đi vào cuối tuần rất nhiều, bạn muốn xem lịch cụ thể không?';
+
+        if (/phu quoc|dao ngoc/.test(t))
+            return '🏝️ <b>Tour Phú Quốc</b> — đảo ngọc xinh đẹp!<br>• <b>Phú Quốc 3N2Đ</b> — từ 4.500.000đ<br>• <b>Phú Quốc 5N4Đ</b> — từ 6.800.000đ (bao gồm vé máy bay)<br><br>Bạn đi mấy người? Nhóm đông có ưu đãi đặc biệt!';
+
+        if (/da lat|cao nguyen/.test(t))
+            return '🌸 <b>Tour Đà Lạt</b> — thành phố ngàn hoa!<br>• <b>Đà Lạt 3N2Đ</b> — từ 1.800.000đ<br>• <b>Đà Lạt romantic 4N3Đ</b> — từ 2.600.000đ<br><br>Đà Lạt mát mẻ quanh năm, thích hợp đi bất cứ lúc nào!';
+
+        if (/ha noi|thu do/.test(t))
+            return '🏛️ <b>Tour Hà Nội</b> — nghìn năm văn hiến!<br>• <b>Hà Nội city tour 2N1Đ</b> — từ 1.500.000đ<br>• <b>Hà Nội & vùng phụ cận</b> — từ 2.400.000đ<br><br>Kết hợp thêm Ninh Bình hoặc Mai Châu rất tuyệt!';
+
+        if (/ho chi minh|sai gon|tphcm/.test(t))
+            return '🏙️ <b>Tour TP. Hồ Chí Minh</b>!<br>• <b>Sài Gòn city tour</b> — từ 800.000đ/người<br>• <b>Sài Gòn & Mekong 3N2Đ</b> — từ 2.100.000đ<br><br>Tour Củ Chi Tunnels cũng rất được yêu thích!';
+
+        // ── Gia ca & dat tour ──
+        if (/gia|bao nhieu|phi|chi phi|cost|price/.test(t))
+            return '💰 Giá tour tại WanderViet rất cạnh tranh!<br>• Tour ngắn ngày (1-2 ngày): từ <b>800K</b><br>• Tour 3-4 ngày: từ <b>1.800K</b><br>• Tour cao cấp 5 sao: từ <b>5.000K</b><br><br>Giá đã bao gồm: xe đón/đưa, hướng dẫn viên, bảo hiểm.<br>Bạn muốn xem giá tour cụ thể nào?';
+
+        if (/dat tour|book|dang ky|mua tour/.test(t))
+            return '📋 Đặt tour tại WanderViet rất đơn giản!<br>1️⃣ Chọn tour yêu thích trên trang<br>2️⃣ Bấm vào card tour → điền form đặt<br>3️⃣ Chúng tôi liên hệ xác nhận trong <b>30 phút</b><br><br>Hoặc gọi ngay <b>0337 596 407</b> để được tư vấn trực tiếp!';
+
+        // ── Chinh sach ──
+        if (/hoan tien|huy tour|chinh sach|bao hiem/.test(t))
+            return '🛡️ Chính sách của WanderViet:<br>• <b>Hoàn 100%</b> nếu hủy trước 7 ngày<br>• <b>Hoàn 50%</b> nếu hủy trước 3 ngày<br>• <b>Bảo hiểm du lịch</b> included trong mọi tour<br>• <b>Cam kết giá tốt nhất</b> — tìm thấy rẻ hơn, hoàn tiền ngay!';
+
+        // ── Thoi gian & lich trinh ──
+        if (/khi nao|thang may|lich|thoi gian|mua/.test(t))
+            return '📅 Gợi ý thời điểm du lịch:<br>• <b>Hạ Long, Hà Nội</b>: tháng 3-5 hoặc 9-11<br>• <b>Hội An, Đà Nẵng</b>: tháng 2-7<br>• <b>Sapa</b>: tháng 9-10 (mùa lúa chín)<br>• <b>Phú Quốc</b>: tháng 11-4<br>• <b>Đà Lạt</b>: quanh năm 🌸<br><br>Bạn muốn đi vào tháng nào?';
+
+        // ── So nguoi & nhom ──
+        if (/may nguoi|nhom|gia dinh|cap doi|hon nhau|cong ty|team/.test(t))
+            return '👥 WanderViet phục vụ mọi quy mô!<br>• <b>Cặp đôi</b>: tour romantic Đà Lạt, Phú Quốc<br>• <b>Gia đình</b>: tour Hạ Long, Hội An, Đà Nẵng<br>• <b>Nhóm 10+</b>: giảm thêm 10-15%<br>• <b>Team building</b>: thiết kế tour riêng theo yêu cầu<br><br>Nhóm bạn có bao nhiêu người?';
+
+        // ── Lien he ──
+        if (/lien he|hotline|so dien thoai|email|dia chi|support/.test(t))
+            return '📞 Liên hệ WanderViet:<br>• <b>Hotline</b>: 0337 596 407<br>• <b>Email</b>: phuoc30102007@gmail.com<br>• <b>Địa chỉ</b>: Hà Đông, Hà Nội<br>• <b>Giờ làm việc</b>: 8:00 - 22:00 mỗi ngày<br><br>Gọi ngay để được tư vấn miễn phí! 😊';
+
+        // ── Cam on ──
+        if (/cam on|thanks|thank|ok|oke|tuyet|hay qua/.test(t))
+            return 'Không có gì! Rất vui được giúp bạn 😊<br>Nếu cần thêm thông tin về tour nào, cứ hỏi mình nhé!';
+
+        // ── Tam biet ──
+        if (/tam biet|bye|thoat|done|xong/.test(t))
+            return 'Tạm biệt bạn! Chúc bạn có chuyến đi thật vui vẻ và đáng nhớ! 🌟<br>WanderViet luôn sẵn sàng đồng hành cùng bạn!';
+
+        // ── Default ──
+        const defaults = [
+            'Bạn muốn khám phá tour ở đâu? Tôi có thể gợi ý <b>Hội An, Hạ Long, Sapa, Đà Nẵng, Phú Quốc</b>... 🗺️',
+            'Mình chưa hiểu rõ câu hỏi của bạn 😅<br>Bạn có thể hỏi về: <b>tour du lịch, giá cả, đặt tour, chính sách hoàn tiền</b> hoặc <b>thời điểm đi</b> nhé!',
+            'Để tư vấn chính xác hơn, bạn cho mình biết:<br>📍 Muốn đi đâu?<br>👥 Đi mấy người?<br>📅 Dự kiến đi tháng mấy?',
+        ];
+        return defaults[Math.floor(Math.random() * defaults.length)];
+    }
+
+        </script>
+
     <button class="scroll-top-btn" id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
         <i class='bx bx-up-arrow-alt'></i>
     </button>
@@ -1047,7 +1319,9 @@ if (typeof module !== 'undefined' && module.exports) {
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
             navbar.classList.toggle('scrolled', window.scrollY > 60);
-            document.getElementById('scroll-top-btn').classList.toggle('visible', window.scrollY > 400);
+            const scrollVisible = window.scrollY > 400;
+            document.getElementById('scroll-top-btn').classList.toggle('visible', scrollVisible);
+            document.getElementById('chat-fab').classList.toggle('shifted', scrollVisible);
         });
 
         // ── Hamburger Menu ──
@@ -1193,7 +1467,7 @@ if (typeof module !== 'undefined' && module.exports) {
             } else {
                 grid.innerHTML = results.map(t => `
       <div class="tour-card" onclick="showTourDetail(toursData.find(x=>x.id===${t.id}))" style="cursor:pointer">
-        <div class="tour-img"><img src="${t.img}" alt="${t.title}">${t.badge ? `<span class="tour-badge ${t.badgeClass || ''}">${t.badge}</span>` : ''}</div>
+        <div class="tour-img"><img loading="lazy" src="${t.img}" alt="${t.title}">${t.badge ? `<span class="tour-badge ${t.badgeClass || ''}">${t.badge}</span>` : ''}</div>
         <div class="tour-body">
           <div class="tour-location"><i class='bx bx-map-pin'></i> ${t.location}</div>
           <h3 class="tour-title">${t.title}</h3>
@@ -1621,13 +1895,15 @@ if (typeof module !== 'undefined' && module.exports) {
         const grid    = document.getElementById('modal-trips-grid');
         const countEl = document.getElementById('modal-trip-count');
         countEl.textContent = 'Đang tải...';
-        // Skeleton: các card cao khác nhau tạo cảm giác masonry
-        grid.innerHTML = Array(8).fill('<div class="modal-skeleton-card"></div>').join('');
+        grid.innerHTML = Array(6).fill('<div class="modal-skeleton-card"></div>').join('');
         try {
+            // T��i dững cache từ apiGetBoth (đã có cache 5 phút)
             const { combined } = await apiGetBoth(API_CONFIG.endpoints.trips);
-            if (!combined.length) throw new Error('Không có dữ liệu');
+            if (!combined.length) throw new Error('no data');
             _modalTrips = combined;
             if (!originalOrder.length) originalOrder = combined;
+            // Xóa skeleton khỏi DOM trước khi render
+            grid.innerHTML = '';
             filterModalTrips();
         } catch (err) {
             grid.innerHTML = `<div style="text-align:center;padding:60px 20px;grid-column:1/-1">
@@ -1689,8 +1965,12 @@ if (typeof module !== 'undefined' && module.exports) {
             return;
         }
 
-        // Dùng lại hàm buildTourCard đã có sẵn
-        grid.innerHTML = trips.map((t, i) => buildTourCard(t, i)).join('');
+        // Smart diff: chỉ render lại nếu dữ liệu thay đổi
+        const newHTML = trips.map((t, i) => buildTourCard(t, i)).join('');
+        if (grid.dataset.rendered !== newHTML) {
+            grid.innerHTML = newHTML;
+            grid.dataset.rendered = newHTML;
+        }
     }
 
     // Đóng bằng Escape
