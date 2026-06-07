@@ -8,6 +8,64 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <link rel="stylesheet" href="css/public.css">
+  <style>
+    /* ── Empty State ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px 36px;
+      text-align: center;
+      gap: 0;
+    }
+    .empty-state__icon-wrap {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--primary-pale, #EEF5F0);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+      flex-shrink: 0;
+    }
+    .empty-state__icon-wrap i {
+      font-size: 32px;
+      color: var(--primary, #2D5A3D);
+      opacity: 0.55;
+    }
+    .empty-state__title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dark, #1A1A2E);
+      margin-bottom: 6px;
+    }
+    .empty-state__desc {
+      font-size: 13px;
+      color: var(--text-muted, #9ca3af);
+      margin-bottom: 20px;
+      max-width: 220px;
+      line-height: 1.5;
+    }
+    .empty-state__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 20px;
+      border-radius: 999px;
+      background: var(--primary, #2D5A3D);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.15s;
+    }
+    .empty-state__btn:hover {
+      background: #4A8C5C;
+      transform: translateY(-1px);
+    }
+  </style>
+
   <script src="authGuard.js"></script>
   <script>
     // Ẩn sớm nút "Đăng nhập" nếu đã có session (tránh flash)
@@ -302,11 +360,24 @@
   }
 
   // ── Trống placeholder ──
-  function emptyState(icon, msg) {
-    return `<div style="text-align:center;padding:40px 20px;color:var(--text-muted,#9ca3af)">
-      <i class='bx ${icon}' style="font-size:2.5rem;opacity:.3;display:block;margin-bottom:10px"></i>
-      <span>${msg}</span>
-    </div>`;
+  function emptyState(icon, msg, showAdminBtn = false) {
+    const btn = showAdminBtn ? `
+      <a href="admin.html" class="empty-state__btn">
+        <i class='bx bx-plus-circle'></i> Thêm ngay
+      </a>` : '';
+    // msg có thể là chuỗi ngắn hoặc "title|desc"
+    const parts = msg.split('|');
+    const title = parts[0].trim();
+    const desc  = parts[1] ? parts[1].trim() : 'Vào trang Admin để bắt đầu thêm dữ liệu.';
+    return `
+      <div class="empty-state">
+        <div class="empty-state__icon-wrap">
+          <i class='bx ${icon}'></i>
+        </div>
+        <div class="empty-state__title">${title}</div>
+        <div class="empty-state__desc">${desc}</div>
+        ${btn}
+      </div>`;
   }
 
   // ── Load data từ localStorage ──
@@ -362,7 +433,7 @@
 
     if (!trips || !trips.length) {
       tag.textContent = '0 Ngày';
-      body.innerHTML = emptyState('bx-calendar-event', 'Danh sách trống. Admin chưa thêm chuyến đi nào.');
+      body.innerHTML = emptyState('bx-calendar-event', 'Chưa có chuyến đi|Admin chưa tạo chuyến đi nào. Thêm ngay để bắt đầu lên kế hoạch!', true);
       return;
     }
 
@@ -383,7 +454,7 @@
     tag.textContent = `${totalDays} Ngày`;
 
     if (!places.length) {
-      body.innerHTML = emptyState('bx-calendar-x', 'Danh sách trống. Admin chưa thêm địa điểm nào.');
+      body.innerHTML = emptyState('bx-calendar-x', 'Chưa có địa điểm|Hành trình theo ngày sẽ hiện ở đây khi Admin thêm địa điểm.', true);
       return;
     }
 
@@ -423,7 +494,7 @@
 
     if (!places || !places.length) {
       tag.textContent = '0 địa điểm';
-      list.innerHTML = emptyState('bx-map-pin', 'Danh sách trống. Admin chưa thêm địa điểm nào.');
+      list.innerHTML = emptyState('bx-map-pin', 'Chưa có địa điểm|Các địa điểm tham quan sẽ xuất hiện ở đây sau khi Admin thêm vào.', true);
       return;
     }
 
@@ -451,7 +522,7 @@
 
     if (!members || !members.length) {
       label.textContent = '0';
-      list.innerHTML = emptyState('bx-group', 'Danh sách trống. Admin chưa thêm thành viên nào.');
+      list.innerHTML = emptyState('bx-group', 'Chưa có thành viên|Danh sách nhóm chưa có ai. Mời thành viên vào Admin nhé!', true);
       return;
     }
 
@@ -473,7 +544,7 @@
     const budget = data && data.budget;
 
     if (!budget || !budget.categories || !budget.categories.length) {
-      sidebar.innerHTML = emptyState('bx-wallet', 'Danh sách trống. Admin chưa cập nhật ngân sách.');
+      sidebar.innerHTML = emptyState('bx-wallet', 'Chưa có ngân sách|Admin chưa cập nhật chi phí cho chuyến đi này.', true);
       return;
     }
 
@@ -504,7 +575,7 @@
 
     if (!notes || !notes.length) {
       countEl.textContent = '0 ghi chú';
-      list.innerHTML = emptyState('bx-note', 'Danh sách trống. Hãy thêm ghi chú đầu tiên bên dưới!');
+      list.innerHTML = emptyState('bx-note', 'Chưa có ghi chú|Hãy là người đầu tiên để lại ghi chú cho nhóm!');
       return;
     }
 

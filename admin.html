@@ -6,6 +6,8 @@
   <title>TripSync Admin – Quản Lý Chuyến Đi</title>
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <link rel="stylesheet" href="css/admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>.toast.warning{border-color:#F59E0B}.toast.warning i{color:#F59E0B}</style>
   <script src="authGuard.js"></script>
   <style>
@@ -354,6 +356,9 @@
           <div class="panel-header">
             <h3><i class='bx bx-trip'></i> Tất cả chuyến đi</h3>
             <div class="panel-header-actions">
+              <button class="btn btn-ghost btn-sm" onclick="exportTripsExcel()" title="Xuất danh sách ra file Excel">
+                <i class='bx bx-spreadsheet'></i> Xuất Excel
+              </button>
               <button class="btn btn-primary btn-sm" onclick="openModal('trip')"><i class='bx bx-plus'></i> Thêm mới</button>
             </div>
           </div>
@@ -842,11 +847,14 @@ function renderDashboard(){
   // Update dashboard budget panel
   const dashBudgetBody = document.getElementById('dashboard-budget-body');
   if(dashBudgetBody){
-    const cats = appData.budget.categories;
-    const total = cats.reduce((a,c)=>a+c.amount,0);
+    const cats   = appData.budget.categories;
+    const total  = cats.reduce((a,c)=>a+c.amount,0);
     const members = appData.budget.memberCount||1;
-    const trip = appData.trips[0];
+    const trip   = appData.trips[0];
+
     if(!cats.length){
+      // Destroy chart cũ nếu có
+      if(window._budgetChartInstance){ window._budgetChartInstance.destroy(); window._budgetChartInstance=null; }
       dashBudgetBody.innerHTML=`<div style="text-align:center;padding:24px;color:var(--text-muted)"><i class='bx bx-wallet' style="font-size:2rem;opacity:.3;display:block;margin-bottom:8px"></i>Chưa có ngân sách</div>`;
     } else {
       dashBudgetBody.innerHTML=`
@@ -856,17 +864,69 @@ function renderDashboard(){
           ${trip?`<div class="btd-sub">${trip.name}</div>`:''}
           <div class="btd-per">≈ ${fmt(Math.round(total/members))} / người</div>
         </div>
-        <div class="budget-chart">
-          <div class="budget-chart-bars" style="margin-bottom:8px">
-            ${cats.map(c=>`<div class="budget-chart-bar" style="width:${total>0?Math.round(c.amount/total*100):0}%;background:${c.color}"></div>`).join('')}
-          </div>
+
+        <!-- Biểu đồ tròn Chart.js -->
+        <div style="position:relative;width:100%;max-width:220px;margin:16px auto 4px;">
+          <canvas id="budget-donut-chart"></canvas>
         </div>
-        <div>
-          ${cats.map(c=>`<div class="budget-summary-row"><span>${c.name}</span><span>${fmt(c.amount)}</span></div>`).join('')}
-          <div class="budget-summary-row" style="margin-top:8px;padding-top:12px;border-top:2px solid var(--bg-2)">
-            <span>Tổng cộng</span><span style="color:var(--primary)">${fmt(total)}</span>
+
+        <div id="budget-donut-legend" style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+          ${cats.map(c=>`
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;">
+              <span style="display:flex;align-items:center;gap:6px;">
+                <span style="width:10px;height:10px;border-radius:50%;background:${c.color};flex-shrink:0;display:inline-block;"></span>
+                ${c.name}
+              </span>
+              <span style="font-weight:600;color:var(--dark)">
+                ${fmt(c.amount)}
+                <span style="color:var(--text-muted);font-weight:400;margin-left:2px">(${total>0?Math.round(c.amount/total*100):0}%)</span>
+              </span>
+            </div>`).join('')}
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;
+                      margin-top:8px;padding-top:10px;border-top:2px solid var(--bg-2,#f0f0f0);">
+            <span>Tổng cộng</span>
+            <span style="color:var(--primary)">${fmt(total)}</span>
           </div>
         </div>`;
+
+      // Vẽ / cập nhật biểu đồ tròn
+      const ctx = document.getElementById('budget-donut-chart').getContext('2d');
+
+      // Destroy instance cũ trước khi vẽ lại (tránh lỗi "Canvas is already in use")
+      if(window._budgetChartInstance){ window._budgetChartInstance.destroy(); }
+
+      window._budgetChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: cats.map(c=>c.name),
+          datasets: [{
+            data:            cats.map(c=>c.amount),
+            backgroundColor: cats.map(c=>c.color),
+            borderColor:     '#fff',
+            borderWidth:     3,
+            hoverBorderWidth: 4,
+            hoverOffset:     6,
+          }]
+        },
+        options: {
+          responsive:        true,
+          maintainAspectRatio: true,
+          cutout:            '62%',   // doughnut hole
+          plugins: {
+            legend: { display: false },  // dùng legend tự build bên dưới
+            tooltip: {
+              callbacks: {
+                label: ctx => {
+                  const val = ctx.parsed;
+                  const pct = total > 0 ? Math.round(val/total*100) : 0;
+                  return ` ${fmt(val)} (${pct}%)`;
+                }
+              }
+            }
+          },
+          animation: { animateRotate: true, duration: 500 }
+        }
+      });
     }
   }
 }
@@ -963,6 +1023,58 @@ function deleteTrip(id){
     saveData(); renderTripsTab(); renderDashboard();
     showToast('Đã xóa chuyến đi','error');
   });
+}
+
+// ── XUẤT EXCEL ──
+function exportTripsExcel(){
+  if(!appData.trips.length){
+    showToast('Chưa có chuyến đi nào để xuất!','error');
+    return;
+  }
+
+  // Map dữ liệu sang hàng Excel — tiêu đề tiếng Việt
+  const rows = appData.trips.map((t, i) => ({
+    'STT':           i + 1,
+    'Tên chuyến đi': t.name || '',
+    'Điểm đến':      t.dest || '',
+    'Ngày đi':       t.start || '',
+    'Ngày về':       t.end || '',
+    'Thời lượng':    (()=>{
+      if(!t.start||!t.end) return '';
+      const days = Math.round((new Date(t.end)-new Date(t.start))/86400000)+1;
+      return `${days} ngày ${days-1} đêm`;
+    })(),
+    'Trạng thái':    statusMap[t.status] || t.status || '',
+    'Phụ trách':     t.leader || '',
+    'Số thành viên': (t.members||[]).length,
+    'Ngân sách (₫)': t.budget || 0,
+    'Ghi chú':       t.notes || '',
+  }));
+
+  // Tạo worksheet và workbook
+  const ws = XLSX.utils.json_to_sheet(rows);
+
+  // Căn độ rộng cột tự động theo nội dung dài nhất
+  const colWidths = Object.keys(rows[0]).map(key => ({
+    wch: Math.max(
+      key.length + 2,
+      ...rows.map(r => String(r[key]).length)
+    )
+  }));
+  ws['!cols'] = colWidths;
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Chuyến đi');
+
+  // Tên file: trips_DDMMYYYY.xlsx
+  const now  = new Date();
+  const dd   = String(now.getDate()).padStart(2,'0');
+  const mm   = String(now.getMonth()+1).padStart(2,'0');
+  const yyyy = now.getFullYear();
+  const filename = `trips_${dd}${mm}${yyyy}.xlsx`;
+
+  XLSX.writeFile(wb, filename);
+  showToast(`Đã xuất file <b>${filename}</b>`, 'success');
 }
 // ── PLACES ──
 function renderPlacesTab(){

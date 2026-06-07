@@ -143,20 +143,90 @@ function showAppLoading(show) {
 
 function showToast(message, type = 'error') {
     if (typeof document === 'undefined') return;
+
+    // Inject animation keyframes một lần duy nhất
+    if (!document.getElementById('toast-styles')) {
+        const style = document.createElement('style');
+        style.id = 'toast-styles';
+        style.textContent = `
+            @keyframes toastSlideIn {
+                from { opacity: 0; transform: translateX(110%); }
+                to   { opacity: 1; transform: translateX(0); }
+            }
+            @keyframes toastSlideOut {
+                from { opacity: 1; transform: translateX(0); }
+                to   { opacity: 0; transform: translateX(110%); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
     let container = document.getElementById('toast-container');
     if (!container) {
         container = document.createElement('div');
         container.id = 'toast-container';
-        container.style.cssText = 'position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:360px;';
+        container.style.cssText = [
+            'position:fixed',
+            'top:80px',
+            'right:16px',
+            'z-index:99999',
+            'display:flex',
+            'flex-direction:column',
+            'gap:10px',
+            'max-width:380px',
+            'pointer-events:none',   // container không chặn click
+        ].join(';');
         document.body.appendChild(container);
     }
+
     const colors = { error:'#DC2626', success:'#2D5A3D', warning:'#D97706', info:'#2563EB' };
     const icons  = { error:'bx-x-circle', success:'bx-check-circle', warning:'bx-error', info:'bx-info-circle' };
-    const toast  = document.createElement('div');
-    toast.style.cssText = `background:${colors[type]||colors.error};color:#fff;padding:12px 16px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,0.15);animation:slideIn 0.2s ease`;
-    toast.innerHTML = `<i class="bx ${icons[type]||icons.error}" style="font-size:18px;flex-shrink:0"></i><span style="flex:1">${message}</span><button onclick="this.parentNode.remove()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:18px;line-height:1;padding:0">&times;</button>`;
+
+    const toast = document.createElement('div');
+    toast.style.cssText = [
+        `background:${colors[type] || colors.error}`,
+        'color:#fff',
+        'padding:13px 16px',
+        'border-radius:12px',
+        'display:flex',
+        'align-items:center',
+        'gap:10px',
+        'font-size:14px',
+        'line-height:1.4',
+        'box-shadow:0 6px 24px rgba(0,0,0,0.18)',
+        'animation:toastSlideIn 0.25s ease forwards',
+        'pointer-events:auto',       // toast nhận click
+        'min-width:260px',
+    ].join(';');
+
+    const closeBtn = `
+        <button
+            onclick="(function(el){
+                el.style.animation='toastSlideOut 0.2s ease forwards';
+                setTimeout(()=>el.remove(),200);
+            })(this.parentNode)"
+            title="Đóng"
+            style="background:rgba(255,255,255,0.25);border:none;color:#fff;
+                   cursor:pointer;font-size:16px;line-height:1;padding:2px 6px;
+                   border-radius:6px;flex-shrink:0;transition:background 0.15s"
+            onmouseover="this.style.background='rgba(255,255,255,0.4)'"
+            onmouseout="this.style.background='rgba(255,255,255,0.25)'"
+        >&times;</button>`;
+
+    toast.innerHTML = `
+        <i class="bx ${icons[type] || icons.error}" style="font-size:20px;flex-shrink:0"></i>
+        <span style="flex:1">${message}</span>
+        ${closeBtn}
+    `;
+
     container.appendChild(toast);
-    setTimeout(() => toast.remove(), 5000);
+
+    // Tự đóng sau 5 giây với animation
+    setTimeout(() => {
+        if (!toast.isConnected) return;
+        toast.style.animation = 'toastSlideOut 0.2s ease forwards';
+        setTimeout(() => toast.remove(), 200);
+    }, 5000);
 }
 
 // ─── Exports ───
