@@ -1060,6 +1060,8 @@ if (typeof module !== 'undefined' && module.exports) {
     /* Khi scroll-top hien, day chat-fab len tren */
     #chat-fab.shifted { bottom: 80px; }
     #chat-fab:hover { background: #4A8C5C; transform: scale(1.08); }
+    /* Chat panel cũng đẩy lên theo khi scroll-top xuất hiện */
+    #chat-panel.shifted { bottom: 136px; }
 
     #chat-panel {
         position: fixed;
@@ -1174,6 +1176,7 @@ if (typeof module !== 'undefined' && module.exports) {
         }
         #chat-fab { bottom: 16px; right: 10px; }
         #chat-fab.shifted { bottom: 72px; }
+        #chat-panel.shifted { bottom: 128px; }
     }
     </style>
 
@@ -1382,6 +1385,7 @@ if (typeof module !== 'undefined' && module.exports) {
             const scrollVisible = window.scrollY > 400;
             document.getElementById('scroll-top-btn').classList.toggle('visible', scrollVisible);
             document.getElementById('chat-fab').classList.toggle('shifted', scrollVisible);
+            document.getElementById('chat-panel').classList.toggle('shifted', scrollVisible);
         });
 
         // ── Hamburger Menu ──
