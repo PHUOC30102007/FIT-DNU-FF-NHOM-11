@@ -138,7 +138,54 @@ function logout() {
     });
 })();
 
-// ─── AUTH GUARD (bảo vệ trang cần đăng nhập) ────────────────
+// ─── ĐỒNG BỘ ĐĂNG NHẬP GIỮA CÁC TAB ───────────────────────
+// Event 'storage' chỉ bắn ở tab KHÁC với tab đang ghi
+// → an toàn, không gây vòng lặp reload
+
+(function initCrossTabSync() {
+    if (typeof window === 'undefined') return;
+
+    /**
+     * Snapshot trạng thái đăng nhập của tab hiện tại
+     * tại thời điểm load trang — dùng để so sánh sau
+     */
+    const _snapshotOnLoad = localStorage.getItem(AUTH_KEYS.currentUser) || null;
+
+    window.addEventListener('storage', function onStorageChange(e) {
+        // Chỉ quan tâm đến key 'currentUser' trong localStorage
+        // (sessionStorage không fire storage event cross-tab)
+        if (e.storageArea !== localStorage) return;
+        if (e.key !== AUTH_KEYS.currentUser)  return;
+
+        const prev = e.oldValue;   // giá trị trước khi thay đổi
+        const next = e.newValue;   // giá trị mới (null nếu bị xóa)
+
+        // Không làm gì nếu thực tế không đổi
+        if (prev === next) return;
+
+        if (!next) {
+            // Tab khác đã ĐĂNG XUẤT → về login
+            window.location.replace('login.html');
+        } else if (!prev) {
+            // Tab khác vừa ĐĂNG NHẬP → reload để hiển thị đúng UI
+            window.location.reload();
+        } else {
+            // Tab khác đổi sang USER KHÁC (switch account) → reload
+            try {
+                const prevUser = JSON.parse(prev);
+                const nextUser = JSON.parse(next);
+                // Chỉ reload nếu thực sự đổi user (so sánh id hoặc email)
+                const prevId = prevUser?.id || prevUser?.email;
+                const nextId = nextUser?.id || nextUser?.email;
+                if (prevId !== nextId) {
+                    window.location.reload();
+                }
+            } catch {
+                window.location.reload();
+            }
+        }
+    });
+})();
 
 /**
  * Gọi ở đầu mỗi trang cần bảo vệ (admin, index, public nếu cần).

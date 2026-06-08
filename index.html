@@ -41,19 +41,35 @@
                 <span class="nav-logo-text">WanderViet</span>
             </a>
             <ul class="nav-links">
-                <li><a href="#tours">Tour</a></li>
-                <li><a href="#destinations">Điểm Đến</a></li>
-                <li><a href="#about">Về Chúng Tôi</a></li>
-                <li><a href="#blog">Blog</a></li>
-                <li><a href="#contact">Liên Hệ</a></li>
+                <li><a href="#tours" data-i18n="nav_tour">Tour</a></li>
+                <li><a href="#destinations" data-i18n="nav_destinations">Điểm Đến</a></li>
+                <li><a href="#about" data-i18n="nav_about">Về Chúng Tôi</a></li>
+                <li><a href="#blog" data-i18n="nav_blog">Blog</a></li>
+                <li><a href="#contact" data-i18n="nav_contact">Liên Hệ</a></li>
             </ul>
             <div class="nav-actions">
+                <!-- ── Language Switcher ── -->
+                <div class="lang-switcher" id="lang-switcher">
+                    <button class="lang-btn" id="lang-btn" onclick="toggleLangDropdown()" aria-label="Chọn ngôn ngữ" aria-haspopup="true" aria-expanded="false">
+                        <span id="lang-flag">🇻🇳</span>
+                        <span id="lang-label">VI</span>
+                        <i class='bx bx-chevron-down lang-chevron' id="lang-chevron"></i>
+                    </button>
+                    <div class="lang-dropdown" id="lang-dropdown" role="menu">
+                        <button class="lang-option" data-lang="vi" onclick="setLang('vi')" role="menuitem">
+                            <span>🇻🇳</span> Tiếng Việt
+                        </button>
+                        <button class="lang-option" data-lang="en" onclick="setLang('en')" role="menuitem">
+                            <span>🇬🇧</span> English
+                        </button>
+                    </div>
+                </div>
                 <a href="public.html" class="nav-login" style="display:flex;align-items:center;gap:6px;"><i
                         class='bx bx-trip' style="font-size:16px"></i> TripSync</a>
 
                 <div id="nav-guest">
-                    <a href="login.html" class="nav-login">Đăng nhập</a>
-                    <a href="login.html" class="btn nav-cta">Đăng ký</a>
+                    <a href="login.html" class="nav-login" data-i18n="nav_login">Đăng nhập</a>
+                    <a href="login.html" class="btn nav-cta" data-i18n="nav_register">Đăng ký</a>
                 </div>
 
                 <div id="nav-user" class="nav-user-wrap" style="display:none;">
@@ -150,33 +166,33 @@
                 <div class="hero-badge">
                     <i class='bx bxs-star'></i> #1 Tour Du Lịch Việt Nam 2026
                 </div>
-                <h1 class="hero-title">
+                <h1 class="hero-title" data-i18n="hero_title">
                     Khám Phá<br><span>Việt Nam</span><br>Theo Cách Của Bạn
                 </h1>
-                <p class="hero-desc">
+                <p class="hero-desc" data-i18n="hero_desc">
                     Trải nghiệm những hành trình độc đáo từ vịnh Hạ Long huyền ảo đến phố cổ Hội An thơ mộng. Chúng tôi
                     đồng hành cùng bạn trên từng bước chân.
                 </p>
                 <div class="hero-actions">
-                    <a href="#tours" class="btn btn-accent">
+                    <a href="#tours" class="btn btn-accent" data-i18n="hero_cta_primary">
                         <i class='bx bx-map-alt'></i> Khám Phá Tour
                     </a>
-                    <a href="#about" class="btn btn-outline">
+                    <a href="#about" class="btn btn-outline" data-i18n="hero_cta_secondary">
                         <i class='bx bx-play-circle'></i> Xem Video
                     </a>
                 </div>
                 <div class="hero-stats">
                     <div class="hero-stat">
                         <div class="hero-stat-num">500+</div>
-                        <div class="hero-stat-label">Tour độc quyền</div>
+                        <div class="hero-stat-label" data-i18n="stat_tours">Tour độc quyền</div>
                     </div>
                     <div class="hero-stat">
                         <div class="hero-stat-num">50K+</div>
-                        <div class="hero-stat-label">Khách hài lòng</div>
+                        <div class="hero-stat-label" data-i18n="stat_customers">Khách hài lòng</div>
                     </div>
                     <div class="hero-stat">
                         <div class="hero-stat-num">63</div>
-                        <div class="hero-stat-label">Tỉnh thành</div>
+                        <div class="hero-stat-label" data-i18n="stat_provinces">Tỉnh thành</div>
                     </div>
                 </div>
             </div>
@@ -187,53 +203,62 @@
 
                     <div class="hero-img-card"
                         style="margin-top:0!important; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                        <img loading="lazy" src="media/HoiAn.jpg" alt="Hội An"
+                        <img
+                            loading="lazy"
+                            fetchpriority="high"
+                            src="media/HoiAn.jpg"
+                            alt="Hội An — Phố Cổ"
+                            width="400" height="160"
                             style="display:block;width:100%;height:160px;object-fit:cover;">
                         <div class="hero-img-info"
                             style="padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; background: #fff;">
                             <span style="font-weight: 600; color: #1A1A2E; font-size: 14px;">Hội An</span>
-                            <span class="rating"
-                                style="color: #E8A838; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 2px;"><i
-                                    class='bx bxs-star'></i> 4.9</span>
+                            <span class="rating" style="color: #E8A838; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 2px;"><i class='bx bxs-star'></i> 4.9</span>
                         </div>
                     </div>
 
                     <div class="hero-img-card"
                         style="margin-top:0!important; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                        <img loading="lazy" src="media/VinhHaLong.jpg" alt="Hạ Long"
+                        <img
+                            loading="lazy"
+                            src="media/VinhHaLong.jpg"
+                            alt="Vịnh Hạ Long"
+                            width="400" height="160"
                             style="display:block;width:100%;height:160px;object-fit:cover;">
                         <div class="hero-img-info"
                             style="padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; background: #fff;">
                             <span style="font-weight: 600; color: #1A1A2E; font-size: 14px;">Hạ Long</span>
-                            <span class="rating"
-                                style="color: #E8A838; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 2px;"><i
-                                    class='bx bxs-star'></i> 4.8</span>
+                            <span class="rating" style="color: #E8A838; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 2px;"><i class='bx bxs-star'></i> 4.8</span>
                         </div>
                     </div>
 
                     <div class="hero-img-card"
                         style="margin-top:0!important; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                        <img loading="lazy" src="media/SaPa.jpg" alt="Sapa"
+                        <img
+                            loading="lazy"
+                            src="media/SaPa.jpg"
+                            alt="Sapa — Vùng Cao Tây Bắc"
+                            width="400" height="160"
                             style="display:block;width:100%;height:160px;object-fit:cover;">
                         <div class="hero-img-info"
                             style="padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; background: #fff;">
                             <span style="font-weight: 600; color: #1A1A2E; font-size: 14px;">Sapa</span>
-                            <span class="rating"
-                                style="color: #E8A838; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 2px;"><i
-                                    class='bx bxs-star'></i> 4.7</span>
+                            <span class="rating" style="color: #E8A838; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 2px;"><i class='bx bxs-star'></i> 4.7</span>
                         </div>
                     </div>
 
                     <div class="hero-img-card"
                         style="margin-top:0!important; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                        <img loading="lazy" src="media/DaLat.png" alt="Đà Lạt"
+                        <img
+                            loading="lazy"
+                            src="media/DaLat.png"
+                            alt="Đà Lạt — Thành Phố Ngàn Hoa"
+                            width="400" height="160"
                             style="display:block;width:100%;height:160px;object-fit:cover;">
                         <div class="hero-img-info"
                             style="padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; background: #fff;">
                             <span style="font-weight: 600; color: #1A1A2E; font-size: 14px;">Đà Lạt</span>
-                            <span class="rating"
-                                style="color: #E8A838; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 2px;"><i
-                                    class='bx bxs-star'></i> 4.8</span>
+                            <span class="rating" style="color: #E8A838; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 2px;"><i class='bx bxs-star'></i> 4.8</span>
                         </div>
                     </div>
 
@@ -256,38 +281,38 @@
             <div class="search-wrapper">
 
                 <div class="search-field">
-                    <label>Điểm Đến</label>
-                    <input type="text" placeholder="Hội An, Hạ Long, Sapa...">
+                    <label data-i18n="search_dest">Điểm Đến</label>
+                    <input type="text" data-i18n="search_dest_ph" placeholder="Hội An, Hạ Long, Sapa...">
                 </div>
 
                 <div class="search-divider"></div>
 
                 <div class="search-field">
-                    <label>Ngày Đi</label>
+                    <label data-i18n="search_date">Ngày Đi</label>
                     <input type="date">
                 </div>
 
                 <div class="search-divider"></div>
 
                 <div class="search-field">
-                    <label>Loại Tour</label>
-                    <select>
-                        <option value="Tất cả tour">Tất cả tour</option>
-                        <option value="Biển & Đảo">Biển & Đảo</option>
-                        <option value="Núi & Cao Nguyên">Núi & Cao Nguyên</option>
-                        <option value="Phố Cổ">Phố Cổ</option>
-                        <option value="Miền Tây">Miền Tây</option>
+                    <label data-i18n="search_type">Loại Tour</label>
+                    <select id="search-type-select">
+                        <option value="all"      data-i18n="tour_all">Tất cả tour</option>
+                        <option value="beach"    data-i18n="tour_beach">Biển & Đảo</option>
+                        <option value="mountain" data-i18n="tour_mountain">Núi & Cao Nguyên</option>
+                        <option value="oldtown"  data-i18n="tour_oldtown">Phố Cổ</option>
+                        <option value="mekong"   data-i18n="tour_mekong">Miền Tây</option>
                     </select>
                 </div>
 
                 <div class="search-divider"></div>
 
                 <div class="search-field">
-                    <label>Số Người</label>
+                    <label data-i18n="search_people">Số Người</label>
                     <input type="number" min="1" value="2">
                 </div>
 
-                <button class="search-btn" aria-label="Tìm kiếm">
+                <button class="search-btn" data-i18n-aria="search_btn" aria-label="Tìm kiếm">
                     <i class='bx bx-search-alt-2'></i>
                 </button>
 
@@ -893,17 +918,13 @@ if (typeof module !== 'undefined' && module.exports) {
 
     <footer class="footer" id="contact">
         <div class="container">
-            <div class="footer-grid">
+            <div class="footer-grid" style="grid-template-columns: 2fr 1fr;">
                 <div class="footer-brand">
                     <a href="index.html" class="nav-logo" style="margin-bottom: 0;">
-                        <div class="nav-logo-icon">
-                            <i class='bx bx-trip'></i>
-                        </div>
-                        <span
-                            style="font-family: 'Playfair Display', serif; font-weight: 700; font-size: 20px; color: white;">WanderViet</span>
+                        <div class="nav-logo-icon"><i class='bx bx-trip'></i></div>
+                        <span style="font-family: 'Playfair Display', serif; font-weight: 700; font-size: 20px; color: white;">WanderViet</span>
                     </a>
-                    <p>Khám phá vẻ đẹp Việt Nam cùng những hành trình được thiết kế tỉ mỉ, đầy ắp trải nghiệm và kỷ niệm
-                        đáng nhớ.</p>
+                    <p data-i18n="footer_desc">Khám phá vẻ đẹp Việt Nam cùng những hành trình được thiết kế tỉ mỉ, đầy ắp trải nghiệm và kỷ niệm đáng nhớ.</p>
                     <div class="footer-socials">
                         <a href="#" class="footer-social"><i class='bx bxl-facebook'></i></a>
                         <a href="#" class="footer-social"><i class='bx bxl-instagram'></i></a>
@@ -912,27 +933,7 @@ if (typeof module !== 'undefined' && module.exports) {
                     </div>
                 </div>
                 <div class="footer-col">
-                    <h4>Tour Du Lịch</h4>
-                    <ul>
-                        <li><a href="#">Tour Miền Bắc</a></li>
-                        <li><a href="#">Tour Miền Trung</a></li>
-                        <li><a href="#">Tour Miền Nam</a></li>
-                        <li><a href="#">Tour Nước Ngoài</a></li>
-                        <li><a href="#">Tour Theo Nhóm</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Hỗ Trợ</h4>
-                    <ul>
-                        <li><a href="#">Trung Tâm Hỗ Trợ</a></li>
-                        <li><a href="#">Câu Hỏi Thường Gặp</a></li>
-                        <li><a href="#">Chính Sách Hoàn Tiền</a></li>
-                        <li><a href="#">Hướng Dẫn Đặt Tour</a></li>
-                        <li><a href="#">Liên Hệ Chúng Tôi</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Liên Hệ</h4>
+                    <h4 data-i18n="footer_col3_title">Liên Hệ</h4>
                     <ul>
                         <li><a href="https://maps.google.com/?q=Hà+Đông,+Hà+Nội" target="_blank"><i class='bx bx-map'
                                     style="margin-right:6px"></i>Hà Đông, Hà Nội</a></li>
@@ -949,11 +950,11 @@ if (typeof module !== 'undefined' && module.exports) {
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>© 2024 WanderViet. Tất cả quyền được bảo lưu.</p>
+                <p data-i18n="footer_copy">© 2024 WanderViet. Tất cả quyền được bảo lưu.</p>
                 <div class="footer-bottom-links">
-                    <a href="#">Chính sách bảo mật</a>
-                    <a href="#">Điều khoản dịch vụ</a>
-                    <a href="#">Cookie</a>
+                    <a href="#" data-i18n="footer_privacy">Chính sách bảo mật</a>
+                    <a href="#" data-i18n="footer_terms">Điều khoản dịch vụ</a>
+                    <a href="#" data-i18n="footer_cookie">Cookie</a>
                 </div>
             </div>
         </div>
@@ -964,20 +965,28 @@ if (typeof module !== 'undefined' && module.exports) {
     <div class="modal-overlay" id="modal-booking">
         <div class="modal-box modal-box--sticky-footer">
             <div class="modal-box__header">
-                <h3>Đặt Tour Ngay</h3>
-                <p>Điền thông tin để chúng tôi liên hệ tư vấn miễn phí cho bạn</p>
+                <h3 data-i18n="booking_title">Đặt Tour Ngay</h3>
+                <p data-i18n="booking_subtitle">Điền thông tin để chúng tôi liên hệ tư vấn miễn phí cho bạn</p>
             </div>
             <div class="modal-box__body">
-                <div class="form-group"><label>Họ và tên</label><input type="text" id="book-name" placeholder="Nguyễn Văn A"></div>
-                <div class="form-group"><label>Số điện thoại</label><input type="tel" id="book-phone" placeholder="0912 345 678"></div>
-                <div class="form-group"><label>Email</label><input type="email" id="book-email" placeholder="email@example.com"></div>
-                <div class="form-group"><label>Tour quan tâm</label><input type="text" id="book-tour" placeholder="Tên tour..."></div>
-                <div class="form-group"><label>Ngày khởi hành dự kiến</label><input type="date" id="book-date"></div>
-                <div class="form-group"><label>Ghi chú</label><textarea id="book-note" placeholder="Yêu cầu đặc biệt, số người..."></textarea></div>
+                <div class="form-group"><label data-i18n="booking_name">Họ và tên</label><input type="text" id="book-name" placeholder="Nguyễn Văn A"></div>
+                <div class="form-group" id="book-phone-group">
+                    <label>Số điện thoại <span style="color:#DC2626;font-size:11px;font-weight:500;margin-left:4px;">*</span></label>
+                    <input type="tel" id="book-phone" placeholder="0912 345 678 hoặc +84912 345 678"
+                        oninput="validatePhoneRealtime(this)"
+                        autocomplete="tel" maxlength="15">
+                    <span id="book-phone-hint" style="display:none;font-size:12px;margin-top:4px;color:#DC2626;">
+                        <i class='bx bx-error-circle'></i> <span data-i18n="booking_phone_err">Số điện thoại không đúng định dạng Việt Nam</span>
+                    </span>
+                </div>
+                <div class="form-group"><label data-i18n="booking_email">Email</label><input type="email" id="book-email" placeholder="email@example.com"></div>
+                <div class="form-group"><label data-i18n="booking_tour">Tour quan tâm</label><input type="text" id="book-tour" data-i18n-ph="booking_tour_ph" placeholder="Tên tour..."></div>
+                <div class="form-group"><label data-i18n="booking_date">Ngày khởi hành dự kiến</label><input type="date" id="book-date"></div>
+                <div class="form-group"><label data-i18n="booking_note">Ghi chú</label><textarea id="book-note" data-i18n-ph="booking_note_ph" placeholder="Yêu cầu đặc biệt, số người..."></textarea></div>
             </div>
             <div class="modal-footer modal-box__footer">
-                <button class="btn-cancel" onclick="closeModal('booking')">Huỷ</button>
-                <button class="btn-confirm" onclick="submitBooking()"><i class='bx bx-send'></i> Gữi yêu cầu</button>
+                <button class="btn-cancel" onclick="closeModal('booking')" data-i18n="booking_cancel">Huỷ</button>
+                <button class="btn-confirm" onclick="submitBooking()"><i class='bx bx-send'></i> <span data-i18n="booking_submit">Gửi yêu cầu</span></button>
             </div>
         </div>
     </div>
@@ -1812,6 +1821,103 @@ if (typeof module !== 'undefined' && module.exports) {
             background: #FEF2F2 !important;
         }
 
+        /* ── Language Switcher ── */
+        .lang-switcher {
+            position: relative;
+        }
+
+        .lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            border-radius: 100px;
+            padding: 5px 10px 5px 8px;
+            cursor: pointer;
+            color: var(--white);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            letter-spacing: 0.3px;
+        }
+
+        .navbar.scrolled .lang-btn {
+            background: var(--primary-pale);
+            border-color: rgba(45, 90, 61, 0.2);
+            color: var(--dark);
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .navbar.scrolled .lang-btn:hover {
+            background: #d8ead2;
+        }
+
+        .lang-chevron {
+            font-size: 16px;
+            transition: transform 0.25s;
+        }
+
+        .lang-chevron.open {
+            transform: rotate(180deg);
+        }
+
+        .lang-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 160px;
+            background: var(--white);
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.13);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-8px) scale(0.97);
+            transform-origin: top right;
+            transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 2001;
+        }
+
+        .lang-dropdown.open {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0) scale(1);
+        }
+
+        .lang-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 14px;
+            border: none;
+            background: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .lang-option:hover {
+            background: var(--primary-pale);
+            color: var(--primary);
+        }
+
+        .lang-option.active {
+            background: var(--primary-pale);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
         .mobile-user-info {
             display: flex;
             align-items: center;
@@ -2166,6 +2272,311 @@ if (typeof module !== 'undefined' && module.exports) {
             if (e.target === this) closeAuthModal();
         });
     window.showLoginPrompt = showLoginPrompt;
+    </script>
+
+    <!-- ══════════════════════════════════════════
+         i18n — Đa ngôn ngữ (Phần 1)
+         Cấu trúc: LANG[langCode][key] = string
+         Mở rộng: thêm key vào 2 object là xong
+    ══════════════════════════════════════════ -->
+    <script>
+    const LANG_KEY = 'wv_lang';  // localStorage key
+
+    // ── Language object ───────────────────────────────────────────
+    const LANG = {
+        vi: {
+            // Meta
+            _flag:  '🇻🇳',
+            _label: 'VI',
+            _name:  'Tiếng Việt',
+
+            // Navbar
+            nav_tour:         'Tour',
+            nav_destinations: 'Điểm Đến',
+            nav_about:        'Về Chúng Tôi',
+            nav_blog:         'Blog',
+            nav_contact:      'Liên Hệ',
+            nav_login:        'Đăng nhập',
+            nav_register:     'Đăng ký',
+            nav_my_trips:     'Chuyến đi của tôi',
+            nav_profile:      'Hồ sơ cá nhân',
+            nav_settings:     'Cài đặt',
+            nav_logout:       'Đăng xuất',
+
+            // Hero
+            hero_title:         'Khám Phá<br><span>Việt Nam</span><br>Theo Cách Của Bạn',
+            hero_desc:          'Trải nghiệm những hành trình độc đáo từ vịnh Hạ Long huyền ảo đến phố cổ Hội An thơ mộng. Chúng tôi đồng hành cùng bạn trên từng bước chân.',
+            hero_cta_primary:   '<i class="bx bx-map-alt"></i> Khám Phá Tour',
+            hero_cta_secondary: '<i class="bx bx-play-circle"></i> Xem Video',
+
+            // Hero stats
+            stat_tours:     'Tour độc quyền',
+            stat_customers: 'Khách hài lòng',
+            stat_provinces: 'Tỉnh thành',
+
+            // Search
+            search_dest:    'Điểm Đến',
+            search_dest_ph: 'Hội An, Hạ Long, Sapa...',
+            search_date:    'Ngày Đi',
+            search_type:    'Loại Tour',
+            search_people:  'Số Người',
+            search_btn:     'Tìm kiếm',
+
+            // Tour type options
+            tour_all:      'Tất cả tour',
+            tour_beach:    'Biển & Đảo',
+            tour_mountain: 'Núi & Cao Nguyên',
+            tour_oldtown:  'Phố Cổ',
+            tour_mekong:   'Miền Tây',
+
+            // Section headings
+            sec_featured:     'Tour Nổi Bật',
+            sec_destinations: 'Điểm Đến Phổ Biến',
+            sec_why:          'Tại Sao Chọn WanderViet?',
+            sec_blog:         'Blog Du Lịch',
+            sec_contact:      'Liên Hệ Với Chúng Tôi',
+
+            // Booking modal
+            booking_title:    'Đặt Tour Ngay',
+            booking_subtitle: 'Điền thông tin để chúng tôi liên hệ tư vấn miễn phí cho bạn',
+            booking_name:     'Họ và tên',
+            booking_phone:    'Số điện thoại',
+            booking_phone_err:'Số điện thoại không đúng định dạng Việt Nam',
+            booking_email:    'Email',
+            booking_tour:     'Tour quan tâm',
+            booking_tour_ph:  'Tên tour...',
+            booking_date:     'Ngày khởi hành dự kiến',
+            booking_note:     'Ghi chú',
+            booking_note_ph:  'Yêu cầu đặc biệt, số người...',
+            booking_submit:   'Gửi yêu cầu',
+            booking_cancel:   'Huỷ',
+
+            // Toast / feedback
+            toast_feature_wip: 'Tính năng đang phát triển!',
+            toast_logout_ok:   'Đã đăng xuất thành công!',
+
+            // Auth modal
+            auth_title:  'Cần đăng nhập',
+            auth_desc:   'Bạn cần đăng nhập để sử dụng tính năng này. Đăng nhập ngay để tiếp tục.',
+            auth_later:  'Để sau',
+            auth_login:  'Đăng nhập',
+
+            // Footer
+            footer_desc:       'Khám phá vẻ đẹp Việt Nam cùng những hành trình được thiết kế tỉ mỉ, đầy ắp trải nghiệm và kỷ niệm đáng nhớ.',
+            footer_col3_title: 'Liên Hệ',
+            footer_copy:       '© 2024 WanderViet. Tất cả quyền được bảo lưu.',
+            footer_privacy:    'Chính sách bảo mật',
+            footer_terms:      'Điều khoản dịch vụ',
+            footer_cookie:     'Cookie',
+        },
+
+        en: {
+            // Meta
+            _flag:  '🇬🇧',
+            _label: 'EN',
+            _name:  'English',
+
+            // Navbar
+            nav_tour:         'Tours',
+            nav_destinations: 'Destinations',
+            nav_about:        'About Us',
+            nav_blog:         'Blog',
+            nav_contact:      'Contact',
+            nav_login:        'Log in',
+            nav_register:     'Sign up',
+            nav_my_trips:     'My Trips',
+            nav_profile:      'Profile',
+            nav_settings:     'Settings',
+            nav_logout:       'Log out',
+
+            // Hero
+            hero_title:         'Discover<br><span>Vietnam</span><br>Your Way',
+            hero_desc:          'Experience unique journeys from the mystic Ha Long Bay to the poetic ancient town of Hoi An. We accompany you every step of the way.',
+            hero_cta_primary:   '<i class="bx bx-map-alt"></i> Explore Tours',
+            hero_cta_secondary: '<i class="bx bx-play-circle"></i> Watch Video',
+
+            // Hero stats
+            stat_tours:     'Exclusive tours',
+            stat_customers: 'Happy guests',
+            stat_provinces: 'Provinces',
+
+            // Search
+            search_dest:    'Destination',
+            search_dest_ph: 'Hoi An, Ha Long, Sapa...',
+            search_date:    'Departure',
+            search_type:    'Tour Type',
+            search_people:  'Travelers',
+            search_btn:     'Search',
+
+            // Tour type options
+            tour_all:      'All tours',
+            tour_beach:    'Beach & Islands',
+            tour_mountain: 'Mountains & Highlands',
+            tour_oldtown:  'Old Town',
+            tour_mekong:   'Mekong Delta',
+
+            // Section headings
+            sec_featured:     'Featured Tours',
+            sec_destinations: 'Popular Destinations',
+            sec_why:          'Why Choose WanderViet?',
+            sec_blog:         'Travel Blog',
+            sec_contact:      'Get In Touch',
+
+            // Booking modal
+            booking_title:    'Book a Tour',
+            booking_subtitle: 'Fill in your details and we\'ll contact you for a free consultation',
+            booking_name:     'Full name',
+            booking_phone:    'Phone number',
+            booking_phone_err:'Invalid Vietnamese phone number format',
+            booking_email:    'Email',
+            booking_tour:     'Tour of interest',
+            booking_tour_ph:  'Tour name...',
+            booking_date:     'Expected departure date',
+            booking_note:     'Notes',
+            booking_note_ph:  'Special requests, number of people...',
+            booking_submit:   'Send request',
+            booking_cancel:   'Cancel',
+
+            // Toast / feedback
+            toast_feature_wip: 'Feature coming soon!',
+            toast_logout_ok:   'Logged out successfully!',
+
+            // Auth modal
+            auth_title:  'Login required',
+            auth_desc:   'You need to log in to use this feature. Log in now to continue.',
+            auth_later:  'Later',
+            auth_login:  'Log in',
+
+            // Footer
+            footer_desc:       'Discover the beauty of Vietnam with meticulously crafted journeys, full of experiences and unforgettable memories.',
+            footer_col3_title: 'Contact',
+            footer_copy:       '© 2024 WanderViet. All rights reserved.',
+            footer_privacy:    'Privacy Policy',
+            footer_terms:      'Terms of Service',
+            footer_cookie:     'Cookie',
+        }
+    };
+
+    // ── Helpers ───────────────────────────────────────────────────
+    let _currentLang = localStorage.getItem(LANG_KEY) || 'vi';
+
+    /** Lấy chuỗi dịch theo key, fallback về key nếu thiếu */
+    function t(key) {
+        return (LANG[_currentLang] && LANG[_currentLang][key]) || key;
+    }
+
+    /** Áp dụng ngôn ngữ lên toàn bộ DOM */
+    function applyLang(lang) {
+        const dict = LANG[lang];
+        if (!dict) return;
+
+        document.documentElement.lang = lang === 'vi' ? 'vi' : 'en';
+
+        // 1. data-i18n — text thường và innerHTML (cho hero buttons có icon)
+        const HTML_KEYS = new Set([
+            'hero_title', 'hero_cta_primary', 'hero_cta_secondary'
+        ]);
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            const val = dict[key];
+            if (val === undefined) return;
+
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.placeholder = val;
+            } else if (HTML_KEYS.has(key)) {
+                el.innerHTML = val;       // cho phép <br>, <span>, <i>
+            } else {
+                el.textContent = val;
+            }
+        });
+
+        // 2. data-i18n-ph — placeholder riêng (input/textarea không dùng data-i18n cho cả label)
+        document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+            const key = el.getAttribute('data-i18n-ph');
+            const val = dict[key];
+            if (val !== undefined) el.placeholder = val;
+        });
+
+        // 3. data-i18n-aria — aria-label
+        document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+            const key = el.getAttribute('data-i18n-aria');
+            const val = dict[key];
+            if (val !== undefined) el.setAttribute('aria-label', val);
+        });
+
+        // 4. <option data-i18n> — select options
+        document.querySelectorAll('option[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            const val = dict[key];
+            if (val !== undefined) el.textContent = val;
+        });
+
+        // 5. Cập nhật lang-btn (flag + label)
+        const flagEl  = document.getElementById('lang-flag');
+        const labelEl = document.getElementById('lang-label');
+        if (flagEl)  flagEl.textContent  = dict._flag;
+        if (labelEl) labelEl.textContent = dict._label;
+
+        // 6. Đánh dấu option active trong dropdown
+        document.querySelectorAll('.lang-option').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+    }
+
+    /** Chọn ngôn ngữ — lưu localStorage + áp dụng + đóng dropdown */
+    function setLang(lang) {
+        if (!LANG[lang]) return;
+        _currentLang = lang;
+        localStorage.setItem(LANG_KEY, lang);
+        applyLang(lang);
+        closeLangDropdown();
+        showToast(
+            lang === 'vi' ? '🇻🇳 Đã chuyển sang Tiếng Việt' : '🇬🇧 Switched to English',
+            'success'
+        );
+    }
+
+    // ── Dropdown toggle ───────────────────────────────────────────
+    function toggleLangDropdown() {
+        const dropdown = document.getElementById('lang-dropdown');
+        const chevron  = document.getElementById('lang-chevron');
+        const btn      = document.getElementById('lang-btn');
+        const isOpen   = dropdown.classList.contains('open');
+        if (isOpen) {
+            closeLangDropdown();
+        } else {
+            dropdown.classList.add('open');
+            chevron.classList.add('open');
+            btn.setAttribute('aria-expanded', 'true');
+        }
+    }
+
+    function closeLangDropdown() {
+        const dropdown = document.getElementById('lang-dropdown');
+        const chevron  = document.getElementById('lang-chevron');
+        const btn      = document.getElementById('lang-btn');
+        dropdown.classList.remove('open');
+        chevron.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+    }
+
+    // Đóng khi click ra ngoài
+    document.addEventListener('click', function(e) {
+        const switcher = document.getElementById('lang-switcher');
+        if (switcher && !switcher.contains(e.target)) closeLangDropdown();
+    });
+
+    // ── Init ──────────────────────────────────────────────────────
+    function initI18n() {
+        applyLang(_currentLang);
+    }
+
+    // Chạy ngay sau khi DOM sẵn sàng
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initI18n);
+    } else {
+        initI18n();
+    }
     </script>
 </body>
 
