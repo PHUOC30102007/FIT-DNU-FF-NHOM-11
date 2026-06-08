@@ -1049,7 +1049,6 @@ if (typeof module !== 'undefined' && module.exports) {
     <style>
     #chat-fab {
         position: fixed; bottom: 24px; right: 24px;
-        --chat-right: 24px;   /* dùng để chat-panel căn theo */
         width: 44px; height: 44px; border-radius: 50%;
         background: var(--primary, #2D5A3D); border: none; color: #fff;
         font-size: 22px; cursor: pointer;
@@ -1059,15 +1058,17 @@ if (typeof module !== 'undefined' && module.exports) {
         transition: bottom 0.3s ease, transform 0.2s, background 0.2s;
     }
     /* Khi scroll-top hien, day chat-fab len tren */
+    /* scroll-top btn cao 44px + bottom 16px = chiếm 60px → fab lên 60+16=76 → dùng 80 cho thoáng */
     #chat-fab.shifted { bottom: 80px; }
     #chat-fab:hover { background: #4A8C5C; transform: scale(1.08); }
-    /* Chat panel cũng đẩy lên theo khi scroll-top xuất hiện */
-    #chat-panel.shifted { bottom: 136px; }
 
+    /* panel bottom = fab bottom + fab height(44) + gap(8) */
+    /* desktop normal : 24 + 44 + 8 = 76  → dùng 76px  */
+    /* desktop shifted: 80 + 44 + 8 = 132 → dùng 132px */
     #chat-panel {
         position: fixed;
-        bottom: 80px;
-        right: 24px;          /* desktop: khớp với #chat-fab right */
+        bottom: 76px;
+        right: 24px;
         width: 300px;
         max-height: calc(100vh - 160px);
         height: min(380px, calc(100vh - 160px));
@@ -1076,12 +1077,13 @@ if (typeof module !== 'undefined' && module.exports) {
         box-shadow: 0 12px 48px rgba(0,0,0,0.18);
         display: none;
         flex-direction: column;
-        /* Thap hon navbar (1000) va mobile-menu (1100) */
         z-index: 990;
         overflow: hidden;
         animation: chatPop 0.25s cubic-bezier(0.34,1.56,0.64,1);
     }
     #chat-panel.open { display: flex; }
+    #chat-panel.shifted { bottom: 132px; }   /* 80 + 44 + 8 */
+
     @keyframes chatPop {
         from { opacity:0; transform:scale(0.88) translateY(16px); }
         to   { opacity:1; transform:scale(1) translateY(0); }
@@ -1168,16 +1170,18 @@ if (typeof module !== 'undefined' && module.exports) {
     #chat-send:hover { background:#4A8C5C; }
     #chat-send:disabled { background:#aaa; cursor:not-allowed; }
     @media(max-width:480px) {
-        #chat-fab { bottom: 16px; right: 10px; }
-        #chat-fab.shifted { bottom: 72px; }
-        #chat-panel.shifted { bottom: 128px; }
+        /* fab: bottom 16px, height 44px → panel bottom = 16+44+8 = 68px */
+        #chat-fab         { bottom: 16px; right: 16px; }
+        #chat-fab.shifted { bottom: 72px; }          /* scroll-top chiếm ~56px */
+
         #chat-panel {
-            width: calc(100vw - 20px);
-            right: 10px;      /* khớp với #chat-fab right mobile */
+            width: calc(100vw - 32px);
+            right: 16px;                             /* căn theo fab */
             height: min(340px, calc(100vh - 150px));
             max-height: calc(100vh - 150px);
-            bottom: 76px;
+            bottom: 68px;                            /* 16 + 44 + 8 */
         }
+        #chat-panel.shifted { bottom: 124px; }       /* 72 + 44 + 8 */
     }
     </style>
 
