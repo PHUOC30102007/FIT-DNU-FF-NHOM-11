@@ -1050,11 +1050,13 @@ if (typeof module !== 'undefined' && module.exports) {
     #chat-fab {
         position: fixed; bottom: 24px; right: 24px;
         width: 44px; height: 44px; border-radius: 50%;
-        background: var(--primary, #2D5A3D); border: none; color: #fff;
+        background: #2D5A3D; border: none; color: #fff;
         font-size: 22px; cursor: pointer;
         display: flex; align-items: center; justify-content: center;
         box-shadow: 0 4px 16px rgba(45,90,61,0.4);
-        z-index: 989;
+        /* Cao hơn navbar(1000), mobile-menu(1100), hero overflow */
+        z-index: 1200;
+        pointer-events: auto;   /* đảm bảo nhận click dù hero có overflow:hidden */
         transition: bottom 0.3s ease, transform 0.2s, background 0.2s;
     }
     /* Khi scroll-top hien, day chat-fab len tren */
@@ -1077,7 +1079,8 @@ if (typeof module !== 'undefined' && module.exports) {
         box-shadow: 0 12px 48px rgba(0,0,0,0.18);
         display: none;
         flex-direction: column;
-        z-index: 990;
+        /* Cao hơn navbar(1000), dưới modal(3000) */
+        z-index: 1150;
         overflow: hidden;
         animation: chatPop 0.25s cubic-bezier(0.34,1.56,0.64,1);
     }
