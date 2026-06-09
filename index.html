@@ -11,6 +11,12 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
     <link rel="stylesheet" href="css/app.css">
+    <style>
+        /* Chặn horizontal scroll — fix fixed buttons bị đẩy ra ngoài mobile */
+        html { overflow-x: hidden; }
+        html, body { max-width: 100%; }
+        *, *::before, *::after { box-sizing: border-box; }
+    </style>
     <script>
         // Chạy sớm nhất có thể (trước khi render DOM) để tránh flash chữ "Đăng nhập"
         (function() {
