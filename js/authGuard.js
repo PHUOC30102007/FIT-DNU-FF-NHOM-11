@@ -245,8 +245,22 @@ function renderUserUI(user) {
             case 'initials': el.textContent = initials; break;
             case 'avatar':
                 if (el.tagName === 'IMG') {
-                    el.src = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=2D5A3D&color=fff`;
-                    el.alt = user.name || 'Avatar';
+                    if (user.avatar) {
+                        el.src = user.avatar;
+                        el.alt = user.name || 'Avatar';
+                        el.style.display = '';
+                    } else {
+                        // Tài khoản thường — hiện icon user thay vì ảnh
+                        el.style.display = 'none';
+                        const iconEl = el.parentElement.querySelector('.avatar-icon-fallback');
+                        if (!iconEl) {
+                            const icon = document.createElement('div');
+                            icon.className = 'avatar-icon-fallback';
+                            icon.style.cssText = 'width:36px;height:36px;border-radius:50%;background:var(--primary,#2D5A3D);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0;';
+                            icon.innerHTML = "<i class='bx bx-user'></i>";
+                            el.parentElement.insertBefore(icon, el);
+                        }
+                    }
                 } else {
                     el.textContent = initials;
                 }

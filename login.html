@@ -130,7 +130,6 @@
         .btn-social:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-pale); }
         .btn-social i { font-size: 20px; }
         .btn-social.google:hover { border-color: #EA4335; color: #EA4335; background: #FFF5F5; }
-        .btn-social.facebook:hover { border-color: #1877F2; color: #1877F2; background: #EFF6FF; }
 
         .auth-footer { text-align: center; margin-top: 24px; font-size: 14px; color: var(--text-muted); }
         .auth-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
@@ -245,12 +244,12 @@
             </div>
 
             <div class="form-group">
-                <label for="login-email">Email</label>
+                <label for="login-username">Tên đăng nhập</label>
                 <div class="input-wrap">
-                    <input type="email" id="login-email" placeholder="email@example.com" autocomplete="email">
-                    <i class='bx bxs-envelope field-icon'></i>
+                    <input type="text" id="login-username" placeholder="Nhập tên đăng nhập" autocomplete="username">
+                    <i class='bx bxs-user field-icon'></i>
                 </div>
-                <div class="field-error" id="err-login-email"><i class='bx bx-error-circle'></i><span></span></div>
+                <div class="field-error" id="err-login-username"><i class='bx bx-error-circle'></i><span></span></div>
             </div>
 
             <div class="form-group">
@@ -267,7 +266,6 @@
                 <label class="remember-me">
                     <input type="checkbox" id="login-remember"> Ghi nhớ đăng nhập
                 </label>
-                <a href="#" class="forgot-link">Quên mật khẩu?</a>
             </div>
 
             <button class="btn-submit" id="btn-login" onclick="handleLogin()">
@@ -292,13 +290,10 @@
             <span class="google-disconnect" id="google-disconnect" style="display:none" onclick="disconnectGoogle()">Dùng tài khoản khác</span>
 
             <div class="social-btns" id="social-btns-login">
-                <button class="btn-social google" id="btn-google-login" onclick="handleGoogleLogin()">
+                <button class="btn-social google" id="btn-google-login" onclick="handleGoogleLogin()" style="width:100%">
                     <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                    <span>Google</span>
+                    <span>Đăng nhập với Google</span>
                     <div class="google-spinner"></div>
-                </button>
-                <button class="btn-social facebook">
-                    <i class='bx bxl-facebook'></i> Facebook
                 </button>
             </div>
 
@@ -307,19 +302,59 @@
             </div>
         </div>
 
-        <!-- ══════════════ REGISTER — Google Only ══════════════ -->
+        <!-- ══════════════ REGISTER FORM ══════════════ -->
         <div class="form-panel" id="panel-register">
             <div class="auth-heading">
                 <h3>Tạo tài khoản mới ✨</h3>
                 <p>Tham gia cộng đồng 50.000+ du khách WanderViet</p>
             </div>
 
-            <div class="reg-benefits">
-                <div class="reg-benefit-item"><i class='bx bx-check-circle'></i> Đặt tour ngay lập tức</div>
-                <div class="reg-benefit-item"><i class='bx bx-gift'></i> Voucher chào mừng 500K</div>
-                <div class="reg-benefit-item"><i class='bx bx-shield-check'></i> Bảo mật bởi Google</div>
-                <div class="reg-benefit-item"><i class='bx bx-time-five'></i> Chỉ mất 10 giây</div>
+            <div class="form-group">
+                <label for="reg-username">Tên đăng nhập</label>
+                <div class="input-wrap">
+                    <input type="text" id="reg-username" placeholder="Nhập tên đăng nhập" autocomplete="username">
+                    <i class='bx bxs-user field-icon'></i>
+                </div>
+                <div class="field-error" id="err-reg-username"><i class='bx bx-error-circle'></i><span></span></div>
             </div>
+
+            <div class="form-group">
+                <label for="reg-pw">Mật khẩu</label>
+                <div class="input-wrap">
+                    <input type="password" id="reg-pw" placeholder="Tối thiểu 8 ký tự"
+                        autocomplete="new-password" oninput="checkPasswordStrength(this.value)">
+                    <i class='bx bxs-lock-alt field-icon'></i>
+                    <i class='bx bx-hide toggle-pw' onclick="togglePw('reg-pw', this)"></i>
+                </div>
+                <div class="pw-strength" id="pw-strength">
+                    <div class="pw-strength-bar"><div class="pw-strength-fill" id="pw-fill"></div></div>
+                    <div class="pw-strength-text" id="pw-text"></div>
+                </div>
+                <div class="field-error" id="err-reg-pw"><i class='bx bx-error-circle'></i><span></span></div>
+            </div>
+
+            <div class="form-group">
+                <label for="reg-pw2">Xác nhận mật khẩu</label>
+                <div class="input-wrap">
+                    <input type="password" id="reg-pw2" placeholder="Nhập lại mật khẩu" autocomplete="new-password">
+                    <i class='bx bxs-lock field-icon'></i>
+                    <i class='bx bx-hide toggle-pw' onclick="togglePw('reg-pw2', this)"></i>
+                </div>
+                <div class="field-error" id="err-reg-pw2"><i class='bx bx-error-circle'></i><span></span></div>
+            </div>
+
+            <button class="btn-submit" id="btn-register" onclick="handleRegister()">
+                <div class="btn-spinner"></div>
+                <span class="btn-label"><i class='bx bx-user-plus'></i> Tạo tài khoản</span>
+            </button>
+
+            <div class="divider"><span>Hoặc đăng ký với</span></div>
+
+            <button class="btn-google-reg" id="btn-google-reg" onclick="handleGoogleRegister()">
+                <svg width="20" height="20" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                <span id="btn-google-reg-label">Đăng ký với Google</span>
+                <div class="google-spinner" id="reg-google-spinner"></div>
+            </button>
 
             <div class="google-user-card" id="reg-google-user-card">
                 <div id="reg-google-avatar-wrap"></div>
@@ -329,22 +364,10 @@
                 </div>
                 <div class="google-user-badge"><i class='bx bxl-google'></i> Google</div>
             </div>
-
-            <button class="btn-google-reg" id="btn-google-reg" onclick="handleGoogleRegister()">
-                <svg width="20" height="20" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                <span id="btn-google-reg-label">Đăng ký với Google</span>
-                <div class="google-spinner" id="reg-google-spinner"></div>
-            </button>
-
             <button class="btn-google-continue" id="btn-reg-continue" style="display:none" onclick="continueRegisterWithGoogle()">
-                <i class='bx bx-check-circle'></i> Hoàn tất đăng ký
+                <i class='bx bx-check-circle'></i> Hoàn tất đăng ký với Google
             </button>
             <span class="google-disconnect" id="reg-google-disconnect" style="display:none" onclick="disconnectRegGoogle()">Dùng tài khoản khác</span>
-
-            <div class="reg-divider-note">
-                <i class='bx bx-lock-alt'></i>
-                WanderViet không lưu mật khẩu Google của bạn
-            </div>
 
             <div class="auth-footer">
                 Đã có tài khoản? <a href="#" onclick="switchTab('login')">Đăng nhập</a>
@@ -591,53 +614,23 @@ async function apiCreateMember(memberData) {
  */
 function validateRegisterForm() {
     let isValid = true;
+    ['err-reg-username', 'err-reg-pw', 'err-reg-pw2'].forEach(id => clearFieldError(id));
 
-    // Xóa errors cũ
-    ['err-lastname', 'err-firstname', 'err-reg-email', 'err-phone', 'err-reg-pw', 'err-reg-pw2', 'err-terms']
-        .forEach(id => clearFieldError(id));
+    const username = document.getElementById('reg-username').value.trim();
+    const pw       = document.getElementById('reg-pw').value;
+    const pw2      = document.getElementById('reg-pw2').value;
 
-    const lastName  = document.getElementById('reg-lastname').value.trim();
-    const firstName = document.getElementById('reg-firstname').value.trim();
-    const email     = document.getElementById('reg-email').value.trim();
-    const phone     = document.getElementById('reg-phone').value.trim();
-    const pw        = document.getElementById('reg-pw').value;
-    const pw2       = document.getElementById('reg-pw2').value;
-    const terms     = document.getElementById('reg-terms').checked;
-
-    // Họ
-    if (!lastName) {
-        showFieldError('err-lastname', 'Vui lòng nhập họ');
+    if (!username) {
+        showFieldError('err-reg-username', 'Vui lòng nhập tên đăng nhập');
         isValid = false;
-    } else if (lastName.length < 2) {
-        showFieldError('err-lastname', 'Họ phải có ít nhất 2 ký tự');
+    } else if (username.length < 3) {
+        showFieldError('err-reg-username', 'Tên đăng nhập phải có ít nhất 3 ký tự');
+        isValid = false;
+    } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        showFieldError('err-reg-username', 'Chỉ dùng chữ cái, số và dấu gạch dưới (_)');
         isValid = false;
     }
 
-    // Tên
-    if (!firstName) {
-        showFieldError('err-firstname', 'Vui lòng nhập tên');
-        isValid = false;
-    }
-
-    // Email
-    if (!email) {
-        showFieldError('err-reg-email', 'Vui lòng nhập email');
-        isValid = false;
-    } else if (!isValidEmail(email)) {
-        showFieldError('err-reg-email', 'Email không đúng định dạng (vd: abc@gmail.com)');
-        isValid = false;
-    }
-
-    // Điện thoại
-    if (!phone) {
-        showFieldError('err-phone', 'Vui lòng nhập số điện thoại');
-        isValid = false;
-    } else if (!isValidPhone(phone)) {
-        showFieldError('err-phone', 'Số điện thoại không hợp lệ (vd: 0912345678)');
-        isValid = false;
-    }
-
-    // Mật khẩu
     if (!pw) {
         showFieldError('err-reg-pw', 'Vui lòng nhập mật khẩu');
         isValid = false;
@@ -646,18 +639,11 @@ function validateRegisterForm() {
         isValid = false;
     }
 
-    // Xác nhận mật khẩu
     if (!pw2) {
         showFieldError('err-reg-pw2', 'Vui lòng xác nhận mật khẩu');
         isValid = false;
     } else if (pw !== pw2) {
         showFieldError('err-reg-pw2', 'Mật khẩu xác nhận không khớp');
-        isValid = false;
-    }
-
-    // Điều khoản
-    if (!terms) {
-        showFieldError('err-terms', 'Bạn cần đồng ý với điều khoản để tiếp tục');
         isValid = false;
     }
 
@@ -671,73 +657,59 @@ function validateRegisterForm() {
 async function handleRegister() {
     if (!validateRegisterForm()) return;
 
-    const email     = document.getElementById('reg-email').value.trim();
-    const phone     = document.getElementById('reg-phone').value.trim();
-    const pw        = document.getElementById('reg-pw').value;
-    const lastName  = document.getElementById('reg-lastname').value.trim();
-    const firstName = document.getElementById('reg-firstname').value.trim();
+    const username = document.getElementById('reg-username').value.trim();
+    const pw       = document.getElementById('reg-pw').value;
 
     setBtnLoading('btn-register', true);
     setLoading(true);
 
     try {
-        // 1. Kiểm tra email đã tồn tại chưa (GET)
+        // 1. Kiểm tra username đã tồn tại chưa
         const members = await apiGetMembers();
-        const existing = members.find(m => m.email && m.email.toLowerCase() === email.toLowerCase());
+        const existing = members.find(m => m.username && m.username.toLowerCase() === username.toLowerCase());
 
         if (existing) {
-            showFieldError('err-reg-email', 'Email này đã được đăng ký. Hãy thử đăng nhập.');
+            showFieldError('err-reg-username', 'Tên đăng nhập đã được dùng. Hãy chọn tên khác.');
             setBtnLoading('btn-register', false);
             setLoading(false);
             return;
         }
 
-        // 2. Tạo member mới (POST)
+        // 2. Tạo member mới
         const newMember = {
-            email: email,
-            password: hashPassword(pw),
-            firstName: firstName,
-            lastName: lastName,
-            phone: phone,
-            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName + '+' + lastName)}&background=2D5A3D&color=fff`,
+            username:  username,
+            password:  hashPassword(pw),
+            name:      username,
+            avatar:    '',
             createdAt: new Date().toISOString(),
-            role: 'user'
+            role:      'user'
         };
 
         const created = await apiCreateMember(newMember);
 
         // 3. Lưu session
         const sessionUser = {
-            id: created.id,
-            name: `${firstName} ${lastName}`,
-            email: email,
-            avatar: newMember.avatar,
-            role: 'user'
+            id:     created.id,
+            name:   username,
+            email:  '',
+            avatar: '',
+            role:   'user'
         };
         localStorage.setItem('currentUser', JSON.stringify(sessionUser));
 
         // 4. Reset form
-        ['reg-lastname','reg-firstname','reg-email','reg-phone','reg-pw','reg-pw2'].forEach(id => {
+        ['reg-username', 'reg-pw', 'reg-pw2'].forEach(id => {
             document.getElementById(id).value = '';
         });
-        document.getElementById('reg-terms').checked = false;
         document.getElementById('pw-strength').classList.remove('show');
 
-        // 5. Thông báo & chuyển về tab login (jQuery slideDown effect)
         setLoading(false);
         setBtnLoading('btn-register', false);
-        showAuthToast(`🎉 Tạo tài khoản thành công! Xin chào, ${firstName}!`, 'success');
+        showAuthToast(`🎉 Tạo tài khoản thành công! Xin chào, ${username}!`, 'success');
 
-        // jQuery: hiệu ứng thành công rồi chuyển tab
         setTimeout(() => {
             switchTab('login');
-            // jQuery: tự điền email vào form login
-            $('#login-email').val(email).trigger('focus');
-            // jQuery slideDown để hiển thị gợi ý
-            $('<div id="login-prefill-tip" class="d-flex align-items-center gap-2 p-2 mb-3" style="background:#E8F2EB;border-radius:10px;font-size:13px;color:#2D5A3D"><i class="bx bx-check-circle"></i>Email đã được điền sẵn. Hãy nhập mật khẩu để đăng nhập!</div>')
-                .insertBefore('#login-email').closest('.form-group')
-                .parent()
-                .prepend($('<div id="login-prefill-tip" class="d-flex align-items-center gap-2 p-2 mb-2" style="background:#E8F2EB;border-radius:10px;font-size:13px;color:#2D5A3D;display:none"><i class="bx bx-check-circle"></i> Email đã được điền sẵn. Hãy nhập mật khẩu!</div>').slideDown(400));
+            $('#login-username').val(username).trigger('focus');
         }, 1500);
 
     } catch (err) {
@@ -758,36 +730,27 @@ async function handleRegister() {
  */
 function validateLoginForm() {
     let isValid = true;
-    clearFieldError('err-login-email');
+    clearFieldError('err-login-username');
     clearFieldError('err-login-pw');
 
-    const email = document.getElementById('login-email').value.trim();
-    const pw    = document.getElementById('login-pw').value;
+    const username = document.getElementById('login-username').value.trim();
+    const pw       = document.getElementById('login-pw').value;
 
-    if (!email) {
-        showFieldError('err-login-email', 'Vui lòng nhập email');
-        isValid = false;
-    } else if (!isValidEmail(email)) {
-        showFieldError('err-login-email', 'Email không đúng định dạng');
+    if (!username) {
+        showFieldError('err-login-username', 'Vui lòng nhập tên đăng nhập');
         isValid = false;
     }
-
     if (!pw) {
         showFieldError('err-login-pw', 'Vui lòng nhập mật khẩu');
         isValid = false;
     }
-
     return isValid;
 }
 
-/**
- * Xử lý đăng nhập
- * Kiểm tra tài khoản từ MockAPI
- */
 async function handleLogin() {
     if (!validateLoginForm()) return;
 
-    const email    = document.getElementById('login-email').value.trim();
+    const username = document.getElementById('login-username').value.trim();
     const pw       = document.getElementById('login-pw').value;
     const remember = document.getElementById('login-remember').checked;
 
@@ -795,52 +758,38 @@ async function handleLogin() {
     setLoading(true);
 
     try {
-        // GET danh sách members và tìm tài khoản
         const members = await apiGetMembers();
         const member = members.find(m =>
-            m.email && m.email.toLowerCase() === email.toLowerCase() &&
+            m.username && m.username.toLowerCase() === username.toLowerCase() &&
             m.password === hashPassword(pw)
         );
 
         if (!member) {
             setLoading(false);
             setBtnLoading('btn-login', false);
-
-            // Kiểm tra email có tồn tại không
-            const emailExists = members.find(m => m.email && m.email.toLowerCase() === email.toLowerCase());
-            if (emailExists) {
+            const usernameExists = members.find(m => m.username && m.username.toLowerCase() === username.toLowerCase());
+            if (usernameExists) {
                 showFieldError('err-login-pw', 'Mật khẩu không đúng. Vui lòng thử lại.');
-                // jQuery: shake effect
                 $('#login-pw').closest('.input-wrap').addClass('animate__animated animate__shakeX');
             } else {
-                showFieldError('err-login-email', 'Email chưa được đăng ký. Hãy tạo tài khoản mới.');
+                showFieldError('err-login-username', 'Tên đăng nhập chưa được đăng ký.');
             }
             return;
         }
 
-        // Đăng nhập thành công
         const sessionUser = {
-            id: member.id,
-            name: `${member.firstName || ''} ${member.lastName || ''}`.trim() || member.email,
-            email: member.email,
-            avatar: member.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.firstName || 'User')}&background=2D5A3D&color=fff`,
-            role: member.role || 'user'
+            id:     member.id,
+            name:   member.name || member.username,
+            email:  member.email || '',
+            avatar: member.avatar || '',
+            role:   member.role || 'user'
         };
 
-        // Lưu session
-        if (remember) {
-            localStorage.setItem('currentUser', JSON.stringify(sessionUser));
-            localStorage.setItem('rememberLogin', '1');
-        } else {
-            sessionStorage.setItem('currentUser', JSON.stringify(sessionUser));
-            localStorage.removeItem('rememberLogin');
-        }
+        saveSession(sessionUser, remember);
 
         setLoading(false);
         setBtnLoading('btn-login', false);
-        showAuthToast(`Xin chào, ${sessionUser.name.split(' ').pop()}! 👋`, 'success');
-
-        // Chuyển hướng sau 1.2s
+        showAuthToast(`Xin chào, ${sessionUser.name}! 👋`, 'success');
         setTimeout(() => { window.location.href = 'index.html'; }, 1200);
 
     } catch (err) {
@@ -1083,18 +1032,17 @@ function disconnectGoogle() {
 // ============================================================
 $(document).ready(function() {
     // jQuery event: xóa lỗi khi người dùng bắt đầu nhập
-    $('#login-email').on('input', function() { clearFieldError('err-login-email'); });
+    $('#login-username').on('input', function() { clearFieldError('err-login-username'); });
     $('#login-pw').on('input', function() { clearFieldError('err-login-pw'); });
-    $('#reg-email').on('input', function() { clearFieldError('err-reg-email'); });
-    $('#reg-lastname').on('input', function() { clearFieldError('err-lastname'); });
-    $('#reg-firstname').on('input', function() { clearFieldError('err-firstname'); });
-    $('#reg-phone').on('input', function() { clearFieldError('err-phone'); });
+    $('#reg-username').on('input', function() { clearFieldError('err-reg-username'); });
     $('#reg-pw').on('input', function() { clearFieldError('err-reg-pw'); });
     $('#reg-pw2').on('input', function() { clearFieldError('err-reg-pw2'); });
-    $('#reg-terms').on('change', function() { if ($(this).is(':checked')) clearFieldError('err-terms'); });
 
     // jQuery: Enter key để submit
     $('#login-pw').on('keydown', function(e) {
+        if (e.key === 'Enter') handleLogin();
+    });
+    $('#login-username').on('keydown', function(e) {
         if (e.key === 'Enter') handleLogin();
     });
     $('#reg-pw2').on('keydown', function(e) {
