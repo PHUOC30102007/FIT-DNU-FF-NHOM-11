@@ -398,8 +398,7 @@
 const GOOGLE_CLIENT_ID = '1014023750706-f9marjiuupk68t2dtd1r5pd1iuojm4ii.apps.googleusercontent.com';
 
 // MockAPI endpoint cho members (tài khoản người dùng)
-// Schema: id, email, password, firstName, lastName, phone, createdAt, avatar
-const MEMBERS_API = 'https://6a157e8991ff9a63de083fe6.mockapi.io/api/v1';
+const MEMBERS_API = 'https://6a157e8991ff9a63de083fe6.mockapi.io/api/v1/members';
 
 // ── State ──────────────────────────────────────────────────
 let googleUser = null;
@@ -873,7 +872,7 @@ async function continueRegisterWithGoogle() {
     setLoading(true);
     try {
         // Kiểm tra đã tồn tại chưa
-        const existing = await fetch(`${MEMBERS_API}/members?email=${encodeURIComponent(regGoogleUser.email)}`);
+        const existing = await fetch(`${MEMBERS_API}?email=${encodeURIComponent(regGoogleUser.email)}`);
         const list = await existing.json();
         if (Array.isArray(list) && list.length > 0) {
             // Đã có tài khoản → đăng nhập luôn
@@ -894,7 +893,7 @@ async function continueRegisterWithGoogle() {
             googleId: regGoogleUser.id,
             createdAt: new Date().toISOString()
         };
-        await fetch(`${MEMBERS_API}/members`, {
+        await fetch(MEMBERS_API, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newMember)
